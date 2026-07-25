@@ -1,0 +1,128 @@
+﻿{
+  "$schema": "https://www.codebuddy.cn/docs/cli/settings",
+  "permissions": {
+    "allow": [
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git branch*)",
+      "Bash(git rev-parse*)",
+      "Bash(ls *)",
+      "Bash(dir *)",
+      "Bash(python -m json.tool*)",
+      "Bash(python -m pytest*)",
+      "Bash(py -m pytest*)",
+      "Bash(npx jest*)",
+      "Bash(jest*)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(git push --force*)",
+      "Bash(git push -f *)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -f*)",
+      "Bash(sudo *)",
+      "Bash(chmod 777*)",
+      "Bash(*>.env*)",
+      "Bash(cat *.env*)",
+      "Bash(type *.env*)",
+      "Read(**/.env*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .codebuddy/hooks/cs-session-start.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .codebuddy/hooks/cs-sdd-cache-pre.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .codebuddy/hooks/cs-simplify-ignore.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "WebFetch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .codebuddy/hooks/cs-sdd-cache-post.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .codebuddy/hooks/cs-simplify-ignore.sh",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "bash .codebuddy/hooks/cs-grill-reminder.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .codebuddy/hooks/cs-simplify-ignore.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "excludedCommands": [
+      "git",
+      "docker",
+      "rm",
+      "curl"
+    ]
+  },
+  "mcpServers": {
+    "codebuddy": {
+      "command": "npx",
+      "args": [
+        "codebuddy",
+        "mcp",
+        "stdio"
+      ],
+      "description": "codebuddy MCP Server — AI-native game development toolchain"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+---
+description: "Run a web performance audit via the web-performance-auditor persona / 通过Web性能审计角色运行Web性能审计"
+---
+
+`/webperf` targets web applications specifically. Do not use it for utility libraries, CLIs, or server-only code with no browser-facing output.
+
+## Determine the mode
+
+**Deep mode** — activate when any of these is available:
+- A Lighthouse JSON report file
+- A PageSpeed Insights JSON response (includes Lighthouse + CrUX)
+- A CrUX API response
+- A DevTools performance trace
+- A live URL plus `chrome-devtools` MCP server configured
+- Chrome DevTools MCP CLI invoked locally
+
+**Quick mode** — default when none of the above are available. The agent scans source code for structural anti-patterns and labels every finding as `potential impact`.
+
+## Run the audit
+
+Spawn the `cs-web-perf-auditor` subagent. Pass it:
+- The files, components, or diff under review
+- Any artifact paths or pasted JSON content
+- The target URL or page name when known
+- Which mode you expect (Quick or Deep)
+
+The subagent returns a scorecard (only populated with sourced values), a ranked list of findings, positive observations, and proactive recommendations.
