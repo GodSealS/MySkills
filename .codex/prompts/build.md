@@ -1,0 +1,44 @@
+﻿---
+description: "Implement tasks incrementally — build, test, verify, commit. Add \"auto\" to run the whole plan in one approved pass. / 增量实现任务——构建、测试、验证、提交。添加\"auto\"一次性执行完整计划。"
+argument-hint: "[args]"
+---
+
+Invoke `cs-incremental` alongside `cs-tdd`.
+
+## Modes
+
+- **`/build`** — implement the *next* pending task, then stop (careful, one slice at a time).
+- **`/build auto`** — generate the plan if needed, get a single approval, then implement *every* task without stopping between them.
+
+`$ARGUMENTS` selects the mode. Treat `auto` or `all` as autonomous mode; anything else (or empty) is the default single-task mode.
+
+## Default: one task
+
+Pick the next pending task from the plan. Then:
+
+1. Read the task's acceptance criteria
+2. Load relevant context (existing code, patterns, types)
+3. Write a failing test for the expected behavior (RED)
+4. Implement the minimum code to pass the test (GREEN)
+5. Run the full test suite to check for regressions
+6. Run the build to verify compilation
+7. Commit with a descriptive message
+8. Mark the task complete and stop
+
+## Autonomous: the whole plan (`/build auto`)
+
+Use this once a spec exists and you want to collapse plan + build into one run. It removes the manual stepping between tasks — **not** the verification. Every task still earns a passing test and its own commit.
+
+1. **Require a spec.** Look for `SPEC.md` at repo root, `docs/SPEC.md`, or under `spec/`. If none exists, stop and tell the user to run `/spec` first.
+2. **Require a Grill Review decision.** The selected spec must contain `## Grill Review` with either completed `/grill-me` findings and a decision, or an explicit skip plus accepted risks. Otherwise stop and direct the user to complete or formally skip the review.
+3. **Establish a clean baseline.** Run `git status --porcelain`. If there are uncommitted changes outside planning artifacts, stop and ask the user to commit, stash, or confirm.
+4. **Plan if needed.** If no `tasks/plan.md`, invoke `cs-planning` to generate one.
+5. **Single checkpoint.** Present the full plan and wait for an unambiguous affirmative. This is the only human gate — after approval, run autonomously.
+6. **Execute every task in dependency order.** For each task, run RED → GREEN → regression → build → commit → mark complete. Stage only the files that task touched — make one commit per task.
+7. **Stop and ask the user** when:
+   - A test can't be made to pass → follow `cs-debugging`
+   - The spec is ambiguous or a task needs an uncovered decision
+   - A task is high-risk or irreversible → follow `cs-doubt-driven` and get explicit sign-off
+8. **Summarize at the end:** tasks completed, tests added, commits made, anything skipped.
+
+If any step fails, follow `cs-debugging`.
