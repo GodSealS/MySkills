@@ -28,7 +28,7 @@ $SrcCommands = Join-Path $Repo '.codebuddy\commands'
 $SrcRefs     = Join-Path $Repo '.codebuddy\references'
 
 # Skills that are CodeBuddy-only (heavy binary assets, browser tooling, or MCP routing).
-$ExcludeSkills = @('cs-huashu-design', 'cs-code-query')
+$ExcludeSkills = @('cs-huashu-design')
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -61,6 +61,10 @@ function Fix-Refs($text) {
     # Normalize every reference link to ../../references/<file> so it resolves from
     # skills/<name>/, .gemini/skills/<name>/ and .agents/skills/<name>/ (all 2 levels deep).
     $text = $text -replace '(?i)\S*references/([A-Za-z0-9_\-]+\.md)', '../../references/$1'
+    # cs-code-query references its own sub-files via an absolute .codebuddy path.
+    # Rewrite to a relative path so it resolves from within the skill directory
+    # (skills/cs-code-query/, .gemini/skills/cs-code-query/, .agents/skills/cs-code-query/).
+    $text = $text -replace '\.codebuddy/skills/code-query/', ''
     return $text
 }
 

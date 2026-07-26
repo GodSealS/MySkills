@@ -1,8 +1,6 @@
----
+﻿---
 name: code-query
 description: "Routes all code-related queries to the project knowledge graph. Supports three backends: CodeGraph (recommended), Understand-Anything, and Graphify. Provides create, query, and update operations for each. / 将所有代码相关查询路由到项目知识图谱，支持三种后端：CodeGraph（推荐）、Understand-Anything、Graphify，每种后端提供创建、查询、更新操作。"
-argument-hint: "[query about code | create | update] [--kb CG|US|GR]  (CG=codegraph, US=understand-anything, GR=graphify; omit to auto-match)"
-allowed-tools: Read, Glob, Grep, Bash, ListDir
 model: DeepSeek-V4-Pro
 ---
 
@@ -71,12 +69,12 @@ If NO knowledge base directory exists:
 
    > 项目尚未配置任何知识图谱。推荐安装 **CodeGraph**（最快、最省资源、100%本地运行）。
    >
-   > 安装命令详见 `.codebuddy/skills/code-query/<kb>/create.md`，或参考 README.md「本地知识库集成」章节。
+   > 安装命令详见 `<kb>/create.md`，或参考 README.md「本地知识库集成」章节。
    >
    > 请选择：codegraph / understand-anything / graphify
 
 4. **After user selects a KB**, load and execute the corresponding `create.md`:
-   - `Read .codebuddy/skills/code-query/<kb>/create.md`
+   - `Read <kb>/create.md`
    - Follow its instructions to install (if needed) and initialize the KB
    - **Completion criterion**: Verify the KB directory exists via `ListDir`, then remind: **知识图谱已就绪，可以开始查询了！**
 
@@ -119,7 +117,7 @@ create it before querying.
 Once KB and operation are determined, read the corresponding sub-file:
 
 ```
-Read: .codebuddy/skills/code-query/<kb>/<operation>.md
+Read: <kb>/<operation>.md
 ```
 
 Then follow its instructions exactly. Load only the sub-file needed for the current operation.
