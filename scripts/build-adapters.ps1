@@ -28,7 +28,8 @@ $SrcCommands = Join-Path $Repo '.codebuddy\commands'
 $SrcRefs     = Join-Path $Repo '.codebuddy\references'
 
 # Skills that are CodeBuddy-only (heavy binary assets, browser tooling, or MCP routing).
-$ExcludeSkills = @('cs-huashu-design')
+# (None currently excluded; cs-huashu-design and cs-code-query now sync to all platforms.)
+$ExcludeSkills = @()
 
 # ---------------------------------------------------------------------------
 # Helpers
