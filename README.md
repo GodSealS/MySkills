@@ -47,7 +47,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install.ps1 -Target 
 Project-level (auto-discovered from the repo) — just keep `.gemini/` in your project root.
 For a global install:
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install.ps1 -Target gemini -Home
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install.ps1 -Target gemini -UserHome
 ```
 Or use Gemini's own installer against the canonical tree:
 ```bash
@@ -56,14 +56,17 @@ gemini skills install ./skills
 
 ### Codex
 Project-level — keep `.agents/`, `.codex/`, and `AGENTS.md` in your project root (Codex
-auto-discovers `.agents/skills` and `AGENTS.md`). For a global install:
+auto-discovers `.agents/skills` and `AGENTS.md`). For a global install, skills are registered in
+`~/.codex/skills`; existing files not owned by this pack are preserved:
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install.ps1 -Target codex -Home
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install.ps1 -Target codex -UserHome
 ```
+`-Clean` is deliberately ignored for user-level installs so it cannot delete other Codex skills
+or configuration.
 
 Install everything at once:
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install.ps1 -Target all -Home
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install.ps1 -Target all -UserHome
 ```
 
 ## Regenerate adapters
@@ -71,8 +74,8 @@ After editing anything under `.codebuddy/`, rebuild the platform trees:
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-adapters.ps1
 ```
-`cs-huashu-design` (CodeBuddy-only, browser/asset dependent) and `cs-code-query` (CodeBuddy/MCP-routing)
-are excluded from the neutral adapters.
+`cs-huashu-design` (browser/asset dependent) and `cs-code-query` (MCP-routing)
+are now synced to all platform adapters.
 
 ## Skill phases
 Define: cs-interview-me, cs-idea-refine, cs-grill-me, cs-spec-driven

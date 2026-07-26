@@ -27,8 +27,8 @@ $SrcAgents   = Join-Path $Repo '.codebuddy\agents'
 $SrcCommands = Join-Path $Repo '.codebuddy\commands'
 $SrcRefs     = Join-Path $Repo '.codebuddy\references'
 
-# Skills that are CodeBuddy-only (heavy binary assets, browser tooling, or MCP routing).
-# (None currently excluded; cs-huashu-design and cs-code-query now sync to all platforms.)
+# Skills excluded from neutral adapters.
+# (None currently excluded — all skills sync to all platforms.)
 $ExcludeSkills = @()
 
 # ---------------------------------------------------------------------------
@@ -134,7 +134,11 @@ Write-Host "Agents: $((Get-ChildItem -Path $SrcAgents -File).Count) -> agents/ .
 
 # ---------------------------------------------------------------------------
 # 4. Commands
-#    canonical commands/*.md ; Gemini .gemini/commands/*.toml ; Codex .codex/prompts/*.md
+#    canonical commands/*.md ; Gemini .gemini/commands/*.toml
+#
+#    Codex renders files in .codex/prompts/ in its slash-command menu. Those
+#    entries must therefore use the actual skill names, not this pack's legacy
+#    workflow aliases (build, plan, review, ...).
 # ---------------------------------------------------------------------------
 $dstCmdCanon = Join-Path $Repo 'commands'
 $dstCmdGem   = Join-Path $Repo '.gemini\commands'
@@ -160,10 +164,27 @@ foreach ($cmd in (Get-ChildItem -Path $SrcCommands -File -Filter *.md)) {
     $toml = "description = `"$descEsc`"`n`nprompt = $promptStr`n"
     Set-Content -NoNewline -Path (Join-Path $dstCmdGem "$base.toml") -Value $toml -Encoding UTF8
 
-    # Codex prompt (markdown, frontmatter description + argument-hint)
-    $codexPrompt = "---`ndescription: `"$desc`"`nargument-hint: `"[args]`"`n---`n`n$body"
-    Set-Content -NoNewline -Path (Join-Path $dstCmdCodex "$base.md") -Value $codexPrompt -Encoding UTF8
 }
-Write-Host "Commands: $((Get-ChildItem -Path $SrcCommands -File -Filter *.md).Count) -> commands/ .gemini/commands/ .codex/prompts/"
+Write-Host "Commands: $((Get-ChildItem -Path $SrcCommands -File -Filter *.md).Count) -> commands/ .gemini/commands/"
+
+# Codex slash commands are a thin launch surface for each auto-discovered
+# skill. Keep the body deliberately small so SKILL.md remains the single source
+# of truth for each workflow.
+foreach ($sd in $skillDirs) {
+    $definition = Join-Path $sd.FullName 'SKILL.md'
+    if (-not (Test-Path $definition)) {
+        Write-Warning "Skill definition missing, skipped Codex prompt: $definition"
+        continue
+    }
+
+    $raw = Get-Content -Raw -Path $definition
+    $skillName = if ($raw -match '(?m)^name:\s*(.+?)\s*$') { $matches[1].Trim().Trim('"') } else { $sd.Name }
+    $skillDesc = if ($raw -match '(?m)^description:\s*(.+?)\s*$') { $matches[1].Trim().Trim('"') } else { $skillName }
+    $skillDesc = $skillDesc.Replace('"', '\"')
+
+    $codexPrompt = "---`ndescription: `"$skillDesc`"`nargument-hint: `"[args]`"`n---`n`nInvoke the $skillName skill and follow its workflow for: `$ARGUMENTS"
+    Set-Content -NoNewline -Path (Join-Path $dstCmdCodex "$skillName.md") -Value $codexPrompt -Encoding UTF8
+}
+Write-Host "Codex prompts: $($skillDirs.Count) skill names -> .codex/prompts/"
 
 Write-Host "`nDone. Adapter tree built under $Repo"

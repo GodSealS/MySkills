@@ -5,18 +5,18 @@
 .DESCRIPTION
   -Target codebuddy  -> install .codebuddy/ (skills/agents/commands/references/hooks + AGENTS.md/settings.json/CODEBUDDY.md)
   -Target gemini     -> install .gemini/ + GEMINI.md
-  -Target codex      -> install .agents/ + .codex/ + AGENTS.md
+  -Target codex      -> install project adapters, or register skills under ~/.codex/skills
   -Target all        -> all of the above
 
   By default -Destination is the current directory (a project root). Use -UserHome to install into
-  the user's home config directory (~/.codebuddy, ~/.gemini, ~/.agents, ~/.codex).
+  the user's home config directory (~/.codebuddy, ~/.gemini, ~/.codex).
 
   Install mode:
     -Merge (default)  Merge into the destination. Only the pack's own files/subdirs are written;
                       pre-existing destination files (e.g. graphify user skills) are preserved.
                       Safe for user-level config dirs.
-    -Clean            Replace the destination completely (delete first). Use only for a fresh
-                      project root or when you intentionally want to wipe the target.
+    -Clean            Replace generated platform directories for project installs. It is
+                      intentionally downgraded to a safe merge for user-level installs.
 
   Example:
     powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install.ps1 -Target codebuddy -UserHome
@@ -28,6 +28,7 @@ param(
     [string]$Target = 'all',
     [string]$Destination = '.',
     [switch]$UserHome,
+    [string]$UserHomePath,
     [switch]$Merge,
     [switch]$Clean
 )
@@ -36,11 +37,10 @@ $ErrorActionPreference = 'Stop'
 $Repo = Resolve-Path (Join-Path $PSScriptRoot '..')
 
 if ($UserHome) {
-    $homeBase = $env:USERPROFILE
+    $homeBase = if ($UserHomePath) { [System.IO.Path]::GetFullPath($UserHomePath) } elseif ($env:USERPROFILE) { $env:USERPROFILE } else { $HOME }
     $destCodebuddy = Join-Path $homeBase '.codebuddy'
     $destGemini    = Join-Path $homeBase '.gemini'
     $destCodex     = Join-Path $homeBase '.codex'
-    $destAgents    = Join-Path $homeBase '.agents'
     $destRoot      = $homeBase
 } else {
     $destCodebuddy = Join-Path $Destination '.codebuddy'
@@ -90,7 +90,91 @@ function Copy-File($src, $dst, [string]$label) {
     Write-Host "Installed $label -> $dst"
 }
 
+function Get-Sha256($path) {
+    return (Get-FileHash -Algorithm SHA256 -LiteralPath $path).Hash
+}
+
+function Read-CodexManifest($path) {
+    $known = @{}
+    if (-not (Test-Path $path)) { return $known }
+
+    try {
+        $manifest = Get-Content -Raw -Path $path | ConvertFrom-Json
+        foreach ($entry in @($manifest.files)) {
+            if ($entry.path -and $entry.sha256) { $known[$entry.path] = $entry.sha256 }
+        }
+    } catch {
+        Write-Warning "Ignoring unreadable Codex install manifest: $path"
+    }
+    return $known
+}
+
+function Install-CodexUserFile($src, $dst, [string]$key, $known, $next) {
+    $sourceHash = Get-Sha256 $src
+    $install = -not (Test-Path -LiteralPath $dst)
+
+    if (-not $install) {
+        $destinationHash = Get-Sha256 $dst
+        $install = ($destinationHash -eq $sourceHash) -or
+            ($known.ContainsKey($key) -and $known[$key] -eq $destinationHash)
+
+        if (-not $install) {
+            Write-Warning "Skipped existing user Codex file (not owned by this pack): $dst"
+            return
+        }
+    }
+
+    $parent = Split-Path -Parent $dst
+    if (-not (Test-Path -LiteralPath $parent)) { New-Item -ItemType Directory -Force -Path $parent | Out-Null }
+    Copy-Item -Force -LiteralPath $src -Destination $dst
+    $next[$key] = $sourceHash
+}
+
+function Install-CodexUserTree($src, $dst, [string]$prefix, $known, $next) {
+    if (-not (Test-Path $src)) { Write-Warning "Source missing, skipped: $src"; return }
+
+    foreach ($file in (Get-ChildItem -Path $src -File -Recurse)) {
+        $relativePath = $file.FullName.Substring($src.Length).TrimStart('\', '/')
+        $key = ($prefix + '/' + $relativePath).Replace('\', '/')
+        Install-CodexUserFile $file.FullName (Join-Path $dst $relativePath) $key $known $next
+    }
+}
+
+function Install-CodexUserSkills($src, $dst, $known, $next) {
+    if (-not (Test-Path $src)) { Write-Warning "Source missing, skipped: $src"; return }
+
+    foreach ($skill in (Get-ChildItem -Path $src -Directory)) {
+        $key = ('skills/' + $skill.Name + '/SKILL.md')
+        $sourceDefinition = Join-Path $skill.FullName 'SKILL.md'
+        $destinationDefinition = Join-Path (Join-Path $dst $skill.Name) 'SKILL.md'
+
+        # A skill directory is a single ownership unit. Do not blend the pack's
+        # auxiliary files into a user-maintained skill with the same name.
+        if ((Test-Path -LiteralPath $destinationDefinition) -and
+            ((Get-Sha256 $sourceDefinition) -ne (Get-Sha256 $destinationDefinition)) -and
+            (-not ($known.ContainsKey($key) -and $known[$key] -eq (Get-Sha256 $destinationDefinition)))) {
+            Write-Warning "Skipped existing user Codex skill (not owned by this pack): $($skill.Name)"
+            continue
+        }
+
+        Install-CodexUserTree $skill.FullName (Join-Path $dst $skill.Name) ('skills/' + $skill.Name) $known $next
+    }
+}
+
+function Write-CodexManifest($path, $files) {
+    $entries = foreach ($key in ($files.Keys | Sort-Object)) {
+        [ordered]@{ path = $key; sha256 = $files[$key] }
+    }
+    $manifest = [ordered]@{ version = 1; files = @($entries) }
+    Set-Content -Path $path -Value ($manifest | ConvertTo-Json -Depth 3) -Encoding UTF8
+}
+
 # Resolve install mode. -Clean wins; otherwise -Merge (incl. default) merges.
+if ($Clean -and $UserHome) {
+    Write-Warning '-Clean is disabled for user-level installs to preserve existing skills and configuration.'
+    $Clean = $false
+}
+
 if ($Clean) {
     $mode = 'Replace'
     $DirCopy = ${function:Replace-Platform}
@@ -117,15 +201,30 @@ if ($doCodebuddy) {
     Copy-File (Join-Path $Repo '.codebuddy\settings.json')  (Join-Path $destCodebuddy 'settings.json')  'CodeBuddy/settings.json'
     Copy-File (Join-Path $Repo '.codebuddy\CODEBUDDY.md')   (Join-Path $destCodebuddy 'CODEBUDDY.md')   'CodeBuddy/CODEBUDDY.md'
 }
-# Gemini / Codex: generated platform dirs. Obey the selected mode (merge/clean).
+# Gemini: generated platform dir. Obey the selected mode (merge/clean).
 if ($doGemini) {
     & $DirCopy (Join-Path $Repo '.gemini') $destGemini 'Gemini'
     Copy-File (Join-Path $Repo 'GEMINI.md') (Join-Path $destRoot 'GEMINI.md') 'GEMINI.md'
 }
 if ($doCodex) {
-    & $DirCopy (Join-Path $Repo '.agents') $destAgents 'Codex skills'
-    & $DirCopy (Join-Path $Repo '.codex')  $destCodex  'Codex prompts/agents'
-    Copy-File (Join-Path $Repo 'AGENTS.md') (Join-Path $destRoot 'AGENTS.md') 'AGENTS.md'
+    if ($UserHome) {
+        # Codex discovers global skills from ~/.codex/skills, not ~/.agents/skills.
+        # Keep a manifest so pack updates never overwrite an unrelated or edited file.
+        $manifestPath = Join-Path $destCodex '.agent-skills-manifest.json'
+        $known = Read-CodexManifest $manifestPath
+        $next = @{}
+        Install-CodexUserSkills (Join-Path $Repo '.agents\skills') (Join-Path $destCodex 'skills') $known $next
+        Install-CodexUserTree (Join-Path $Repo '.agents\references') (Join-Path $destCodex 'references') 'references' $known $next
+        Install-CodexUserTree (Join-Path $Repo '.codex\prompts') (Join-Path $destCodex 'prompts') 'prompts' $known $next
+        Install-CodexUserTree (Join-Path $Repo '.codex\agents') (Join-Path $destCodex 'agents') 'agents' $known $next
+        Install-CodexUserFile (Join-Path $Repo 'AGENTS.md') (Join-Path $destCodex 'AGENTS.md') 'AGENTS.md' $known $next
+        Write-CodexManifest $manifestPath $next
+        Write-Host "Installed Codex user-level adapters -> $destCodex"
+    } else {
+        & $DirCopy (Join-Path $Repo '.agents') $destAgents 'Codex skills'
+        & $DirCopy (Join-Path $Repo '.codex')  $destCodex  'Codex prompts/agents'
+        Copy-File (Join-Path $Repo 'AGENTS.md') (Join-Path $destRoot 'AGENTS.md') 'AGENTS.md'
+    }
 }
 
 Write-Host "`nDone."
