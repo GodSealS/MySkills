@@ -5,7 +5,7 @@
 **本 skill 的能力覆盖**：
 - **HTML 演示版（基础产物，永远默认必做）** → 每页独立 HTML + `assets/deck_index.html` 聚合，浏览器里键盘翻页、全屏演讲
 - HTML → PDF 导出 → `scripts/export_deck_pdf.mjs` / `scripts/export_deck_stage_pdf.mjs`
-- HTML → 可编辑 PPTX 导出 → ../../references/editable-pptx.md` + `scripts/html2pptx.js` + `scripts/export_deck_pptx.mjs`（要求 HTML 按 4 条硬约束写）
+- HTML → 可编辑 PPTX 导出 → `references/editable-pptx.md` + `scripts/html2pptx.js` + `scripts/export_deck_pptx.mjs`（要求 HTML 按 4 条硬约束写）
 
 > **⚠️ HTML 是基础，PDF/PPTX 是衍生物。** 不管最终交付什么格式，都**必须**先做 HTML 聚合演示版（`index.html` + `slides/*.html`），它是幻灯片作品的「源」。PDF/PPTX 是从 HTML 一行命令导出的快照。
 >
@@ -76,7 +76,7 @@ PPTX 可编辑的前提是 `html2pptx.js` 能把 DOM 逐元素翻译为 PowerPoi
 
 ### 事后才知道要 PPTX 怎么办（紧急补救）
 
-极个别情况：HTML 已经写好了才发现要 PPTX。推荐走 **fallback 流程**（完整说明见 ../../references/editable-pptx.md` 末尾「Fallback：已有视觉稿但用户坚持要 editable PPTX」）：
+极个别情况：HTML 已经写好了才发现要 PPTX。推荐走 **fallback 流程**（完整说明见 `references/editable-pptx.md` 末尾「Fallback：已有视觉稿但用户坚持要 editable PPTX」）：
 
 1. **首选：改出 PDF**（视觉 100% 保留，跨平台，接收方能看能印）—— 如果接收方实际需求是「演讲/存档」，PDF 就是最佳交付物
 2. **次选：AI 以视觉稿为蓝本，重写一版 editable HTML** → 导出 editable PPTX —— 保留色彩/布局/文案的设计决策，牺牲渐变、web component、复杂 SVG 等视觉能力
@@ -661,7 +661,7 @@ node scripts/export_deck_pptx.mjs --slides <dir> --out deck.pptx
 
 工作原理：`html2pptx` 逐元素读 computedStyle 把 DOM 翻译成 PowerPoint 对象（text frame / shape / picture）。文字变成真文本框，PPT 里双击即可编辑。
 
-**硬性约束**（HTML 必须满足，否则该页 skip，详细说明见 ../../references/editable-pptx.md`）：
+**硬性约束**（HTML 必须满足，否则该页 skip，详细说明见 `references/editable-pptx.md`）：
 - 所有文字必须在 `<p>`/`<h1>`-`<h6>`/`<ul>`/`<ol>` 里（禁止裸文本 div）
 - `<p>`/`<h*>` 标签自身不能有 background/border/shadow（放外层 div）
 - 不用 `::before`/`::after` 插入装饰文字（伪元素提不出来）
@@ -709,7 +709,7 @@ node scripts/export_deck_pptx.mjs --slides <dir> --out deck.pptx
 
 ## 导出为可编辑 PPTX 的深度路径（仅长期项目）
 
-如果你的 deck 会长期维护、反复修改、团队协作——建议**一开始就按 html2pptx 约束写 HTML**，这样 `export_deck_pptx.mjs` 可以直接全部 pass。详见 ../../references/editable-pptx.md`（4 条硬约束 + HTML 模板 + 常见错误速查 + 已有视觉稿的 fallback 流程）。
+如果你的 deck 会长期维护、反复修改、团队协作——建议**一开始就按 html2pptx 约束写 HTML**，这样 `export_deck_pptx.mjs` 可以直接全部 pass。详见 `references/editable-pptx.md`（4 条硬约束 + HTML 模板 + 常见错误速查 + 已有视觉稿的 fallback 流程）。
 
 ---
 

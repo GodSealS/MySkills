@@ -1,0 +1,3 @@
+﻿interface:
+  display_name: "CS Security"
+  short_description: "Hardens code against vulnerabilities."

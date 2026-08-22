@@ -1,0 +1,3 @@
+﻿interface:
+  display_name: "CS Using"
+  short_description: "Discovers and invokes agent skills."

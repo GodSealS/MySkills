@@ -1,0 +1,3 @@
+﻿interface:
+  display_name: "CS Code Query"
+  short_description: "Routes all code-related queries to the project knowledge graph."

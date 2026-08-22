@@ -1,0 +1,3 @@
+﻿interface:
+  display_name: "CS Skill Review"
+  short_description: "Use when reviewing a skill, auditing skill quality, checking if a skill follows best practices, or when asked to evaluate a SKILL.md."

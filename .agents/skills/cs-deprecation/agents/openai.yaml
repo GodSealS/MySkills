@@ -1,0 +1,3 @@
+﻿interface:
+  display_name: "CS Deprecation"
+  short_description: "Manages deprecation and migration."

@@ -26,7 +26,7 @@
 **如果用户说"没有"**：
 - 帮他找——翻项目目录、看有没有参考品牌
 - 还没有？明确说："我会基于通用直觉做，但这通常做不出符合你品牌的作品。你考虑下是否先提供一些参考？"
-- ../../references/design-context.md`的fallback策略办
+- 实在要做，就按`references/design-context.md`的fallback策略办
 
 ### 2. Variations维度
 
@@ -148,7 +148,7 @@ HTML文件头部先写你的**assumptions+reasoning comments**，像junior给man
 
 ### Pass 4：验证+交付
 
-- ../../references/verification.md`）
+- 用Playwright截图（见`references/verification.md`）
 - 打开浏览器肉眼确认
 - 总结**极简**：只说caveats和next steps
 

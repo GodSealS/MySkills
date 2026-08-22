@@ -190,7 +190,7 @@ HTML deck 浏览器演讲 · `html2pptx.js` 读 DOM 的 computedStyle 逐元素�
 - `/slides/slide-06b-darwin-flow.html` · 完全独立视觉语言的对照案例
 - `/slides/slide-03b-deepseek-cover.html` · AI slop vs 真实设计师视角的对比页
 
-详细 cinematic patterns 见 ../../references/cinematic-patterns.md`。
+详细 cinematic patterns 见 `references/cinematic-patterns.md`。
 
 ---
 

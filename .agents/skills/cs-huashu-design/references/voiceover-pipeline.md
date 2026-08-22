@@ -3,7 +3,7 @@
 > 把动画从「无声画面 + 后期配音」升级为「**先有解说词，再按音频实测时长驱动画面**」的工作流。
 > 适用：5-20 分钟概念解说视频、教程视频、长篇知识科普。
 >
-> 配套 ../../references/animation-best-practices.md` 使用——本文件管 **怎么把解说和画面对上**，
+> 配套 `references/animation-best-practices.md` 使用——本文件管 **怎么把解说和画面对上**，
 > animation-best-practices 管 **每一帧画面怎么动**。
 
 ---

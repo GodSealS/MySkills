@@ -1,0 +1,3 @@
+﻿interface:
+  display_name: "CS Interview Me"
+  short_description: "Extracts what the user actually wants instead of what they think they should want."

@@ -1,0 +1,3 @@
+﻿interface:
+  display_name: "CS Spec Driven"
+  short_description: "Creates specs before coding."

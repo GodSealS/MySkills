@@ -6,10 +6,11 @@
   -Target codebuddy  -> install .codebuddy/ (skills/agents/commands/references/hooks + AGENTS.md/settings.json/CODEBUDDY.md)
   -Target gemini     -> install .gemini/ + GEMINI.md
   -Target codex      -> install project adapters, or register skills under ~/.codex/skills
+  -Target claude     -> install .claude/ + canonical skills/ + CLAUDE.md, or register skills under ~/.claude/skills
   -Target all        -> all of the above
 
   By default -Destination is the current directory (a project root). Use -UserHome to install into
-  the user's home config directory (~/.codebuddy, ~/.gemini, ~/.codex).
+  the user's home config directory (~/.codebuddy, ~/.gemini, ~/.codex, ~/.claude).
 
   Install mode:
     -Merge (default)  Merge into the destination. Only the pack's own files/subdirs are written;
@@ -24,7 +25,7 @@
 #>
 
 param(
-    [ValidateSet('codex', 'codebuddy', 'gemini', 'all')]
+    [ValidateSet('codex', 'codebuddy', 'gemini', 'claude', 'all')]
     [string]$Target = 'all',
     [string]$Destination = '.',
     [switch]$UserHome,
@@ -41,11 +42,13 @@ if ($UserHome) {
     $destCodebuddy = Join-Path $homeBase '.codebuddy'
     $destGemini    = Join-Path $homeBase '.gemini'
     $destCodex     = Join-Path $homeBase '.codex'
+    $destClaude    = Join-Path $homeBase '.claude'
     $destRoot      = $homeBase
 } else {
     $destCodebuddy = Join-Path $Destination '.codebuddy'
     $destGemini    = Join-Path $Destination '.gemini'
     $destCodex     = Join-Path $Destination '.codex'
+    $destClaude    = Join-Path $Destination '.claude'
     $destAgents    = Join-Path $Destination '.agents'
     $destRoot      = $Destination
 }
@@ -119,7 +122,7 @@ function Install-CodexUserFile($src, $dst, [string]$key, $known, $next) {
             ($known.ContainsKey($key) -and $known[$key] -eq $destinationHash)
 
         if (-not $install) {
-            Write-Warning "Skipped existing user Codex file (not owned by this pack): $dst"
+            Write-Warning "Skipped existing user file (not owned by this pack): $dst"
             return
         }
     }
@@ -153,7 +156,7 @@ function Install-CodexUserSkills($src, $dst, $known, $next) {
         if ((Test-Path -LiteralPath $destinationDefinition) -and
             ((Get-Sha256 $sourceDefinition) -ne (Get-Sha256 $destinationDefinition)) -and
             (-not ($known.ContainsKey($key) -and $known[$key] -eq (Get-Sha256 $destinationDefinition)))) {
-            Write-Warning "Skipped existing user Codex skill (not owned by this pack): $($skill.Name)"
+            Write-Warning "Skipped existing user skill (not owned by this pack): $($skill.Name)"
             continue
         }
 
@@ -187,6 +190,7 @@ Write-Host "Install mode: $mode"
 $doCodebuddy = ($Target -eq 'codebuddy') -or ($Target -eq 'all')
 $doGemini    = ($Target -eq 'gemini')    -or ($Target -eq 'all')
 $doCodex     = ($Target -eq 'codex')     -or ($Target -eq 'all')
+$doClaude    = ($Target -eq 'claude')    -or ($Target -eq 'all')
 
 # CodeBuddy: skills/agents/commands/references/hooks + AGENTS.md/settings.json/CODEBUDDY.md.
 # CodeBuddy skills live in a single flat namespace, so we always MERGE its
@@ -224,6 +228,49 @@ if ($doCodex) {
         & $DirCopy (Join-Path $Repo '.agents') $destAgents 'Codex skills'
         & $DirCopy (Join-Path $Repo '.codex')  $destCodex  'Codex prompts/agents'
         Copy-File (Join-Path $Repo 'AGENTS.md') (Join-Path $destRoot 'AGENTS.md') 'AGENTS.md'
+    }
+}
+
+# Claude Code: project-level uses `.claude/skills/` (Claude auto-discovers
+# skills there), `.claude/commands/` + `.claude/rules/`, optional
+# `.claude-plugin/` for plugin/marketplace discovery, and `CLAUDE.md` for
+# top-level context. User-level installs mirror content into
+# `~/.claude/skills/`, `~/.claude/commands/`, etc., with the same
+# manifest-protection pattern used for Codex to avoid clobbering user-edited
+# skill files.
+if ($doClaude) {
+    $manifestPath = if ($UserHome) { Join-Path $destClaude '.agent-skills-manifest.json' } else { $null }
+
+    if ($UserHome) {
+        $known = if ($manifestPath) { Read-CodexManifest $manifestPath } else { @{} }
+        $next = @{}
+        # Skills: copy each full `skills/<name>/` tree (SKILL.md plus its
+        # references/, assets/, scripts/ etc.) to ~/.claude/skills/<name>/.
+        # Reuses the manifest-protected skill-tree installer shared with Codex.
+        $srcSkillsCanon = Join-Path $Repo 'skills'
+        if (Test-Path $srcSkillsCanon) {
+            $destClaudeSkills = Join-Path $destClaude 'skills'
+            if (-not (Test-Path $destClaudeSkills)) { New-Item -ItemType Directory -Force -Path $destClaudeSkills | Out-Null }
+            Install-CodexUserSkills $srcSkillsCanon $destClaudeSkills $known $next
+        }
+        # Slash commands: ~/.claude/commands/<name>.md
+        Install-CodexUserTree (Join-Path $Repo '.claude\commands') (Join-Path $destClaude 'commands') 'commands' $known $next
+        # Rules: ~/.claude/rules/<name>.md
+        Install-CodexUserTree (Join-Path $Repo '.claude\rules') (Join-Path $destClaude 'rules') 'rules' $known $next
+        # CLAUDE.md (only write if missing — never overwrite user-owned content).
+        $claudeMdSrc = Join-Path $Repo 'CLAUDE.md'
+        if (Test-Path $claudeMdSrc) { Install-CodexUserFile $claudeMdSrc (Join-Path $destClaude 'CLAUDE.md') 'CLAUDE.md' $known $next }
+        Write-CodexManifest $manifestPath $next
+        Write-Host "Installed Claude user-level adapters -> $destClaude"
+    } else {
+        # Project-level install: copy .claude/ (skills, commands, rules),
+        # the plugin manifest, and the top-level CLAUDE.md. We use the same
+        # merge-by-default behavior as CodeBuddy so co-located user skills
+        # in `.claude/skills/` (e.g. team-internal) are not wiped on update.
+        if (Test-Path (Join-Path $Repo '.claude')) { Merge-Platform (Join-Path $Repo '.claude') $destClaude 'Claude' }
+        $pluginDir = Join-Path $Repo '.claude-plugin'
+        if (Test-Path $pluginDir) { & $DirCopy $pluginDir (Join-Path $destRoot '.claude-plugin') 'Claude plugin manifest' }
+        Copy-File (Join-Path $Repo 'CLAUDE.md') (Join-Path $destRoot 'CLAUDE.md') 'CLAUDE.md'
     }
 }
 

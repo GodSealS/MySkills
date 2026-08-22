@@ -243,8 +243,8 @@ Gallery 阶段左上角有个 `HUASHU · DESIGN` 小标识，16% opacity 色值�
 
 ## 相关 Reference
 
-- ../../references/animations.md](animations.md) · ../../references/animation-best-practices.md](animation-best-practices.md)
-- ../../references/video-export.md](video-export.md)
-- 音频配置（BGM + SFX ../../references/audio-design-rules.md](audio-design-rules.md)
-- Apple ../../references/apple-gallery-showcase.md](apple-gallery-showcase.md)
+- 完整技术流程：[references/animations.md](animations.md) · [references/animation-best-practices.md](animation-best-practices.md)
+- 动画导出流水线：[references/video-export.md](video-export.md)
+- 音频配置（BGM + SFX 双轨）：[references/audio-design-rules.md](audio-design-rules.md)
+- Apple 画廊风格的横向参考：[references/apple-gallery-showcase.md](apple-gallery-showcase.md)
 - 源 HTML（v6 + 音频集成版）：`www.huasheng.ai/huashu-design-hero/index.html`

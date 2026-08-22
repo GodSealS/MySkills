@@ -81,7 +81,7 @@ Good hi-fi design **must** grow from existing context. First ask the user if the
 
 🛑 **Checkpoint · Asset Self-Check**: Physical products must have product photos (not CSS silhouettes), digital products need logos + UI screenshots, colors extracted from real HTML/SVG. If missing, stop and fill in — don't force it.
 
-> **Full protocol** (5-step detailed operations + download commands + brand-spec template + full-process fallback + counterexamples + cost comparison) → ../../references/brand-asset-protocol.md`
+> **Full protocol** (5-step detailed operations + download commands + brand-spec template + full-process fallback + counterexamples + cost comparison) → `references/brand-asset-protocol.md`
 
 ### 2. Junior Designer Mode: Show Assumptions First, Then Execute
 
@@ -153,7 +153,7 @@ Purple gradients, emoji icons, rounded cards + left border accent, SVG-drawn fac
 
 When the task itself is to show anti-patterns (e.g., "what is AI slop", or comparison/review), **don't fill the entire page with slop**. Instead, use **honest bad-sample containers** — isolated with dashed borders + "Counter-example · Don't do this" corner label, so the counter-example serves the narrative rather than polluting the page's main tone.
 
-Full checklist in ../../references/content-guidelines.md`.
+Full checklist in `references/content-guidelines.md`.
 
 ## Design Direction Advisor (Fallback Mode)
 
@@ -209,7 +209,7 @@ Before starting, answer one question: **Does this design require images for its 
 | Natural history / history / art / flora & fauna / classical | Wikimedia Commons, Met / Art Institute Open Access, Biodiversity Heritage Library (classical natural history illustrations, e.g., Edward Lear / John Gould parrot plates) |
 | General lifestyle / scene / product photography | Unsplash, Pexels (royalty-free) |
 | User's own products / brand | Go through §1.a Core Asset Protocol for official images |
-| **Specific products/brands named or displayed side-by-side in the design (including third-party comparison targets)** | **Go through §1.a for each product's official logo** (svgl API → simpleicons → Google favicon, see ../../references/brand-asset-protocol.md` Step 3.1). Comparison / ranking / review decks MUST go through this row |
+| **Specific products/brands named or displayed side-by-side in the design (including third-party comparison targets)** | **Go through §1.a for each product's official logo** (svgl API → simpleicons → Google favicon, see `references/brand-asset-protocol.md` Step 3.1). Comparison / ranking / review decks MUST go through this row |
 
 🔴 **Named product logo sub-gate (must pass before spawning three logic paths, hard requirement)**: List every product/brand name that will appear in the design **individually as a checklist**, confirm each has been retrieved as an official logo and embedded (base64 / local path), then spawn. **A single item on the checklist missing its logo = 🛑 STOP and fill in** (only when truly unavailable, fall back to honest placeholder and explicitly state "X logo pending"). All three subagents share this batch of logos. ⚠️ This is the most common failure point for comparison / ranking / review decks — "just extracted brand colors and started" = missed this gate (2026-06-06 Five Coding Agent PPT real failure, see brand-asset-protocol counterexample).
 
@@ -243,14 +243,14 @@ Take a deep breath and seriously consider: **If budget were unlimited, who is th
 Shared execution rules (all three subagents):
 - Use **user's real content** (not Lorem), three versions same content, only design logic differs, for easy horizontal comparison
 - Pure HTML/CSS single file; **content-required images use Phase 3.5 real images** (shared across all three), only decorative/abstract images use CSS geometry/SVG/solid color blocks, never leave empty placeholders
-- 🎞️ **PPT / deck scenarios must use deck template (never write vertical scroll long pages!)**: Each page is an independent `<section>` (1920×1080), wrapped in `assets/deck_index.html`'s pagination zoom shell — **left/right keys / click to flip + adaptive `fit()` zoom** (entire page scales into browser window, never renders at raw pixel size showing only a corner). Three versions only change visual style, deck skeleton unified with this template, presentation experience consistent. See ../../references/slide-decks.md`. Screenshots captured per **single page** at 1920×1080, not the full long page. **Single page content must never self-draw page numbers / page count / progress markers** — page numbers are uniformly handled by the deck shell (`deck_index.html` counter); self-drawing conflicts with the deck and creates duplicates (real case: showing both "02/03" and "6/16"). `deck_index.html` now **defaults to 3D overview wall** (all pages tilted, spread out, floating; click "▶ Start Presentation" or any card to enter fullscreen single page, ESC to return to overview) — mention this feature when delivering a deck
+- 🎞️ **PPT / deck scenarios must use deck template (never write vertical scroll long pages!)**: Each page is an independent `<section>` (1920×1080), wrapped in `assets/deck_index.html`'s pagination zoom shell — **left/right keys / click to flip + adaptive `fit()` zoom** (entire page scales into browser window, never renders at raw pixel size showing only a corner). Three versions only change visual style, deck skeleton unified with this template, presentation experience consistent. See `references/slide-decks.md`. Screenshots captured per **single page** at 1920×1080, not the full long page. **Single page content must never self-draw page numbers / page count / progress markers** — page numbers are uniformly handled by the deck shell (`deck_index.html` counter); self-drawing conflicts with the deck and creates duplicates (real case: showing both "02/03" and "6/16"). `deck_index.html` now **defaults to 3D overview wall** (all pages tilted, spread out, floating; click "▶ Start Presentation" or any card to enter fullscreen single page, ESC to return to overview) — mention this feature when delivering a deck
 - Save to current **project directory** (`project-name/design-demos/[logic-name].html`) — ❌ forbid `_temp/` (iron rule)
 - Screenshot: `npx playwright screenshot file:///path.html out.png --viewport-size=1440,900` (PPT uses 1920,1080)
 - ✅ **Output self-check (anti-cheat, must inspect before entering Phase 5)**: Confirm `design-demos/` has truly **3 .html files** — fewer than 3 = didn't complete three logic paths, fill in before continuing, don't deliver just one version
 - After all three complete, **show all three screenshots together**, each labeled: which logic path, which specific style/reference/designer, one sentence on why
 
 > Only when user has **confirmed image-gen capability**, AI-generated styles go through `huashu-gpt-image` (see `design-styles.md` tail "AI Image Generation-Specific Styles"); otherwise always HTML.
-> Full 40-style library (web 20 + PPT 20, with fidelity/temperature/HTML implementation/open-source fonts) → ../../references/design-styles.md`.
+> Full 40-style library (web 20 + PPT 20, with fidelity/temperature/HTML implementation/open-source fonts) → `references/design-styles.md`.
 
 **Phase 5 · User Chooses Based on "Seen Real Visuals"** (first valid choice): After seeing three real screenshots, pick one to deepen / mix ("roulette's palette + designer's layout") / tweak / redo all → rerun three logic paths.
 
@@ -376,20 +376,20 @@ When making iPhone mockups, **hard-bind** to `assets/ios_frame.jsx`. This is the
 
 1. **Understand requirements**:
    - 🔍 **0. Fact verification (required when involving specific products/technologies, highest priority)**: When the task involves specific products/technologies/events (DJI Pocket 4, Gemini 3 Pro, Nano Banana Pro, a new SDK, etc.), the **first action** is `WebSearch` to verify existence, release status, latest version, key specs. Write facts into `product-facts.md`. See "Core Principle #0". **Do this before asking clarifying questions** — wrong facts make any questions pointless.
-   - New or vague tasks must ask clarifying questions, see ../../references/workflow.md`. One focused round usually enough, skip for minor tweaks.
+   - New or vague tasks must ask clarifying questions, see `references/workflow.md`. One focused round usually enough, skip for minor tweaks.
    - 🛑 **Checkpoint 1: Send question list to user at once, wait for all answers before proceeding**. Don't ask while building.
    - 🛑 **Slide/PPT tasks: HTML aggregated demo version is always the default base artifact** (regardless of final format user wants):
      - **Required**: Each page as independent HTML + `assets/deck_index.html` aggregator (rename to `index.html`, edit MANIFEST listing all pages), keyboard navigation & fullscreen presentation in browser — this is the "source" of the slide work
      - **Delivery process iron rule (don't ask format, HTML deck is the only pushed base path)**: **Never ask** the user at the start whether they want PDF / PPTX — directly build HTML deck (with 3D overview wall + fullscreen presentation, best effect, this is what we want to push). 
      - **After HTML deck is complete**: ① **Automatically** use `scripts/export_deck_pdf.mjs` to generate PDF version for delivery (don't ask, just give it); ② Then **ask if they need editable PPTX**, if yes use `scripts/export_deck_pptx.mjs` for best-effort conversion and export.
      - 🔴 **Never sacrifice HTML design quality just to enable PPTX conversion**: PPTX is an after-the-fact best-effort derivative, **don't** constrain or downgrade HTML design from the first line just to satisfy html2pptx's 4 hard constraints. HTML deck's visual freedom always takes priority; if PPTX can't render certain effects, honestly tell the user "this PPTX version loses X, see the full effect in HTML / PDF".
-     - **≥5 page deck must first make 2-page showcase to establish grammar, then batch-push** (see ../../references/slide-decks.md` "Make Showcase Before Batch Production" chapter) — skipping this = wrong direction means N rounds of rework instead of 2
-     - See ../../references/slide-decks.md` opening "HTML-First Architecture + Delivery Format Decision Tree"
+     - **≥5 page deck must first make 2-page showcase to establish grammar, then batch-push** (see `references/slide-decks.md` "Make Showcase Before Batch Production" chapter) — skipping this = wrong direction means N rounds of rework instead of 2
+     - See `references/slide-decks.md` opening "HTML-First Architecture + Delivery Format Decision Tree"
    - ⚡ **If user didn't give clear style reference (no design system, no screenshot/Figma, no specified specific style) → enter "Design Direction Advisor (Fallback Mode)" major section, complete Phases 1-5 (user selects direction from three versions), then return here to Step 2**. Barrier should be low: "make an XX" triggers as long as it lacks a style keyword — better to push 3 directions for the user to pick than let the model silently pick minimalism and start.
 
 2. **Explore resources + extract core assets** (not just extract color values): Read design system, linked files, uploaded screenshots/code. **When involving specific brands, must follow §1.a "Core Asset Protocol" five steps** (ask → search by type → download by type for logo/product images/UI → verify + extract → write `brand-spec.md` with all asset paths).
    - 🛑 **Checkpoint 2 · Asset Self-Check**: Before starting, confirm core assets are in place — physical products must have product photos (not CSS silhouettes), digital products need logos + UI screenshots, colors extracted from real HTML/SVG. If missing, stop and fill in — don't force it.
-   - If user didn't give context and no assets can be found, first go through Design Direction Advisor Fallback, then use ../../references/design-context.md` taste anchors as fallback.
+   - If user didn't give context and no assets can be found, first go through Design Direction Advisor Fallback, then use `references/design-context.md` taste anchors as fallback.
 
 3. **Answer four questions first, then plan the system**: **The first half of this step is more decisive than all CSS rules for the output**.
 
@@ -410,37 +410,37 @@ When making iPhone mockups, **hard-bind** to `assets/ios_frame.jsx`. This is the
 
 6. **Full pass**: Fill placeholders, make variations, add Tweaks. Show again halfway — don't wait until everything is done.
 
-7. **Verification**: Use Playwright screenshot (see ../../references/verification.md`), check console errors, send to user.
+7. **Verification**: Use Playwright screenshot (see `references/verification.md`), check console errors, send to user.
    🛑 **Checkpoint 4: Before delivery, manually review in browser**. AI-written code often has interaction bugs.
 
 8. **Summary**: Minimal, only caveats and next steps.
 
 9. **(Default) Export video · Must include SFX + BGM**: Animation HTML's **default delivery format is MP4 with audio**, not silent visuals. Silent version = half-finished product — user subconsciously perceives "things moving but without sound response", the root of cheapness perception lies here. Pipeline:
    - `scripts/render-video.js` records 25fps silent MP4 (intermediate product only, **not the finished product**)
-   - When **true 60fps / deterministic / Bilibili portfolio delivery** is needed and the animation uses Stage clock, switch to `scripts/render-video-seek.js --fps=60` (frame-by-frame seek, no interpolation, no black frames, see ../../references/video-export.md`)
+   - When **true 60fps / deterministic / Bilibili portfolio delivery** is needed and the animation uses Stage clock, switch to `scripts/render-video-seek.js --fps=60` (frame-by-frame seek, no interpolation, no black frames, see `references/video-export.md`)
    - `scripts/convert-formats.sh` derives 60fps MP4 + palette-optimized GIF (as platform requires)
    - `scripts/add-music.sh` adds BGM (6 scene-matched tracks: tech/ad/educational/tutorial + alt variants)
-   - SFX designed per ../../references/audio-design-rules.md` cue list (timeline + sound type), using `assets/sfx/<category>/*.mp3` 37 pre-made resources, selecting density by Recipe A/B/C/D (launch hero ≈ 6 cues/10s, tool demo ≈ 0-2 cues/10s)
+   - SFX designed per `references/audio-design-rules.md` cue list (timeline + sound type), using `assets/sfx/<category>/*.mp3` 37 pre-made resources, selecting density by Recipe A/B/C/D (launch hero ≈ 6 cues/10s, tool demo ≈ 0-2 cues/10s)
    - **BGM + SFX dual-track must be done together** — BGM only = ⅓ completion; SFX occupies high frequencies, BGM occupies low frequencies, frequency separation see audio-design-rules.md's ffmpeg template
    - Before delivery, `ffprobe -select_streams a` to confirm audio stream exists — without it, it's not finished
    - **Condition to skip audio**: User explicitly says "no audio", "silent visuals", "I'll voice it myself" — otherwise default to include.
-   - See full flow in ../../references/video-export.md` + ../../references/audio-design-rules.md` + ../../references/sfx-library.md`.
+   - See full flow in `references/video-export.md` + `references/audio-design-rules.md` + `references/sfx-library.md`.
 
-9.5. **(When narration is involved, use this path) Narration-Driven Animation · L2 Long-Form Concept Video**: When user wants "5-20 minute explainer of a concept", "tutorial with voiceover", "long-form explainer video" — **don't make the animation first then add voiceover**, that makes the visual rhythm mismatch the narration. Switch to ../../references/voiceover-pipeline.md`'s narration-driven flow:
+9.5. **(When narration is involved, use this path) Narration-Driven Animation · L2 Long-Form Concept Video**: When user wants "5-20 minute explainer of a concept", "tutorial with voiceover", "long-form explainer video" — **don't make the animation first then add voiceover**, that makes the visual rhythm mismatch the narration. Switch to `references/voiceover-pipeline.md`'s narration-driven flow:
    - **Write narration script** (markdown, `## scene-id` segments, `[[cue:xx]]` marks key lines) → narration script is the source code, rhythm depends on it
    - **Run narrate-pipeline.mjs** (Doubao TTS · `.env` configured voice) → outputs voiceover.mp3 + timeline.json (cue timings are actually measured, not estimated from character count)
    - **🛑 Before designing animation, answer 3 iron rules**: (1) What's the hero element? (2) How does it morph across 7 segments? (3) At any frame, is there motion? Can't answer — don't write code
    - **Write animation HTML**: Use `assets/narration_stage.jsx` (NarrationStage + Scene + Cue + useNarration + useSceneFade + **Subtitles**) → hero goes directly as `<NarrationStage>` child, not inside Scene; `<Subtitles />` default enabled (Bilibili style · dark text + white glow, auto-split ≤12 char short lines not crossing period boundaries)
    - **Record final MP4**: `bash scripts/render-narration.sh demo.html --timeline=_narration/timeline.json [--bgm-mood=educational]` → auto-records silent MP4 + mixes voiceover + optional BGM
-   - **Failure mode #1 (must avoid)**: Each Scene has independent layout + cue uses fade-up + scene switch uses full-page opacity toggle = **voiceover PowerPoint** = quality goes to zero. Full rules in ../../references/voiceover-pipeline.md` opening "Iron Rules" chapter.
+   - **Failure mode #1 (must avoid)**: Each Scene has independent layout + cue uses fade-up + scene switch uses full-page opacity toggle = **voiceover PowerPoint** = quality goes to zero. Full rules in `references/voiceover-pipeline.md` opening "Iron Rules" chapter.
 
-10. **(Optional) Expert Review**: If user says "review", "how does it look", "score this", or you have concerns about the output and want to proactively quality-check, follow ../../references/critique-guide.md` for 5-dimension review — Philosophical Consistency / Visual Hierarchy / Detail Execution / Functionality / Innovation each scored 0-10, output summary + Keep (what's good) + Fix (severity: ⚠️Fatal / ⚡Important / 💡Suggestion) + Quick Wins (top 3 things achievable in 5 minutes). Review the design, not the designer.
+10. **(Optional) Expert Review**: If user says "review", "how does it look", "score this", or you have concerns about the output and want to proactively quality-check, follow `references/critique-guide.md` for 5-dimension review — Philosophical Consistency / Visual Hierarchy / Detail Execution / Functionality / Innovation each scored 0-10, output summary + Keep (what's good) + Fix (severity: ⚠️Fatal / ⚡Important / 💡Suggestion) + Quick Wins (top 3 things achievable in 5 minutes). Review the design, not the designer.
 
 **Checkpoint principle**: When you encounter 🛑, stop, clearly tell the user "I've done X, next I plan to do Y, do you confirm?" and truly **wait**. Don't say it and then start anyway.
 
 ### Question-Asking Essentials
 
-Must ask (using ../../references/workflow.md` templates):
+Must ask (using `references/workflow.md` templates):
 - Design system / UI kit / codebase — do you have one? If not, go find one first
 - How many variations do you want? Which dimensions to vary on?
 - Do you care about flow, copy, or visuals?
@@ -455,9 +455,9 @@ The process assumes user cooperation and normal environment. In practice, these 
 | Requirements too vague to begin | User gives only one vague sentence (e.g., "make a nice page") | Proactively list 3 possible directions for user to pick (e.g., "landing page / dashboard / product detail page"), rather than asking 10 questions directly |
 | User refuses to answer question list | User says "stop asking, just make it" | Respect their pace, use best judgment to make 1 main solution + 1 clearly different variant, on delivery **clearly mark assumptions**, making it easy for user to locate what to change |
 | Design context contradictory | User's reference image conflicts with brand guidelines | Stop, point out the specific contradiction ("screenshot uses serif fonts, guidelines say sans"), let user pick one |
-| Starter component load failure | Console 404 / integrity mismatch | First check ../../references/react-setup.md` common error table; if still failing, fall back to pure HTML+CSS without React, ensure usable output |
+| Starter component load failure | Console 404 / integrity mismatch | First check `references/react-setup.md` common error table; if still failing, fall back to pure HTML+CSS without React, ensure usable output |
 | Time pressure, quick delivery needed | User says "need it in 30 minutes" | Skip Junior pass, go straight to Full pass, only make 1 solution, on delivery **clearly mark "without early validation"**, remind user quality may be compromised |
-| SKILL.md size exceeded | New HTML >1000 lines | Split per ../../references/react-setup.md` splitting strategy into multiple jsx files, end with `Object.assign(window,...)` sharing |
+| SKILL.md size exceeded | New HTML >1000 lines | Split per `references/react-setup.md` splitting strategy into multiple jsx files, end with `Object.assign(window,...)` sharing |
 | Restraint vs. required product density conflict | Product's core selling point is AI intelligence / data visualization / context awareness (e.g., Pomodoro, Dashboard, Tracker, AI agent, Copilot, bookkeeping, health monitoring) | Go **high-density** information density per taste anchor table: ≥3 points of product-differentiating information per screen. Decorative icons still taboo — what's added is **content-rich** density, not decoration |
 
 **Principle**: On exception, **first tell the user what happened** (1 sentence), then handle per table. Don't silently decide.
@@ -473,10 +473,10 @@ The process assumes user cooperation and normal environment. In practice, these 
 | Icons | **Decorative** icons everywhere (slop collision) | Density elements that carry **differentiating information** must be preserved — don't strip product features along with decoration |
 | Filler | Fabricated stats/quotes as decoration | White space, or ask user for real content |
 | Animation | Scattered micro-interactions | One well-orchestrated page load |
-| Animation-pseudo chrome | Drawing bottom progress bar / timecode / copyright bar inside the frame (conflicts with Stage scrubber) | Frame only carries narrative content; progress/timing handled by Stage chrome (see ../../references/animation-pitfalls.md` §11) |
-| Animation-PowerPoint transition | Each scene independent layout + cue fade-up + scene switch full-page opacity toggle (= voiceover PowerPoint) | **The entire piece is one continuous motion narrative**: pick 1-2 hero elements that persist across scenes, each segment is a state change of the hero (position/size/form), scenes morph not cut (see ../../references/voiceover-pipeline.md` "Iron Rules" chapter) |
+| Animation-pseudo chrome | Drawing bottom progress bar / timecode / copyright bar inside the frame (conflicts with Stage scrubber) | Frame only carries narrative content; progress/timing handled by Stage chrome (see `references/animation-pitfalls.md` §11) |
+| Animation-PowerPoint transition | Each scene independent layout + cue fade-up + scene switch full-page opacity toggle (= voiceover PowerPoint) | **The entire piece is one continuous motion narrative**: pick 1-2 hero elements that persist across scenes, each segment is a state change of the hero (position/size/form), scenes morph not cut (see `references/voiceover-pipeline.md` "Iron Rules" chapter) |
 
-## Technical Red Lines (Must Read ../../references/react-setup.md)
+## Technical Red Lines (Must Read references/react-setup.md)
 
 **React+Babel projects** must use pinned versions (see `react-setup.md`). Three unbreakable rules:
 
@@ -491,7 +491,7 @@ The process assumes user cooperation and normal environment. In practice, these 
 - **Single file** (only ≤5 page minimal pitch, and clearly no overview wall needed, or cross-page JS state sharing required) → `assets/deck_stage.js`.
 - 🛑 **Don't default to single file and bypass the overview wall** — real failure from a 13-page Peking University deck: chose single file = lost overview wall, violated PPT default delivery format. Before choosing single file, confirm "this is truly ≤5 pages and doesn't need overview wall".
 
-Read ../../references/slide-decks.md` "🛑 Architecture First" section — wrong choice means repeatedly hitting CSS specificity/scope pitfalls.
+Read `references/slide-decks.md` "🛑 Architecture First" section — wrong choice means repeatedly hitting CSS specificity/scope pitfalls.
 
 ## Starter Components (Under assets/)
 
@@ -499,12 +499,12 @@ Pre-built starter components, copy directly into project:
 
 | File | When to Use | Provides |
 |------|------------|----------|
-| `deck_index.html` | **Slides' default base artifact** (regardless of final PDF or PPTX, HTML aggregated version always done first) | **Directly copy, don't rewrite its overview logic**. Comes with **two adaptive overviews** (random by seconds on open: grid iframe 60% / infinite gallery images 40%) + keyboard navigation + scale + counter + print merge, each page independent HTML avoids CSS cross-contamination, click any card enters presentation. Usage: copy as `index.html`, edit MANIFEST (each item `{file,label}`; **for gallery mode add `thumb` field and first run `scripts/gen_deck_thumbs.mjs` to generate thumbnails**, otherwise gallery falls back to iframe which is slow). ⚠️ Overview wall has internally solved "adaptive to any page count / card click hit detection / tilted no cropping" three pitfalls — **don't rewrite tilt or grid logic yourself**, read ../../references/slide-decks.md` three hard constraints first |
+| `deck_index.html` | **Slides' default base artifact** (regardless of final PDF or PPTX, HTML aggregated version always done first) | **Directly copy, don't rewrite its overview logic**. Comes with **two adaptive overviews** (random by seconds on open: grid iframe 60% / infinite gallery images 40%) + keyboard navigation + scale + counter + print merge, each page independent HTML avoids CSS cross-contamination, click any card enters presentation. Usage: copy as `index.html`, edit MANIFEST (each item `{file,label}`; **for gallery mode add `thumb` field and first run `scripts/gen_deck_thumbs.mjs` to generate thumbnails**, otherwise gallery falls back to iframe which is slow). ⚠️ Overview wall has internally solved "adaptive to any page count / card click hit detection / tilted no cropping" three pitfalls — **don't rewrite tilt or grid logic yourself**, read `references/slide-decks.md` three hard constraints first |
 | `scripts/gen_deck_thumbs.mjs` | **Generate thumbnails for infinite gallery overview** (grid iframe mode doesn't need this) | playwright captures each page + sharp downscales to 1600px JPEG: `npm i playwright sharp && node gen_deck_thumbs.mjs --slides slides --out thumbs`, then add `thumb` to each MANIFEST item. Resolution don't go <1000px or hover looks blurry |
-| `deck_stage.js` | Making slides (single file architecture, ≤10 pages) | Web component: auto-scale + keyboard nav + slide counter + localStorage + speaker notes ⚠️ **script must be placed after `</deck-stage>`, section's `display: flex` must be on `.active`**, see ../../references/slide-decks.md` two hard constraints |
+| `deck_stage.js` | Making slides (single file architecture, ≤10 pages) | Web component: auto-scale + keyboard nav + slide counter + localStorage + speaker notes ⚠️ **script must be placed after `</deck-stage>`, section's `display: flex` must be on `.active`**, see `references/slide-decks.md` two hard constraints |
 | `scripts/export_deck_pdf.mjs` | **HTML→PDF export (multi-file architecture)** · Each page independent HTML file, playwright `page.pdf()` per page → pdf-lib merge. Text retains vector searchability. Deps: `playwright pdf-lib` |
-| `scripts/export_deck_stage_pdf.mjs` | **HTML→PDF export (single-file deck-stage architecture specific)** · Added 2026-04-20. Handles shadow DOM slot "only outputs 1 page", absolute child overflow, etc. pitfalls. See ../../references/slide-decks.md` final section. Deps: `playwright` |
-| `scripts/export_deck_pptx.mjs` | **HTML→editable PPTX export** · Calls `html2pptx.js` to export native editable text boxes, text in PPT double-click directly editable. **HTML must meet 4 hard constraints** (see ../../references/editable-pptx.md`); prioritize visual freedom scenes → go PDF path instead. Deps: `playwright pptxgenjs sharp` |
+| `scripts/export_deck_stage_pdf.mjs` | **HTML→PDF export (single-file deck-stage architecture specific)** · Added 2026-04-20. Handles shadow DOM slot "only outputs 1 page", absolute child overflow, etc. pitfalls. See `references/slide-decks.md` final section. Deps: `playwright` |
+| `scripts/export_deck_pptx.mjs` | **HTML→editable PPTX export** · Calls `html2pptx.js` to export native editable text boxes, text in PPT double-click directly editable. **HTML must meet 4 hard constraints** (see `references/editable-pptx.md`); prioritize visual freedom scenes → go PDF path instead. Deps: `playwright pptxgenjs sharp` |
 | `scripts/html2pptx.js` | **HTML→PPTX element-level translator** · Reads computedStyle, translates DOM element-by-element into PowerPoint objects (text frame / shape / picture). Called internally by `export_deck_pptx.mjs`. Requires HTML strictly meet 4 hard constraints |
 | `design_canvas.jsx` | Side-by-side display of ≥2 static variations | Grid layout with labels |
 | `animations.jsx` | Any animation HTML | Stage + Sprite + useTime + Easing + interpolate |
@@ -521,27 +521,27 @@ Deep-dive into corresponding references based on task type:
 
 | Task | Read |
 |------|------|
-| Pre-work questions, set direction | ../../references/workflow.md` |
-| Anti-AI slop, content guidelines, scale | ../../references/content-guidelines.md` |
-| React+Babel project setup | ../../references/react-setup.md` |
-| Making slides | ../../references/slide-decks.md` + `assets/deck_index.html` (default multi-file overview wall) + `scripts/gen_deck_thumbs.mjs` (gallery thumbnails) + `assets/deck_stage.js` (only ≤5 page single file) |
-| Export editable PPTX (html2pptx 4 hard constraints) | ../../references/editable-pptx.md` + `scripts/html2pptx.js` |
-| Making animation/motion (**read pitfalls first**) | ../../references/animation-pitfalls.md` + ../../references/animations.md` + `assets/animations.jsx` |
-| **Positive animation design grammar** (Anthropic-level narrative/motion/rhythm/expressive style) | ../../references/animation-best-practices.md` (5-act narrative + Expo easing + 8 motion language rules + 3 scene recipes) |
-| **Narrated long animation / long-form concept video** (5-20 min with voiceover, narration-driven visuals, TTS-measured duration generating timeline) | ../../references/voiceover-pipeline.md` (iron rules: continuous motion narrative, forbid PowerPoint transitions) + `assets/narration_stage.jsx` + `scripts/{tts-doubao,narrate-pipeline}.mjs` + `scripts/{mix-voiceover,render-narration}.sh` |
-| Making Tweaks real-time tuning | ../../references/tweaks-system.md` |
-| No design context — what to do | ../../references/design-context.md` (thin fallback) or ../../references/design-styles.md` (thick fallback: HTML native 40-style library, web 20 + PPT 20, graded by temperature) |
-| **Vague requirements, need style direction recommendation** | ../../references/design-styles.md` (40 HTML native style library, with fidelity/temperature/open-source fonts) + `assets/showcases/INDEX.md` (pre-made screenshot gallery) |
-| **Query scene templates by output type** (covers/PPT/infographics) | ../../references/scene-templates.md` |
-| Post-output verification | ../../references/verification.md` + `scripts/verify.py` |
-| **Design review / scoring** (optional after design complete) | ../../references/critique-guide.md` (5-dimension scoring + common issue checklist) |
-| **Animation export MP4/GIF/add BGM** | ../../references/video-export.md` + `scripts/render-video.js` (default 25fps) / `scripts/render-video-seek.js` (true 60fps · deterministic · no black frames, use when animation uses Stage clock) + `scripts/convert-formats.sh` + `scripts/add-music.sh` |
-| **Animation add SFX** (Apple keynote level, 37 pre-made) | ../../references/sfx-library.md` + `assets/sfx/<category>/*.mp3` |
-| **Animation audio configuration rules** (SFX+BGM dual-track, golden ratio, ffmpeg template, scene recipes) | ../../references/audio-design-rules.md` |
-| **Apple gallery showcase style** (3D tilt + floating cards + slow pan + focus switching, v9 real-combat identical) | ../../references/apple-gallery-showcase.md` |
-| **Gallery Ripple + Multi-Focus scene philosophy** (when 20+ homogeneous assets + scene needs to express "scale × depth" — prefer this; includes preconditions, technical recipes, 5 reusable patterns) | ../../references/hero-animation-case-study.md` (huashu-design hero v9 distilled) |
-| ⭐ **Launch Film workflow** (30-second brand promo / launch trailer / superbowl-tier ad / Apple-level expectations): **Write 10,000-word director's notes first, then animate**. Includes 5-part structure + trigger judgment + multi-perspective parallel strategy + keyframe verification flow | ../../references/launch-film-director-notes.md` (huashu-md-html v2.0 launch film distilled) |
-| ⭐ **Multi-perspective parallel experimentation** (user says "make a few more versions" / "want to see different directions" / multi-platform distribution / client can't decide): 6 artist perspectives simultaneously launch subagents each making independent versions + post-completion 5-dimension review | ../../references/multi-perspective-parallel-case-study.md` (huashu-md-html v2.0 6-perspective real combat) |
+| Pre-work questions, set direction | `references/workflow.md` |
+| Anti-AI slop, content guidelines, scale | `references/content-guidelines.md` |
+| React+Babel project setup | `references/react-setup.md` |
+| Making slides | `references/slide-decks.md` + `assets/deck_index.html` (default multi-file overview wall) + `scripts/gen_deck_thumbs.mjs` (gallery thumbnails) + `assets/deck_stage.js` (only ≤5 page single file) |
+| Export editable PPTX (html2pptx 4 hard constraints) | `references/editable-pptx.md` + `scripts/html2pptx.js` |
+| Making animation/motion (**read pitfalls first**) | `references/animation-pitfalls.md` + `references/animations.md` + `assets/animations.jsx` |
+| **Positive animation design grammar** (Anthropic-level narrative/motion/rhythm/expressive style) | `references/animation-best-practices.md` (5-act narrative + Expo easing + 8 motion language rules + 3 scene recipes) |
+| **Narrated long animation / long-form concept video** (5-20 min with voiceover, narration-driven visuals, TTS-measured duration generating timeline) | `references/voiceover-pipeline.md` (iron rules: continuous motion narrative, forbid PowerPoint transitions) + `assets/narration_stage.jsx` + `scripts/{tts-doubao,narrate-pipeline}.mjs` + `scripts/{mix-voiceover,render-narration}.sh` |
+| Making Tweaks real-time tuning | `references/tweaks-system.md` |
+| No design context — what to do | `references/design-context.md` (thin fallback) or `references/design-styles.md` (thick fallback: HTML native 40-style library, web 20 + PPT 20, graded by temperature) |
+| **Vague requirements, need style direction recommendation** | `references/design-styles.md` (40 HTML native style library, with fidelity/temperature/open-source fonts) + `assets/showcases/INDEX.md` (pre-made screenshot gallery) |
+| **Query scene templates by output type** (covers/PPT/infographics) | `references/scene-templates.md` |
+| Post-output verification | `references/verification.md` + `scripts/verify.py` |
+| **Design review / scoring** (optional after design complete) | `references/critique-guide.md` (5-dimension scoring + common issue checklist) |
+| **Animation export MP4/GIF/add BGM** | `references/video-export.md` + `scripts/render-video.js` (default 25fps) / `scripts/render-video-seek.js` (true 60fps · deterministic · no black frames, use when animation uses Stage clock) + `scripts/convert-formats.sh` + `scripts/add-music.sh` |
+| **Animation add SFX** (Apple keynote level, 37 pre-made) | `references/sfx-library.md` + `assets/sfx/<category>/*.mp3` |
+| **Animation audio configuration rules** (SFX+BGM dual-track, golden ratio, ffmpeg template, scene recipes) | `references/audio-design-rules.md` |
+| **Apple gallery showcase style** (3D tilt + floating cards + slow pan + focus switching, v9 real-combat identical) | `references/apple-gallery-showcase.md` |
+| **Gallery Ripple + Multi-Focus scene philosophy** (when 20+ homogeneous assets + scene needs to express "scale × depth" — prefer this; includes preconditions, technical recipes, 5 reusable patterns) | `references/hero-animation-case-study.md` (huashu-design hero v9 distilled) |
+| ⭐ **Launch Film workflow** (30-second brand promo / launch trailer / superbowl-tier ad / Apple-level expectations): **Write 10,000-word director's notes first, then animate**. Includes 5-part structure + trigger judgment + multi-perspective parallel strategy + keyframe verification flow | `references/launch-film-director-notes.md` (huashu-md-html v2.0 launch film distilled) |
+| ⭐ **Multi-perspective parallel experimentation** (user says "make a few more versions" / "want to see different directions" / multi-platform distribution / client can't decide): 6 artist perspectives simultaneously launch subagents each making independent versions + post-completion 5-dimension review | `references/multi-perspective-parallel-case-study.md` (huashu-md-html v2.0 6-perspective real combat) |
 
 ## Cross-Agent Environment Adaptation Notes
 
@@ -549,11 +549,11 @@ This skill is designed to be **agent-agnostic** — Claude Code, Codex, Cursor, 
 
 - **No built-in fork-verifier agent**: Use `scripts/verify.py` (Playwright wrapper) for manually-driven verification
 - **No asset registered to review pane**: Use agent's Write capability directly to write files, user opens in their own browser/IDE
-- **No Tweaks host postMessage**: Switch to **pure frontend localStorage version**, see ../../references/tweaks-system.md`
-- **No `window.claude.complete` zero-config helper**: If HTML needs to call LLM, use a reusable mock or let user fill in their own API key, see ../../references/react-setup.md`
-- **No structured question UI**: Ask questions in conversation using markdown checklists, reference ../../references/workflow.md` templates
+- **No Tweaks host postMessage**: Switch to **pure frontend localStorage version**, see `references/tweaks-system.md`
+- **No `window.claude.complete` zero-config helper**: If HTML needs to call LLM, use a reusable mock or let user fill in their own API key, see `references/react-setup.md`
+- **No structured question UI**: Ask questions in conversation using markdown checklists, reference `references/workflow.md` templates
 
-All skill path references use **relative-to-this-skill-root** form ../../references/xxx.md`, `assets/xxx.jsx`, `scripts/xxx.sh`) — agents or users resolve per their own install location, no absolute paths relied upon.
+All skill path references use **relative-to-this-skill-root** form (`references/xxx.md`, `assets/xxx.jsx`, `scripts/xxx.sh`) — agents or users resolve per their own install location, no absolute paths relied upon.
 
 ## Output Requirements
 
@@ -592,7 +592,7 @@ All skill path references use **relative-to-this-skill-root** form ../../referen
 - **Fact verification before assumptions** (Core Principle #0): When involving specific products/technologies/events (DJI Pocket 4, Gemini 3 Pro, etc.), must first `WebSearch` verify existence and status, never assert based on training data.
 - **Embody the expert**: When making slides, you're a slide designer. When making animations, you're an animator. You're not writing Web UI.
 - **Body philosophy shorthand**: Junior first show → 3+ variations → honest placeholder → always anti-slop → brand involved → asset protocol (1.a, don't replace product images with CSS silhouettes). See "Core Philosophy" sections above for details.
-- **Before making animation**: Must read ../../references/animation-pitfalls.md` — its 14 rules each come from real failures, skipping will cost you 1-3 rounds of redo.
+- **Before making animation**: Must read `references/animation-pitfalls.md` — its 14 rules each come from real failures, skipping will cost you 1-3 rounds of redo.
 - **Hand-writing Stage / Sprite** (not using `assets/animations.jsx`): Must implement two things — (a) tick first frame synchronously set `window.__ready = true` (b) when detecting `window.__recording === true`, force loop=false. Otherwise video recording will definitely fail.
-- **Making narrated animations** (≥1 minute, long-form concept video): **The entire piece is one continuous motion narrative, not a set of independent scenes**. Pick 1-2 hero elements that persist across scenes, scenes morph not cut. Each Scene with independent layout + cue fade-up + full-page opacity toggle = voiceover PowerPoint = quality zero. Full rules in ../../references/voiceover-pipeline.md` "Iron Rules" chapter. **This rule cannot be emphasized enough.**
-- **Making launch films / brand promos** (20-30 second level, user mentions "Apple level", "Super Bowl quality", "10x detail"): **Write 10,000-word director's notes first, then start animating** — 5-part structure (Statement / Visual System / Story Arc / Storyboard / Manifest), 12-15 shot shot-by-shot spec, each shot with 10 fields (including anti-slop self-check + why this shot exists). Full process + trigger judgment + multi-perspective parallel strategy in ../../references/launch-film-director-notes.md`. **Real lesson**: Skipping this step = programmer-perspective animation (uniform rhythm, missing climax, clashing slogans, missing narrative arc); following this step = one-pass, every frame pause-worthy.
+- **Making narrated animations** (≥1 minute, long-form concept video): **The entire piece is one continuous motion narrative, not a set of independent scenes**. Pick 1-2 hero elements that persist across scenes, scenes morph not cut. Each Scene with independent layout + cue fade-up + full-page opacity toggle = voiceover PowerPoint = quality zero. Full rules in `references/voiceover-pipeline.md` "Iron Rules" chapter. **This rule cannot be emphasized enough.**
+- **Making launch films / brand promos** (20-30 second level, user mentions "Apple level", "Super Bowl quality", "10x detail"): **Write 10,000-word director's notes first, then start animating** — 5-part structure (Statement / Visual System / Story Arc / Storyboard / Manifest), 12-15 shot shot-by-shot spec, each shot with 10 fields (including anti-slop self-check + why this shot exists). Full process + trigger judgment + multi-perspective parallel strategy in `references/launch-film-director-notes.md`. **Real lesson**: Skipping this step = programmer-perspective animation (uniform rhythm, missing climax, clashing slogans, missing narrative arc); following this step = one-pass, every frame pause-worthy.

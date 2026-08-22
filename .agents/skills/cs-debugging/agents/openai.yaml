@@ -1,0 +1,3 @@
+﻿interface:
+  display_name: "CS Debugging"
+  short_description: "Guides systematic root-cause debugging."

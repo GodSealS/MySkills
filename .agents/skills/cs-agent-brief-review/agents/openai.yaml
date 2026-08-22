@@ -1,0 +1,3 @@
+﻿interface:
+  display_name: "CS Agent Brief Review"
+  short_description: "Use when reviewing an agent brief, issue spec, PR description for an AFK agent, or when asked to evaluate whether a task spec is agent-ready."

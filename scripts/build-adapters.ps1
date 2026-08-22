@@ -5,15 +5,18 @@
 .DESCRIPTION
   The single source of truth is .codebuddy/ (skills, agents, commands, references).
   This script regenerates platform-neutral artifacts so the pack installs cleanly to
-  Codex, CodeBuddy, and .gemini:
+  Codex, CodeBuddy, Claude Code, and Gemini CLI:
 
-    skills/         -> canonical neutral skills (name + description frontmatter only)
-    agents/         -> canonical neutral personas
-    references/     -> canonical checklists
-    commands/       -> canonical slash commands (markdown)
-    .gemini/        -> Gemini CLI adapter (skills + commands/*.toml + agents + GEMINI.md)
-    .agents/        -> Codex skill adapter (.agents/skills)
-    .codex/         -> Codex adapter (prompts/ + agents/)
+    skills/             -> canonical neutral skills (name + description frontmatter only)
+    agents/             -> canonical neutral personas
+    references/         -> canonical checklists
+    commands/           -> canonical slash commands (markdown)
+    .gemini/            -> Gemini CLI adapter (skills + commands/*.toml + agents + GEMINI.md)
+    .agents/            -> Codex skill adapter (.agents/skills/<name>/SKILL.md + agents/openai.yaml)
+    .codex/             -> Codex adapter (prompts/ + agents/)
+    .claude/            -> Claude Code adapter (commands/ + rules/)
+    .claude-plugin/     -> Claude Code plugin manifest
+    CLAUDE.md           -> Claude Code top-level project context (only if missing)
 
   CodeBuddy keeps its own .codebuddy/ tree and is unchanged by this script.
 
@@ -58,10 +61,21 @@ function Neutralize-Frontmatter($content) {
     return $content
 }
 
-function Fix-Refs($text) {
-    # Normalize every reference link to ../../references/<file> so it resolves from
-    # skills/<name>/, .gemini/skills/<name>/ and .agents/skills/<name>/ (all 2 levels deep).
-    $text = $text -replace '(?i)\S*references/([A-Za-z0-9_\-]+\.md)', '../../references/$1'
+# Filenames of the shared checklists under .codebuddy/references/. Only these
+# are rewritten by Fix-Refs — skill-local references/ dirs (e.g.
+# cs-huashu-design/references/) keep their relative paths untouched.
+$PublicRefNames = @(Get-ChildItem -Path $SrcRefs -File | ForEach-Object { $_.Name })
+
+function Fix-Refs($text, [string[]]$publicRefs) {
+    # Normalize references to shared checklists to ../../references/<file> so they
+    # resolve from every adapter tree (skills/<name>/, .gemini/skills/<name>/,
+    # .agents/skills/<name>/, .claude/skills/<name>/, all 2 levels deep).
+    # Whitelist by filename so references to a skill's own references/ folder
+    # (e.g. cs-huashu-design/references/brand-asset-protocol.md) are left intact.
+    foreach ($name in $publicRefs) {
+        $esc = [regex]::Escape($name)
+        $text = $text -replace "(?i)\S*references/$esc", "../../references/$name"
+    }
     # cs-code-query references its own sub-files via an absolute .codebuddy path.
     # Rewrite to a relative path so it resolves from within the skill directory
     # (skills/cs-code-query/, .gemini/skills/cs-code-query/, .agents/skills/cs-code-query/).
@@ -79,7 +93,7 @@ function Copy-Tree($src, $dst, [switch]$NeutralizeSkill, [switch]$RewriteRefs) {
         if ($item.Extension -eq '.md') {
             $c = Get-Content -Raw -Path $item.FullName
             if ($NeutralizeSkill -and ($item.Name -eq 'SKILL.md')) { $c = Neutralize-Frontmatter $c }
-            if ($RewriteRefs) { $c = Fix-Refs $c }
+            if ($RewriteRefs) { $c = Fix-Refs $c $PublicRefNames }
             Set-Content -NoNewline -Path $target -Value $c -Encoding UTF8
         } else {
             Copy-Item -Path $item.FullName -Destination $target -Force
@@ -92,31 +106,124 @@ function Copy-Tree($src, $dst, [switch]$NeutralizeSkill, [switch]$RewriteRefs) {
 # ---------------------------------------------------------------------------
 $skillDirs = Get-ChildItem -Path $SrcSkills -Directory | Where-Object { $ExcludeSkills -notcontains $_.Name }
 
-$dstSkillsCanon = Join-Path $Repo 'skills'
-$dstSkillsGem   = Join-Path $Repo '.gemini\skills'
-$dstSkillsCodex = Join-Path $Repo '.agents\skills'
-Clear-Dir $dstSkillsCanon; Clear-Dir $dstSkillsGem; Clear-Dir $dstSkillsCodex
+$dstSkillsCanon  = Join-Path $Repo 'skills'
+$dstSkillsGem    = Join-Path $Repo '.gemini\skills'
+$dstSkillsCodex  = Join-Path $Repo '.agents\skills'
+$dstSkillsClaude = Join-Path $Repo '.claude\skills'
+Clear-Dir $dstSkillsCanon; Clear-Dir $dstSkillsGem; Clear-Dir $dstSkillsCodex; Clear-Dir $dstSkillsClaude
 
 foreach ($sd in $skillDirs) {
-    Copy-Tree -src $sd.FullName -dst (Join-Path $dstSkillsCanon $sd.Name) -NeutralizeSkill -RewriteRefs
-    Copy-Tree -src $sd.FullName -dst (Join-Path $dstSkillsGem   $sd.Name) -NeutralizeSkill -RewriteRefs
-    Copy-Tree -src $sd.FullName -dst (Join-Path $dstSkillsCodex $sd.Name) -NeutralizeSkill -RewriteRefs
+    Copy-Tree -src $sd.FullName -dst (Join-Path $dstSkillsCanon  $sd.Name) -NeutralizeSkill -RewriteRefs
+    Copy-Tree -src $sd.FullName -dst (Join-Path $dstSkillsGem    $sd.Name) -NeutralizeSkill -RewriteRefs
+    Copy-Tree -src $sd.FullName -dst (Join-Path $dstSkillsCodex  $sd.Name) -NeutralizeSkill -RewriteRefs
+    Copy-Tree -src $sd.FullName -dst (Join-Path $dstSkillsClaude $sd.Name) -NeutralizeSkill -RewriteRefs
 }
-Write-Host "Skills: $($skillDirs.Count) -> skills/ .gemini/skills/ .agents/skills/"
+Write-Host "Skills: $($skillDirs.Count) -> skills/ .gemini/skills/ .agents/skills/ .claude/skills/"
+
+# Title-case a hyphenated name, keeping known acronyms uppercase.
+# e.g. "code-review" -> "Code Review",  "frontend-ui" -> "Frontend UI"
+function ConvertTo-TitleCase([string]$name, [string[]]$acronyms) {
+    $parts = $name -split '-'
+    $result = @()
+    foreach ($p in $parts) {
+        $upper = $p.ToUpper()
+        $match = $false
+        foreach ($a in $acronyms) { if ($upper -eq $a) { $result += $a; $match = $true; break } }
+        if (-not $match) { $result += $p.Substring(0,1).ToUpper() + $p.Substring(1).ToLower() }
+    }
+    return $result -join ' '
+}
+
+# ---------------------------------------------------------------------------
+# 1b. Generate Codex UI metadata (agents/openai.yaml) per skill
+#
+# Codex CLI requires agents/openai.yaml in each skill directory to properly
+# render the skill list UI (/ menu). Without this file, installed skills
+# are invisible or display incorrectly.
+# ---------------------------------------------------------------------------
+$codexSkillDirs = Get-ChildItem -Path $dstSkillsCodex -Directory
+$codexMetaCount = 0
+foreach ($sd in $codexSkillDirs) {
+    $skillMd = Join-Path $sd.FullName 'SKILL.md'
+    if (-not (Test-Path $skillMd)) { continue }
+
+    $raw = Get-Content -Raw -Path $skillMd -ErrorAction SilentlyContinue
+    if (-not $raw) { continue }
+
+    $skillName = if ($raw -match '(?m)^name:\s*(.+?)\s*$') { $matches[1].Trim().Trim('"') } else { $sd.Name }
+    $desc     = if ($raw -match '(?m)^description:\s*(.+?)\s*$') { $matches[1].Trim().Trim('"') } else { '' }
+
+    # Compute display_name: "cs-planning" -> "CS Planning"
+    # Known acronyms kept uppercase (case-insensitive in skill name)
+    $Acronyms = @('UI', 'CI', 'CD', 'API', 'TDD', 'ADR', 'ADRS', 'CICD', 'MCP', 'DOM', 'CSS')
+    $displayName = $skillName
+    if ($displayName -match '^cs-(.+)$') {
+        $rest = $matches[1]
+        $displayName = "CS " + (ConvertTo-TitleCase $rest $Acronyms)
+    } else {
+        $displayName = ConvertTo-TitleCase $displayName $Acronyms
+    }
+
+    # Compute short_description: extract the readable English portion.
+    # Two valid source layouts:
+    #   1) "English description. ...Use when... / 中文翻译。"      -> keep prefix before " / "
+    #   2) "中文描述。English description. Use when..."           -> drop leading CJK segment
+    $shortDesc = $desc.Trim()
+    $cjkAfter = $shortDesc -match '/\s*(?:[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff])'
+    if ($cjkAfter -and $shortDesc -match '^(.+?)\s+/\s+') {
+        $shortDesc = $matches[1].Trim()
+    } elseif ($shortDesc -match '^[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]') {
+        # Chinese-first layout: drop text up to and including the first Chinese
+        # sentence terminator (。 / ！ / ？), then keep the English tail.
+        foreach ($terminator in @('。','！','？')) {
+            $idx = $shortDesc.IndexOf($terminator)
+            if ($idx -ge 0 -and ($idx + 1) -lt $shortDesc.Length) {
+                $shortDesc = $shortDesc.Substring($idx + 1).TrimStart()
+                break
+            }
+        }
+    }
+    if ($shortDesc.Length -eq 0) { $shortDesc = $displayName }
+    # Truncate at first sentence boundary (period or newline), max ~120 chars
+    if ($shortDesc -match '^(.{1,120}?)[\.\?\!]') { $shortDesc = $matches[1].Trim() + '.' }
+    elseif ($shortDesc.Length -gt 150) {
+        # Codex UI cards can typically render ~150 chars; truncate at a word
+        # boundary rather than mid-word to keep the prompt readable.
+        $trunc = $shortDesc.Substring(0, 147)
+        $lastSpace = $trunc.LastIndexOf(' ')
+        if ($lastSpace -gt 60) { $trunc = $trunc.Substring(0, $lastSpace) }
+        $shortDesc = $trunc.TrimEnd(',;') + '.'
+    }
+    if ($shortDesc.Length -eq 0) { $shortDesc = $displayName }
+
+    # Write agents/openai.yaml
+    $agentDir = Join-Path $sd.FullName 'agents'
+    if (-not (Test-Path $agentDir)) { New-Item -ItemType Directory -Force -Path $agentDir | Out-Null }
+
+    $yaml = @"
+interface:
+  display_name: "$displayName"
+  short_description: "$shortDesc"
+"@
+    Set-Content -NoNewline -Path (Join-Path $agentDir 'openai.yaml') -Value $yaml -Encoding UTF8
+    $codexMetaCount++
+}
+Write-Host "Codex UI metadata: $codexMetaCount skills -> .agents/skills/*/agents/openai.yaml"
 
 # ---------------------------------------------------------------------------
 # 2. References  ->  references/  +  .gemini/references/  +  .agents/references/
 # ---------------------------------------------------------------------------
-$dstRefsCanon = Join-Path $Repo 'references'
-$dstRefsGem   = Join-Path $Repo '.gemini\references'
-$dstRefsCodex = Join-Path $Repo '.agents\references'
-Clear-Dir $dstRefsCanon; Clear-Dir $dstRefsGem; Clear-Dir $dstRefsCodex
+$dstRefsCanon  = Join-Path $Repo 'references'
+$dstRefsGem    = Join-Path $Repo '.gemini\references'
+$dstRefsCodex  = Join-Path $Repo '.agents\references'
+$dstRefsClaude = Join-Path $Repo '.claude\references'
+Clear-Dir $dstRefsCanon; Clear-Dir $dstRefsGem; Clear-Dir $dstRefsCodex; Clear-Dir $dstRefsClaude
 foreach ($rf in (Get-ChildItem -Path $SrcRefs -File)) {
-    foreach ($d in @($dstRefsCanon, $dstRefsGem, $dstRefsCodex)) {
+    foreach ($d in @($dstRefsCanon, $dstRefsGem, $dstRefsCodex, $dstRefsClaude)) {
         Copy-Item -Path $rf.FullName -Destination (Join-Path $d $rf.Name) -Force
     }
 }
-Write-Host "References: $((Get-ChildItem -Path $SrcRefs -File).Count) -> references/ .gemini/references/ .agents/references/"
+Write-Host "References: $((Get-ChildItem -Path $SrcRefs -File).Count) -> references/ .gemini/references/ .agents/references/ .claude/references/"
 
 # ---------------------------------------------------------------------------
 # 3. Agents  ->  agents/  +  .gemini/agents/  +  .codex/agents/
@@ -166,6 +273,7 @@ foreach ($cmd in (Get-ChildItem -Path $SrcCommands -File -Filter *.md)) {
 
 }
 Write-Host "Commands: $((Get-ChildItem -Path $SrcCommands -File -Filter *.md).Count) -> commands/ .gemini/commands/"
+Write-Host "Codex prompts: $($skillDirs.Count) skill names -> .codex/prompts/"
 
 # Codex slash commands are a thin launch surface for each auto-discovered
 # skill. Keep the body deliberately small so SKILL.md remains the single source
@@ -185,6 +293,157 @@ foreach ($sd in $skillDirs) {
     $codexPrompt = "---`ndescription: `"$skillDesc`"`nargument-hint: `"[args]`"`n---`n`nInvoke the $skillName skill and follow its workflow for: `$ARGUMENTS"
     Set-Content -NoNewline -Path (Join-Path $dstCmdCodex "$skillName.md") -Value $codexPrompt -Encoding UTF8
 }
-Write-Host "Codex prompts: $($skillDirs.Count) skill names -> .codex/prompts/"
+# ---------------------------------------------------------------------------
+# 5. Claude Code adapter
+#
+# Claude Code reads project skills from `.claude/skills/<name>/SKILL.md`
+# (generated in Section 1 alongside the other neutral trees), slash commands
+# from `.claude/commands/`, project rules from `.claude/rules/`, and a
+# top-level `CLAUDE.md` for project context. We also drop
+# `.claude-plugin/plugin.json` + `marketplace.json` so the pack can be loaded
+# as a plugin or a local marketplace.
+#
+# Slash command names mirror the upstream agent-skills short workflow names
+# (build/spec/plan/review/test/ship/code-simplify/webperf) instead of the
+# `cs-<skill>` names used for Codex / Gemini. Each command body still invokes
+# the underlying `cs-<skill>` so the canonical skill is the single source of truth.
+# ---------------------------------------------------------------------------
+$dstCmdClaude = Join-Path $Repo '.claude\commands'
+$dstRulesClaude = Join-Path $Repo '.claude\rules'
+Clear-Dir $dstCmdClaude
+Clear-Dir $dstRulesClaude
+
+# 5a. Slash commands (one per legacy workflow file under commands/*.md).
+# Strip CodeBuddy-only frontmatter fields (user-invocable/allowed-tools/agent/
+# when_to_use/disable-model-invocation) which Claude Code does not recognize.
+# Keep `description:` (and `argument-hint:`, which Claude Code supports).
+$claudeCmdCount = 0
+$claudeCmdNames = @{}
+foreach ($cmd in (Get-ChildItem -Path $SrcCommands -File -Filter *.md)) {
+    $base = $cmd.BaseName
+    $raw = Get-Content -Raw -Path $cmd.FullName
+
+    $clean = $raw
+    if ($clean -match '(?s)^---\r?\n(.*?)\r?\n---\r?\n') {
+        $fm = $matches[1]
+        $body = $clean.Substring($matches[0].Length)
+        $keep = @()
+        foreach ($l in ($fm -split "`r?`n")) {
+            if ($l -match '^(user-invocable|allowed-tools|agent|when_to_use|disable-model-invocation)\s*:') { continue }
+            $keep += $l
+        }
+        $clean = '---' + "`n" + ($keep -join "`n") + "`n---" + "`n" + $body
+    }
+
+    Set-Content -NoNewline -Path (Join-Path $dstCmdClaude "$base.md") -Value $clean -Encoding UTF8
+    $claudeCmdCount++
+    $claudeCmdNames[$base] = $true
+}
+
+# 5a1. Detect `/command` references that have no matching file in
+# .claude/commands/ (e.g. `/grill-me` in spec/plan/build) and generate a thin
+# wrapper that routes to the underlying `cs-<name>` skill.
+$missingRefs = [System.Collections.Generic.SortedSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+foreach ($cmd in (Get-ChildItem -Path $SrcCommands -File -Filter *.md)) {
+    $raw = Get-Content -Raw -Path $cmd.FullName
+    foreach ($m in [regex]::Matches($raw, '/([A-Za-z][A-Za-z0-9\-]*)')) {
+        $name = $m.Groups[1].Value.ToLower()
+        if ($name -and -not $claudeCmdNames.ContainsKey($name)) { [void]$missingRefs.Add($name) }
+    }
+}
+foreach ($name in $missingRefs) {
+    $skillMd = Join-Path $SrcSkills "cs-$name\SKILL.md"
+    if (-not (Test-Path $skillMd)) { continue }
+    $skillRaw = Get-Content -Raw -Path $skillMd
+    $desc = if ($skillRaw -match '(?m)^description:\s*(.+?)\s*$') { $matches[1].Trim().Trim('"') } else { $name }
+    $wrapper = "---`ndescription: `"$desc`"`n---`n`nInvoke the ``cs-$name`` skill and follow its workflow.`n"
+    Set-Content -NoNewline -Path (Join-Path $dstCmdClaude "$name.md") -Value $wrapper -Encoding UTF8
+    $claudeCmdCount++
+}
+Write-Host "Claude commands: $claudeCmdCount -> .claude/commands/"
+
+# 5b. Project rule against skill duplication (mirrors .claude/rules in upstream
+# agent-skills so Claude Code surfaces the CONTRIBUTING.md pre-flight check).
+$ruleBody = @'
+---
+description: Anti-duplication guardrail for adding or changing skills
+paths:
+  - "skills/**"
+  - ".codebuddy/skills/**"
+---
+
+# Adding or changing a skill
+
+This pack already covers most of the development lifecycle, so most new-skill ideas overlap an existing skill or an open skill catalog. Before creating a new `skills/<name>/` (or `.codebuddy/skills/<name>/`) directory or significantly reworking an existing one:
+
+- Search the existing catalog under `.codebuddy/skills/` and `skills/` for an overlap.
+- Justify the gap in one line (what lifecycle phase is missing, and which skill is the closest neighbor).
+- Follow the frontmatter / body anatomy used by the other skills (name + description in frontmatter; Overview / When to Use / Process / Red Flags / Verification in body).
+- Prefer extending an existing skill over adding a near-duplicate.
+
+`CLAUDE.md` (Claude Code), `AGENTS.md` (Codex / CodeBuddy router) and `GEMINI.md` (Gemini CLI router) are the single source of truth for the skill catalog — do not duplicate their content here, link to them.
+'@
+Set-Content -NoNewline -Path (Join-Path $dstRulesClaude 'skills-contributing.md') -Value $ruleBody -Encoding UTF8
+Write-Host "Claude rules: 1 -> .claude/rules/skills-contributing.md"
+
+# 5c. Plugin manifest. Letting the pack load via `.claude-plugin/plugin.json`
+# makes it installable through the plugin marketplace without duplicating skill
+# files at `~/.claude/skills/<name>/`. The marketplace reads this manifest and
+# points at the repo-local `skills/` directory we just generated.
+$pluginDir = Join-Path $Repo '.claude-plugin'
+if (-not (Test-Path $pluginDir)) { New-Item -ItemType Directory -Force -Path $pluginDir | Out-Null }
+$pluginJson = @'
+{
+  "name": "agent-skills-cs",
+  "version": "1.0.0",
+  "description": "Production-grade engineering workflow skills (cs-*) for Claude Code, sourced from .codebuddy/. Install via /plugin or copy the repo.",
+  "author": { "name": "agent-skills" }
+}
+'@
+Set-Content -NoNewline -Path (Join-Path $pluginDir 'plugin.json') -Value $pluginJson -Encoding UTF8
+
+# Marketplace manifest so the pack can also be added as a local plugin
+# marketplace: `claude plugin marketplace add <path>` then install from it.
+$marketplaceJson = @'
+{
+  "name": "agent-skills-cs",
+  "owner": { "name": "agent-skills" },
+  "plugins": [
+    { "source": "./" }
+  ]
+}
+'@
+Set-Content -NoNewline -Path (Join-Path $pluginDir 'marketplace.json') -Value $marketplaceJson -Encoding UTF8
+Write-Host "Claude plugin manifest: 2 -> .claude-plugin/plugin.json + marketplace.json"
+
+# 5d. CLAUDE.md (top-level Claude project context). Generated only when no
+# user-owned CLAUDE.md already exists at the repo root — that file is the
+# user's own persistent context and we must not clobber it on rebuild.
+$dstClaudeMd = Join-Path $Repo 'CLAUDE.md'
+if (-not (Test-Path $dstClaudeMd)) {
+    $claudeMdBody = @'
+# Agent-Skills for Claude Code
+
+This is the **agent-skills** pack — production-grade engineering workflow skills for Claude Code, ported from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) (MIT).
+
+## Skills
+
+Skills are discovered from `.claude/skills/<name>/SKILL.md` (project) and `~/.claude/skills/<name>/SKILL.md` (personal) — 29 skills, all `cs-` prefixed. Claude auto-invokes a skill when its `description` matches the task; you can also type the skill name directly to call it. The slash command shortcuts in `.claude/commands/` cover the main workflows.
+
+## Router
+
+`AGENTS.md` at the repo root is the universal router (also used by Codex / CodeBuddy / Gemini CLI). Read it to map an inbound task to the right skill.
+
+## Conventions
+
+- One `cs-<name>` per lifecycle phase; do not duplicate phases across skills.
+- Every skill follows the same anatomy — frontmatter (`name`, `description`) + body (`Overview`, `When to Use`, `Process`, `Common Rationalizations`, `Red Flags`, `Verification`).
+- Cross-reference other skills instead of paraphrasing their content.
+'@
+    Set-Content -NoNewline -Path $dstClaudeMd -Value $claudeMdBody -Encoding UTF8
+    Write-Host "Claude project context: 1 -> CLAUDE.md (created)"
+} else {
+    Write-Host "Claude project context: existing CLAUDE.md preserved"
+}
 
 Write-Host "`nDone. Adapter tree built under $Repo"

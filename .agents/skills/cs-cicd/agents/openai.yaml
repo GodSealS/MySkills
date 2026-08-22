@@ -1,0 +1,3 @@
+﻿interface:
+  display_name: "CS CICD"
+  short_description: "Automates CI/CD pipeline setup."
