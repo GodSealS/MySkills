@@ -54,6 +54,8 @@ ASSUMPTIONS I'M MAKING:
 5. **Testing Strategy** — Framework, location, coverage expectations
 6. **Boundaries** — Always/Ask First/Never rules
 
+**Architecture Fan-Out:** After the human approves the objective, **FAN-OUT to `cs-architect`** (via `Task`) to produce the architecture: module boundaries, dependency direction, tech stack, and an ADR for each significant decision (written via `cs-docs-adrs` to `docs/adr/`). The architect's output is a required input for the spec's Project Structure section.
+
 **Spec template:**
 
 ```markdown
@@ -138,12 +140,14 @@ Before invoking `cs-planning`, run `/grill-me <spec-path>` and replace the `pend
 - `cs-interview-me`: upstream — extracts what the user actually wants before specifying
 - `cs-idea-refine`: upstream — generates and refines options before writing a spec
 - `grill-me`: required gate before planning — stress-test the spec, then record the findings and decision in `## Grill Review`
+- `cs-architect` (agent): fan-out after the objective is approved — produces module boundaries, dependency direction, tech stack, and ADRs (via `cs-docs-adrs`, stored in `docs/adr/`)
 - `cs-planning`: downstream — break the spec into verifiable tasks
 
 ## Verification
 
 - [ ] The spec covers all six core areas
 - [ ] The human has reviewed and approved the spec
+- [ ] Architecture fan-out to `cs-architect` completed and ADRs recorded (see `cs-docs-adrs`)
 - [ ] `## Grill Review` records completed findings and a decision, or an explicit skip with accepted risks
 - [ ] Success criteria are specific and testable
 - [ ] Boundaries (Always/Ask First/Never) are defined

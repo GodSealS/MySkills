@@ -14,6 +14,8 @@ agent: cs-code-reviewer
 
 Design stable, well-documented interfaces that are hard to misuse. Good interfaces make the right thing easy and the wrong thing hard. This applies to REST APIs, GraphQL schemas, module boundaries, component props, and any surface where one piece of code talks to another.
 
+**Domain Owner:** When this skill is used to design or implement a backend-owned slice (primary owner: `backend` in the task plan), **FAN-OUT to `cs-backend-lead`** (via `Task`). The lead owns the interface and its implementation; this skill provides the design standards. The contract this skill produces is the handshake with `cs-frontend-lead` — define it explicitly before implementation.
+
 ## When to Use
 
 - Designing new API endpoints
@@ -84,3 +86,11 @@ Validate at every trust boundary:
 - [ ] All trust boundaries have validation
 - [ ] Breaking changes are versioned or avoided
 - [ ] Documentation matches implementation
+
+## Orchestration
+
+- **Backend slice design/implementation** → FAN-OUT to `cs-backend-lead`
+- **Frontend consumer** → `cs-frontend-lead`; the contract must be explicit and versioned before frontend consumes it
+- **Architecture boundaries** → set by `cs-architect`; surface disagreements in the report, do not silently redesign
+- **Breaking changes** → route through `cs-deprecation`
+- **Tests** → follow `cs-tdd` for backend logic; Prove-It pattern for bugs

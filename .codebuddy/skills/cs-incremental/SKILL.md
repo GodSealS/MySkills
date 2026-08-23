@@ -14,6 +14,8 @@ agent: cs-code-reviewer
 
 Build in thin vertical slices — implement one piece, test it, verify it, then expand. Avoid implementing an entire feature in one pass. Each increment should leave the system in a working, testable state.
 
+**Owner Routing:** Each slice carries a primary owner from the plan (`arch` / `frontend` / `backend`) and may name collaborators. Route the slice to the primary domain lead via FAN-OUT (`cs-architect` / `cs-frontend-lead` / `cs-backend-lead`) before or during implementation; consult collaborators only at their boundary. For a separately delivered contract, implement it before frontend consumption.
+
 ## When to Use
 
 - Implementing any multi-file change
@@ -95,6 +97,14 @@ Each increment should be independently revertable.
 - [ ] The build is clean
 - [ ] The feature works end-to-end as specified
 - [ ] No uncommitted changes remain
+
+## Orchestration
+
+- **frontend-owned slices** → `cs-frontend-ui` → FAN-OUT to `cs-frontend-lead`
+- **backend-owned slices** → `cs-api-design` → FAN-OUT to `cs-backend-lead`
+- **architecture/contract decisions** → FAN-OUT to `cs-architect`
+- **tests** → `cs-tdd`; **browser verification** → `cs-browser-test`
+- Scope discipline applies per-slice: each lead touches only files within its slice
 
 ## See Also
 

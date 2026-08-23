@@ -49,12 +49,17 @@ Task arrives
 
 ## Agent Personas
 
-| Agent | File | Role |
-|-------|------|------|
-| Code Reviewer | `.codebuddy/agents/cs-code-reviewer.md` | Five-axis code review |
-| Security Auditor | `.codebuddy/agents/cs-security-auditor.md` | Vulnerability detection |
-| Test Engineer | `.codebuddy/agents/cs-test-engineer.md` | Test strategy & coverage |
-| Web Perf Auditor | `.codebuddy/agents/cs-web-perf-auditor.md` | Core Web Vitals audit |
+| Agent | File | Role | Invoked by |
+|-------|------|------|------------|
+| Architect | `.codebuddy/agents/cs-architect.md` | Module boundaries, dependency direction, ADRs | `cs-spec-driven`, `cs-planning` fan-out |
+| Frontend Lead | `.codebuddy/agents/cs-frontend-lead.md` | Frontend domain owner: UI, state, browser verification | frontend-owned `cs-incremental`, `cs-frontend-ui`, `cs-browser-test`, `cs-tdd`, security, and performance work |
+| Backend Lead | `.codebuddy/agents/cs-backend-lead.md` | Backend domain owner: API, data, server security/perf | backend-owned `cs-incremental`, `cs-api-design`, `cs-tdd`, security, and performance work |
+| Code Reviewer | `.codebuddy/agents/cs-code-reviewer.md` | Five-axis code review | `cs-code-review`, `cs-shipping` fan-out |
+| Security Auditor | `.codebuddy/agents/cs-security-auditor.md` | Vulnerability detection | `cs-security`, `cs-shipping` fan-out |
+| Test Engineer | `.codebuddy/agents/cs-test-engineer.md` | Test strategy & coverage | `cs-tdd`, `cs-shipping` fan-out |
+| Web Perf Auditor | `.codebuddy/agents/cs-web-perf-auditor.md` | Core Web Vitals audit | `cs-perf-opt`, `cs-shipping` fan-out |
+
+**Orchestration model:** Agents are invoked **by skills** (fan-out), not by user commands. The three domain agents (Architect / Frontend Lead / Backend Lead) are the *build-side* owners; the four audit agents are the *review-side* owners. Both are triggered automatically when their owning skill enters the relevant phase.
 
 ## Core Operating Behaviors
 

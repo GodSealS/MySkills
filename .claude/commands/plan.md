@@ -11,9 +11,9 @@ Before planning, require a `## Grill Review` section in the spec. It must either
 Then:
 
 1. Enter plan mode — read only, no code changes
-2. Identify the dependency graph between components
+2. Identify the dependency graph between components — FAN-OUT to `cs-architect` to validate module boundaries and dependency direction
 3. Slice work vertically (one complete path per task, not horizontal layers)
-4. Write tasks with acceptance criteria and verification steps
+4. Write tasks with acceptance criteria, verification steps, a **primary owner** tag (`arch` / `frontend` / `backend`), and optional collaborators; keep cross-domain work as an end-to-end slice unless its contract must be independently delivered first.
 5. Add checkpoints between phases
 6. Present the plan for human review
 

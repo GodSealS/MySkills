@@ -34,6 +34,8 @@ Before writing any code, operate in read-only mode:
 
 Map what depends on what. Implementation order follows the dependency graph bottom-up.
 
+**Architect Fan-Out:** After mapping the graph, **FAN-OUT to `cs-architect`** (via `Task`) to validate module boundaries and dependency direction before committing to a task order. The architect confirms there are no cycles and that dependencies flow the right way. If the spec already contains architect-approved ADRs, this step is a confirmation check, not a full redesign.
+
 ### Step 3: Slice Vertically
 
 Instead of building all database, then all API, then all UI — build one complete feature path at a time.
@@ -61,6 +63,9 @@ Task 4: User can view task list (query + API + UI)
 
 **Description:** One paragraph explaining what this task accomplishes.
 
+**Primary owner:** [arch | frontend | backend]   ← required; routes the task to one domain lead
+**Collaborators:** [none | arch | frontend | backend]   ← optional; consulted only where the slice crosses their boundary
+
 **Acceptance criteria:**
 - [ ] [Specific, testable condition]
 - [ ] [Specific, testable condition]
@@ -74,6 +79,12 @@ Task 4: User can view task list (query + API + UI)
 **Files likely touched:** [File paths]
 **Estimated scope:** [Small: 1-2 files | Medium: 3-5 files | Large: 5+ files]
 ```
+
+**Ownership rules:**
+- `frontend` → UI structure, components, state, browser behavior → `cs-frontend-lead` in BUILD
+- `backend` → API, data layer, server logic → `cs-backend-lead` in BUILD
+- `arch` → public contracts, module skeletons, cross-cutting config (structural artifacts only, not business features) → `cs-architect` in BUILD
+- Keep a cross-domain feature as one end-to-end vertical slice. Give it one primary owner and list the other domain as a collaborator. Split out a backend contract task only when it is independently versioned, shared, or needed before parallel frontend work; order that contract before its consumer.
 
 ### Step 5: Order and Checkpoint
 
@@ -100,8 +111,10 @@ Arrange tasks so dependencies are satisfied and verification checkpoints occur e
 ## Verification
 
 - [ ] The source spec contains a completed `## Grill Review` decision or explicit skip with accepted risks
+- [ ] Architecture fan-out to `cs-architect` validated the dependency graph (or spec ADRs reviewed)
 - [ ] Every task has acceptance criteria
 - [ ] Every task has a verification step
+- [ ] Every task has a primary owner (`arch` / `frontend` / `backend`)
 - [ ] Task dependencies are identified and ordered
 - [ ] No task touches more than ~5 files
 - [ ] Checkpoints exist between major phases
@@ -110,8 +123,10 @@ Arrange tasks so dependencies are satisfied and verification checkpoints occur e
 ## Interaction with Other Skills
 
 - `cs-spec-driven`: upstream — provides the spec to break into tasks
+- `cs-architect` (agent): fan-out to validate dependency graph and module boundaries before ordering tasks
 - `grill-me`: upstream — stress-test the design before committing to a task plan
-- `cs-incremental`: downstream — execute tasks in thin vertical slices
+- `cs-incremental`: downstream — execute tasks in thin vertical slices, routed by owner
+- `cs-frontend-lead` / `cs-backend-lead` (agents): downstream — implement primary-owner tasks and consult on listed collaborator boundaries
 - `cs-tdd`: downstream — test-driven implementation of individual tasks
 
 ## See Also

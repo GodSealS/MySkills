@@ -33,7 +33,7 @@ Use this once a spec exists and you want to collapse plan + build into one run. 
 3. **Establish a clean baseline.** Run `git status --porcelain`. If there are uncommitted changes outside planning artifacts, stop and ask the user to commit, stash, or confirm.
 4. **Plan if needed.** If no `tasks/plan.md`, invoke `cs-planning` to generate one.
 5. **Single checkpoint.** Present the full plan and wait for an unambiguous affirmative. This is the only human gate — after approval, run autonomously.
-6. **Execute every task in dependency order.** For each task, run RED → GREEN → regression → build → commit → mark complete. Stage only the files that task touched — make one commit per task.
+6. **Execute every task in dependency order, routed by primary owner.** FAN-OUT to the primary domain lead (`cs-frontend-lead` for frontend tasks, `cs-backend-lead` for backend tasks, `cs-architect` for structural/contract tasks — not business features) and consult listed collaborators only at their boundary. Run RED → GREEN → regression → build → commit → mark complete. Contract-first applies only when a contract is independently delivered. Stage only the files that task touched — make one commit per task.
 7. **Stop and ask the user** when:
    - A test can't be made to pass → follow `cs-debugging`
    - The spec is ambiguous or a task needs an uncovered decision

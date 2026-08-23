@@ -65,14 +65,17 @@ Identify the development phase of the incoming task, then apply the matching ski
 
 ## Personas (agents/)
 
-| Agent | Role | Use when |
-|-------|------|----------|
-| cs-code-reviewer | Senior Staff Engineer | five-axis code review |
-| cs-security-auditor | Security Engineer | vulnerability detection, threat modeling |
-| cs-test-engineer | QA Specialist | test strategy, coverage analysis |
-| cs-web-perf-auditor | Web Perf Engineer | Core Web Vitals audit |
+| Agent | Role | Use when | Invoked by (skill fan-out) |
+|-------|------|----------|-----------------------------|
+| cs-architect | System Architect | module boundaries, dependency direction, tech stack, ADRs | cs-spec-driven, cs-planning |
+| cs-frontend-lead | Frontend Lead | UI implementation, state, browser verification | frontend-owned cs-incremental, cs-frontend-ui, cs-browser-test, cs-tdd, security, performance |
+| cs-backend-lead | Backend Lead | API implementation, data layer, server security/perf | backend-owned cs-incremental, cs-api-design, cs-tdd, security, performance |
+| cs-code-reviewer | Senior Staff Engineer | five-axis code review | cs-code-review, cs-shipping |
+| cs-security-auditor | Security Engineer | vulnerability detection, threat modeling | cs-security, cs-shipping |
+| cs-test-engineer | QA Specialist | test strategy, coverage analysis | cs-tdd, cs-shipping |
+| cs-web-perf-auditor | Web Perf Engineer | Core Web Vitals audit | cs-perf-opt, cs-shipping |
 
-Personas may invoke skills, but do not invoke other personas — only the user (or this router) orchestrates.
+Personas may invoke skills, but do not invoke other personas — only the user (or this router) orchestrates. Agents are triggered **by skills** (fan-out) when their owning skill enters the relevant phase — no user command needed.
 
 ## Process
 

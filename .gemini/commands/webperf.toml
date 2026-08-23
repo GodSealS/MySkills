@@ -1,6 +1,7 @@
-﻿description = "Run a web performance audit via the web-performance-auditor persona / 通过Web性能审计角色运行Web性能审计"
+description = "Run a web performance audit via the web-performance-auditor persona / 通过Web性能审计角色运行Web性能审计"
 
-prompt = '''`/webperf` targets web applications specifically. Do not use it for utility libraries, CLIs, or server-only code with no browser-facing output.
+prompt = '''
+`/webperf` targets web applications specifically. Do not use it for utility libraries, CLIs, or server-only code with no browser-facing output.
 
 ## Determine the mode
 
@@ -22,5 +23,4 @@ Spawn the `cs-web-perf-auditor` subagent. Pass it:
 - The target URL or page name when known
 - Which mode you expect (Quick or Deep)
 
-The subagent returns a scorecard (only populated with sourced values), a ranked list of findings, positive observations, and proactive recommendations.
-'''
+The subagent returns a scorecard (only populated with sourced values), a ranked list of findings, positive observations, and proactive recommendations.'''

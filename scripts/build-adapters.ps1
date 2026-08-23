@@ -158,14 +158,16 @@ function Set-SkillPlatformModel([string]$path, [string]$platform) {
 function Set-AgentPlatformModel([string]$path, [string]$platform) {
     $content = Get-Content -Raw -Path $path
     $agentName = if ($content -match '(?m)^name:\s*(.+?)\s*$') { $matches[1].Trim() } else { throw "Agent name missing: $path" }
-    $highReasoningAgents = @('cs-code-reviewer', 'cs-security-auditor')
-    $isHighReasoning = $highReasoningAgents -contains $agentName
-    $targetModel = switch ($platform) {
-        'claude' { if ($isHighReasoning) { 'opus' } else { 'sonnet' } }
-        'codex'  { if ($isHighReasoning) { 'gpt-5.6-sol' } else { 'gpt-5.6-terra' } }
-        'gemini' { if ($isHighReasoning) { 'gemini-2.5-pro' } else { 'gemini-2.5-flash' } }
-        default  { throw "Unsupported agent platform: $platform" }
+    $proAgents = @('cs-architect', 'cs-backend-lead', 'cs-frontend-lead', 'cs-code-reviewer', 'cs-security-auditor')
+    $flashAgents = @('cs-test-engineer', 'cs-web-perf-auditor')
+    if ($proAgents -contains $agentName) {
+        $tier = 'DeepSeek-V4-Pro'
+    } elseif ($flashAgents -contains $agentName) {
+        $tier = 'DeepSeek-V4-Flash'
+    } else {
+        throw "Unsupported agent persona: $agentName"
     }
+    $targetModel = Get-PlatformModel $tier $platform
     $content = $content -replace '(?m)^model:\s*.+?\s*$', "model: $targetModel"
     Set-Content -NoNewline -Path $path -Value $content -Encoding UTF8
 }

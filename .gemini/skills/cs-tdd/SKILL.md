@@ -18,6 +18,8 @@ Write a failing test before writing the code that makes it pass. For bug fixes, 
 - Adding edge case handling
 - Any change that could break existing behavior
 
+**Owner Routing:** Tests stay with the slice they prove. For a backend-owned slice, FAN-OUT to `cs-backend-lead`; for a frontend-owned slice, FAN-OUT to `cs-frontend-lead`. `cs-test-engineer` remains the independent test-coverage reviewer and does not own feature implementation.
+
 ## The TDD Cycle
 
 ```

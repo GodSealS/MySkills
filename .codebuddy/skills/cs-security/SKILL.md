@@ -23,6 +23,8 @@ Security-first development practices for web applications. Treat every external 
 - Adding file uploads, webhooks, or callbacks
 - Handling payment or PII data
 
+**Owner Routing:** Security remediation stays with the affected slice. FAN-OUT to `cs-backend-lead` for server trust boundaries, authentication, data access, and external integrations; FAN-OUT to `cs-frontend-lead` for browser input handling, rendering, and client storage. `cs-security-auditor` independently reviews the result and does not implement the feature.
+
 ## Process: Threat Model First
 
 1. **Map the trust boundaries.** Where does untrusted data enter your system?

@@ -108,10 +108,10 @@ build_agents() (
     cp "$src" "$target"
     if [ "$platform" = claude ]; then strip_claude_agent_frontmatter "$target"; fi
     if [ "$platform" != neutral ]; then
-      case "$(basename "$src")" in
-        cs-code-reviewer.md|cs-security-auditor.md) tier=DeepSeek-V4-Pro ;;
+      case "$name" in
+        cs-architect.md|cs-backend-lead.md|cs-frontend-lead.md|cs-code-reviewer.md|cs-security-auditor.md) tier=DeepSeek-V4-Pro ;;
         cs-test-engineer.md|cs-web-perf-auditor.md) tier=DeepSeek-V4-Flash ;;
-        *) die "unsupported persona $(basename "$src")" ;;
+        *) die "unsupported persona $name" ;;
       esac
       replace_model "$target" "$(platform_model "$platform" "$tier")"
     fi
@@ -139,12 +139,36 @@ build_refs "$ROOT/.gemini/references"
 build_refs "$ROOT/.agents/references"
 build_refs "$ROOT/.claude/references"
 
-# Keep existing command adapters and refresh the canonical/Claude markdown copies.
-mkdir -p "$ROOT/commands" "$ROOT/.claude/commands"
+# Refresh command adapters from the canonical CodeBuddy commands.
+mkdir -p "$ROOT/commands" "$ROOT/.claude/commands" "$ROOT/.gemini/commands" "$ROOT/.codex/prompts"
 for src in "$ROOT/.codebuddy/commands"/*.md; do
   [ -f "$src" ] || continue
-  cp "$src" "$ROOT/commands/$(basename "$src")"
-  cp "$src" "$ROOT/.claude/commands/$(basename "$src")"
+  name=$(basename "$src")
+  cp "$src" "$ROOT/commands/$name"
+  cp "$src" "$ROOT/.claude/commands/$name"
+
+  description=$(sed -n 's/^description:[[:space:]]*"\(.*\)"[[:space:]]*$/\1/p' "$src" | head -n 1)
+  [ -n "$description" ] || description=${name%.md}
+  body=$(awk 'BEGIN { delimiters = 0 } /^---[[:space:]]*$/ { delimiters++; next } delimiters >= 2 { print }' "$src")
+  escaped_description=$(printf '%s' "$description" | sed 's/\\/\\\\/g; s/"/\\"/g')
+  case "$body" in
+    *"'''"*)
+      escaped_body=$(printf '%s' "$body" | sed 's/\\/\\\\/g; s/"/\\"/g')
+      prompt="\"\"\"$escaped_body\"\"\""
+      ;;
+    *) prompt="'''$body'''" ;;
+  esac
+  printf 'description = "%s"\n\nprompt = %s\n' "$escaped_description" "$prompt" > "$ROOT/.gemini/commands/${name%.md}.toml"
+done
+
+# Codex prompts are a thin launch surface for every auto-discovered skill.
+for src in "$SRC_SKILLS"/*/SKILL.md; do
+  [ -f "$src" ] || continue
+  skill_name=$(sed -n 's/^name:[[:space:]]*\([^[:space:]]*\)[[:space:]]*$/\1/p' "$src" | head -n 1)
+  [ -n "$skill_name" ] || skill_name=$(basename "$(dirname "$src")")
+  skill_description=$(sed -n 's/^description:[[:space:]]*"\(.*\)"[[:space:]]*$/\1/p' "$src" | head -n 1)
+  escaped_description=$(printf '%s' "$skill_description" | sed 's/\\/\\\\/g; s/"/\\"/g')
+  printf '%s\n' '---' "description: \"$escaped_description\"" 'argument-hint: "[args]"' '---' '' "Invoke the $skill_name skill and follow its workflow for: \$ARGUMENTS" > "$ROOT/.codex/prompts/$skill_name.md"
 done
 
 # Claude plugins must contain Claude-native skills and agents at plugin root.

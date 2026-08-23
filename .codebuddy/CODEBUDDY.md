@@ -8,7 +8,10 @@ Skills encode the workflows, quality gates, and best practices that senior engin
 
 ```
 .codebuddy/
-├── agents/                   → 4 reusable specialist personas
+├── agents/                   → 7 reusable specialist personas
+│   ├── cs-architect.md           (build-side: architecture, ADRs)
+│   ├── cs-frontend-lead.md       (build-side: frontend domain owner)
+│   ├── cs-backend-lead.md        (build-side: backend domain owner)
 │   ├── cs-code-reviewer.md
 │   ├── cs-security-auditor.md
 │   ├── cs-test-engineer.md
@@ -111,14 +114,17 @@ CodeBuddy discovers and activates skills based on `AGENTS.md` intent mapping. Wh
 
 ## Agent Personas
 
-| Agent | Role | Use When |
-|-------|------|----------|
-| cs-code-reviewer | Senior Staff Engineer | Five-axis code review |
-| cs-security-auditor | Security Engineer | Vulnerability detection, threat modeling |
-| cs-test-engineer | QA Specialist | Test strategy, coverage analysis |
-| cs-web-perf-auditor | Web Perf Engineer | Core Web Vitals audit |
+| Agent | Role | Use When | Invoked by (skill fan-out) |
+|-------|------|----------|-----------------------------|
+| cs-architect | System Architect | Module boundaries, dependency direction, tech stack, ADRs | cs-spec-driven, cs-planning |
+| cs-frontend-lead | Frontend Lead | UI implementation, state, browser verification | frontend-owned cs-incremental, cs-frontend-ui, cs-browser-test, cs-tdd, security, performance |
+| cs-backend-lead | Backend Lead | API implementation, data layer, server security/perf | backend-owned cs-incremental, cs-api-design, cs-tdd, security, performance |
+| cs-code-reviewer | Senior Staff Engineer | Five-axis code review | cs-code-review, cs-shipping |
+| cs-security-auditor | Security Engineer | Vulnerability detection, threat modeling | cs-security, cs-shipping |
+| cs-test-engineer | QA Specialist | Test strategy, coverage analysis | cs-tdd, cs-shipping |
+| cs-web-perf-auditor | Web Perf Engineer | Core Web Vitals audit | cs-perf-opt, cs-shipping |
 
-Personas follow the composition rule: **only the user (or AGENTS.md intent mapping) is the orchestrator. Personas do not invoke other personas.** A persona may invoke skills.
+Personas follow the composition rule: **only the user (or AGENTS.md intent mapping) is the orchestrator. Personas do not invoke other personas.** A persona may invoke skills. **Agents are triggered by skills** (fan-out) when their owning skill enters the relevant phase — no user command needed.
 
 ## Conventions
 

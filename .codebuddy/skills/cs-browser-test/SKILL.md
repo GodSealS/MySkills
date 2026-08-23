@@ -25,6 +25,8 @@ Use Chrome DevTools MCP to give your agent eyes into the browser. This bridges t
 
 **When NOT to use:** Backend-only changes, CLI tools, or code that doesn't run in a browser.
 
+**Owner Routing:** For a frontend-owned slice, FAN-OUT to `cs-frontend-lead` to run and interpret the browser verification. Browser observations are evidence for the active implementation owner; this skill does not delegate backend-only work.
+
 ## Setting Up Chrome DevTools MCP
 
 Add to `.mcp.json` or CodeBuddy settings:
