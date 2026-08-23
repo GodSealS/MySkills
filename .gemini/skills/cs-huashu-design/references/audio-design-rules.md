@@ -1,4 +1,4 @@
-﻿# 音频设计规则 · huashu-design
+# 音频设计规则 · huashu-design
 
 > 所有动画 demo 的音频应用配方。和 `sfx-library.md`（资产清单）配套使用。
 > 实战锤炼：huashu-design 发布 hero v1-v9 迭代 · Anthropic 三支官方片子的 Gemini 深度拆解 · 8000+ 次 A/B 对比

@@ -6,7 +6,7 @@
   -Target codebuddy  -> install .codebuddy/ (skills/agents/commands/references/hooks + AGENTS.md/settings.json/CODEBUDDY.md)
   -Target gemini     -> install .gemini/ + GEMINI.md
   -Target codex      -> install project adapters, or register skills under ~/.codex/skills
-  -Target claude     -> install .claude/ + canonical skills/ + CLAUDE.md, or register skills under ~/.claude/skills
+  -Target claude     -> install .claude/ + Claude skills/agents + CLAUDE.md, or register them under ~/.claude
   -Target all        -> all of the above
 
   By default -Destination is the current directory (a project root). Use -UserHome to install into
@@ -231,8 +231,8 @@ if ($doCodex) {
     }
 }
 
-# Claude Code: project-level uses `.claude/skills/` (Claude auto-discovers
-# skills there), `.claude/commands/` + `.claude/rules/`, optional
+# Claude Code: project-level uses `.claude/skills/` and `.claude/agents/` (Claude
+# auto-discovers both), `.claude/commands/` + `.claude/rules/`, optional
 # `.claude-plugin/` for plugin/marketplace discovery, and `CLAUDE.md` for
 # top-level context. User-level installs mirror content into
 # `~/.claude/skills/`, `~/.claude/commands/`, etc., with the same
@@ -244,15 +244,15 @@ if ($doClaude) {
     if ($UserHome) {
         $known = if ($manifestPath) { Read-CodexManifest $manifestPath } else { @{} }
         $next = @{}
-        # Skills: copy each full `skills/<name>/` tree (SKILL.md plus its
-        # references/, assets/, scripts/ etc.) to ~/.claude/skills/<name>/.
-        # Reuses the manifest-protected skill-tree installer shared with Codex.
-        $srcSkillsCanon = Join-Path $Repo 'skills'
-        if (Test-Path $srcSkillsCanon) {
+        # Skills: use the Claude adapter so model frontmatter remains Claude-native.
+        $srcSkillsClaude = Join-Path $Repo '.claude\skills'
+        if (Test-Path $srcSkillsClaude) {
             $destClaudeSkills = Join-Path $destClaude 'skills'
             if (-not (Test-Path $destClaudeSkills)) { New-Item -ItemType Directory -Force -Path $destClaudeSkills | Out-Null }
-            Install-CodexUserSkills $srcSkillsCanon $destClaudeSkills $known $next
+            Install-CodexUserSkills $srcSkillsClaude $destClaudeSkills $known $next
         }
+        # Persona agents: use the Claude adapter and preserve user-owned agents.
+        Install-CodexUserTree (Join-Path $Repo '.claude\agents') (Join-Path $destClaude 'agents') 'agents' $known $next
         # Slash commands: ~/.claude/commands/<name>.md
         Install-CodexUserTree (Join-Path $Repo '.claude\commands') (Join-Path $destClaude 'commands') 'commands' $known $next
         # Rules: ~/.claude/rules/<name>.md
@@ -263,13 +263,15 @@ if ($doClaude) {
         Write-CodexManifest $manifestPath $next
         Write-Host "Installed Claude user-level adapters -> $destClaude"
     } else {
-        # Project-level install: copy .claude/ (skills, commands, rules),
+        # Project-level install: copy .claude/ (skills, agents, commands, rules),
         # the plugin manifest, and the top-level CLAUDE.md. We use the same
         # merge-by-default behavior as CodeBuddy so co-located user skills
         # in `.claude/skills/` (e.g. team-internal) are not wiped on update.
         if (Test-Path (Join-Path $Repo '.claude')) { Merge-Platform (Join-Path $Repo '.claude') $destClaude 'Claude' }
         $pluginDir = Join-Path $Repo '.claude-plugin'
         if (Test-Path $pluginDir) { & $DirCopy $pluginDir (Join-Path $destRoot '.claude-plugin') 'Claude plugin manifest' }
+        $claudePluginPackage = Join-Path $Repo 'plugins\claude'
+        if (Test-Path $claudePluginPackage) { & $DirCopy $claudePluginPackage (Join-Path $destRoot 'plugins\claude') 'Claude plugin package' }
         Copy-File (Join-Path $Repo 'CLAUDE.md') (Join-Path $destRoot 'CLAUDE.md') 'CLAUDE.md'
     }
 }

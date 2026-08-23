@@ -1,4 +1,4 @@
-﻿# Animation Best Practices · 正向动画设计语法
+# Animation Best Practices · 正向动画设计语法
 
 > 基于 Anthropic 官方三支产品动画（Claude Design / Claude Code Desktop / Claude for Word）
 > 的深度拆解，提炼出的"Anthropic 级"动画设计规则。

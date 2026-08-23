@@ -1,4 +1,4 @@
-﻿# React + Babel 项目规范
+# React + Babel 项目规范
 
 用HTML+React+Babel做原型时必须遵守的技术规范。不遵守会炸。
 

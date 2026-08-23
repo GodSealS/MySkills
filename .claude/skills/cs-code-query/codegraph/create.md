@@ -1,4 +1,4 @@
-﻿# CodeGraph: Create Knowledge Graph
+# CodeGraph: Create Knowledge Graph
 
 Create a CodeGraph knowledge graph for the current project.
 

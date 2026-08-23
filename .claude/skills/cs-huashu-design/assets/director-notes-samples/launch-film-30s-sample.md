@@ -1,4 +1,4 @@
-﻿# v5 · "Markdown is the new typewriter."
+# v5 · "Markdown is the new typewriter."
 
 > Director's Notes for the **huashu-md-html v2.0** launch film
 > 30 seconds · 1920×1080 · 25 fps · no voiceover

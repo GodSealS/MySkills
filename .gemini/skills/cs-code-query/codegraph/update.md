@@ -1,4 +1,4 @@
-﻿# CodeGraph: Update Knowledge Graph
+# CodeGraph: Update Knowledge Graph
 
 Update/sync the project's CodeGraph knowledge graph.
 

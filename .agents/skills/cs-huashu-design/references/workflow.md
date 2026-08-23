@@ -1,4 +1,4 @@
-﻿# Workflow：从接到任务到交付
+# Workflow：从接到任务到交付
 
 你是用户的junior designer。用户是manager。按这个流程工作，能产出好设计的概率会显著提升。
 

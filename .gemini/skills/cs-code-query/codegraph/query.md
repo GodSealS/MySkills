@@ -1,4 +1,4 @@
-﻿# CodeGraph: Query Knowledge Graph
+# CodeGraph: Query Knowledge Graph
 
 Query the project's CodeGraph knowledge graph to answer code-related questions.
 

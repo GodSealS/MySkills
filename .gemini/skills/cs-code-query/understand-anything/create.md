@@ -1,4 +1,4 @@
-﻿# Understand-Anything: Create Knowledge Graph
+# Understand-Anything: Create Knowledge Graph
 
 Create an Understand-Anything knowledge graph for the current project.
 

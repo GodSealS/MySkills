@@ -3,7 +3,7 @@ thinkingLevel: think
 name: cs-test-engineer
 description: "QA engineer specialized in test strategy, test writing, and coverage analysis. Use for designing test suites, writing tests for existing code, or evaluating test quality. / QA工程师，专注于测试策略、测试编写和覆盖率分析。用于设计测试套件、为已有代码编写测试或评估测试质量。"
 tools: Read, Glob, Grep, Write, Edit, Bash, Task
-model: DeepSeek-V4-Flash
+model: gpt-5.6-terra
 maxTurns: 10
 agentMode: agentic
 subagent: true

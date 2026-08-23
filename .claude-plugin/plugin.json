@@ -1,6 +1,0 @@
-﻿{
-  "name": "agent-skills-cs",
-  "version": "1.0.0",
-  "description": "Production-grade engineering workflow skills (cs-*) for Claude Code, sourced from .codebuddy/. Install via /plugin or copy the repo.",
-  "author": { "name": "agent-skills" }
-}

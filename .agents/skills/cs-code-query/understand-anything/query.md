@@ -1,4 +1,4 @@
-﻿# Understand-Anything: Query Knowledge Graph
+# Understand-Anything: Query Knowledge Graph
 
 Query the project's Understand-Anything knowledge graph to answer code-related questions.
 

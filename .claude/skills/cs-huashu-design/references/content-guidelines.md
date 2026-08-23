@@ -1,4 +1,4 @@
-﻿# Content Guidelines：反AI slop、内容准则、Scale规范
+# Content Guidelines：反AI slop、内容准则、Scale规范
 
 AI设计里最容易掉进去的陷阱。这是一份「不做什么」的清单，比「做什么」更重要——因为AI slop是默认值，你不主动避免就会发生。
 

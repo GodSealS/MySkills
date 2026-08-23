@@ -1,4 +1,4 @@
-﻿# Video Export：HTML 动画导出为 MP4/GIF
+# Video Export：HTML 动画导出为 MP4/GIF
 
 动画 HTML 完成后，用户常想「能导出视频吗」。这份指南给出完整流程。
 

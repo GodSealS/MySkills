@@ -1,4 +1,4 @@
-﻿# Understand-Anything: Update Knowledge Graph
+# Understand-Anything: Update Knowledge Graph
 
 Update/rebuild the project's Understand-Anything knowledge graph.
 

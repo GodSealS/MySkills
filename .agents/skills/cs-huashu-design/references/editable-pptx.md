@@ -1,4 +1,4 @@
-﻿# 可编辑 PPTX 导出：HTML 硬约束 + 尺寸决策 + 常见错误
+# 可编辑 PPTX 导出：HTML 硬约束 + 尺寸决策 + 常见错误
 
 本文档讲的是**用 `scripts/html2pptx.js` + `pptxgenjs` 把 HTML 逐元素翻译成真·可编辑 PowerPoint 文本框**的路径，也是 `export_deck_pptx.mjs` 唯一支持的路径。
 

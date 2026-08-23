@@ -3,7 +3,7 @@ thinkingLevel: think
 name: cs-security-auditor
 description: "Security engineer focused on vulnerability detection, threat modeling, and secure coding practices. Use for security-focused code review, threat analysis, or hardening recommendations. / 安全工程师，专注于漏洞检测、威胁建模和安全编码实践。用于安全审查、威胁分析或加固建议。"
 tools: Read, Glob, Grep, Write, Edit, Bash, Task
-model: DeepSeek-V4-Flash
+model: gemini-2.5-pro
 maxTurns: 10
 agentMode: agentic
 subagent: true

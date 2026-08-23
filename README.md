@@ -24,14 +24,16 @@ into **Codex**, **CodeBuddy**, **Claude Code**, and **Gemini CLI** from a single
 ├── .agents/           # Codex skill adapter (auto-discovered)
 │   └── skills/  references/
 ├── .codex/            # Codex adapter (prompts/*.md + agents/)
-├── .claude/           # Claude Code adapter (skills + slash commands + rules)
-│   ├── skills/ commands/ rules/ references/
+├── .claude/           # Claude Code adapter (skills + agents + slash commands + rules)
+│   ├── skills/ agents/ commands/ rules/ references/
 ├── .claude-plugin/    # Claude Code plugin + marketplace manifests (load via /plugin)
 ├── CLAUDE.md          # Claude Code top-level project context (generated only when missing)
 ├── AGENTS.md          # universal router (Codex / CodeBuddy auto-discover this)
 ├── GEMINI.md          # Gemini persistent context
 └── scripts/
     ├── build-adapters.ps1   # regenerate all adapters from .codebuddy/
+    ├── build-adapters.sh    # macOS/Linux adapter builder
+    ├── install.sh            # macOS/Linux installer
     └── install.ps1          # copy a platform's files to a target location
 ```
 
@@ -84,13 +86,23 @@ Install everything at once:
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install.ps1 -Target all -UserHome
 ```
 
-## Regenerate adapters
-After editing anything under `.codebuddy/`, rebuild the platform trees:
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-adapters.ps1
+### macOS / Linux
+
+Use the POSIX scripts instead of PowerShell:
+```sh
+sh scripts/build-adapters.sh
+sh scripts/install.sh --target claude --user-home
 ```
+
+## Regenerate adapters
+After editing anything under `.codebuddy/`, rebuild the platform trees. On macOS/Linux run
+`sh scripts/build-adapters.sh`; on Windows use `scripts/build-adapters.ps1`.
 `cs-huashu-design` (browser/asset dependent) and `cs-code-query` (MCP-routing)
 are now synced to all platform adapters.
+
+Skill models are selected by complexity in `.codebuddy/`; persona-agent models are selected by role
+and translated per host during adapter generation: CodeBuddy uses DeepSeek, Claude uses Opus/Sonnet,
+Codex uses GPT-5.6 Sol/Terra, and Gemini uses Gemini Pro/Flash.
 
 ## Skill phases
 Define: cs-interview-me, cs-idea-refine, cs-grill-me, cs-spec-driven

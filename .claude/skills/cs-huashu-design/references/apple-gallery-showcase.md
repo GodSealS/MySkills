@@ -1,4 +1,4 @@
-﻿# Apple Gallery Showcase · 画廊展示墙动画风格
+# Apple Gallery Showcase · 画廊展示墙动画风格
 
 > 灵感来源：Claude Design 官网 hero 视频 + 苹果产品页「作品墙」式陈列
 > 实战出处：huashu-design 发布 hero v5

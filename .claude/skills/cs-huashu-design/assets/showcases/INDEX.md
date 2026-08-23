@@ -1,4 +1,4 @@
-﻿# Design Philosophy Showcases — 样例资产索引
+# Design Philosophy Showcases — 样例资产索引
 
 > 8 种场景 × 3 种风格 = 24 个预制设计样例
 > 用于 Phase 3 推荐设计方向时，直接展示「这个风格做出来长什么样」

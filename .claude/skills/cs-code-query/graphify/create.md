@@ -1,4 +1,4 @@
-﻿# Graphify: Create Knowledge Graph
+# Graphify: Create Knowledge Graph
 
 Create a Graphify knowledge graph for the current project.
 

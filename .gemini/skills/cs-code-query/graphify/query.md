@@ -1,4 +1,4 @@
-﻿# Graphify: Query Knowledge Graph
+# Graphify: Query Knowledge Graph
 
 Query the project's Graphify knowledge graph to answer code-related questions.
 

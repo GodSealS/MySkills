@@ -1,4 +1,4 @@
-﻿# Cinematic Patterns · Workflow Demo 的 Best Practice
+# Cinematic Patterns · Workflow Demo 的 Best Practice
 
 > 从「PPT 动画」升级到「发布会级 cinematic」的 5 个关键 pattern。
 > 蒸馏自 2026-04 「聊聊 skill」 deck 的两个 cinematic demo（Nuwa workflow + Darwin workflow），实测可复现。

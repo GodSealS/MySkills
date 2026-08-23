@@ -3,7 +3,7 @@ thinkingLevel: think
 name: cs-web-perf-auditor
 description: "Web performance engineer focused on Core Web Vitals, loading, rendering, and network optimization. Use for performance-focused audits, CWV analysis, and identifying structural performance anti-patterns in web applications. / Web性能工程师，专注于Core Web Vitals、加载、渲染和网络优化。用于性能审计和识别Web应用中的结构性性能反模式。"
 tools: Read, Glob, Grep, Write, Edit, Bash, Task
-model: DeepSeek-V4-Flash
+model: gpt-5.6-terra
 maxTurns: 10
 agentMode: agentic
 subagent: true

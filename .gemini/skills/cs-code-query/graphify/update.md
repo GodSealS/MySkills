@@ -1,4 +1,4 @@
-﻿# Graphify: Update Knowledge Graph
+# Graphify: Update Knowledge Graph
 
 Update/rebuild the project's Graphify knowledge graph.
 

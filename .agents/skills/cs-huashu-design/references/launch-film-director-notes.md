@@ -1,4 +1,4 @@
-﻿# Launch Film 工作流：先写万字 director's notes，再做动画
+# Launch Film 工作流：先写万字 director's notes，再做动画
 
 > 高规格视觉作品（≥ 20 秒、含品牌叙事、含 slogan reveal、可能上 X / 公众号 / B 站推广）的标准工作流。
 >

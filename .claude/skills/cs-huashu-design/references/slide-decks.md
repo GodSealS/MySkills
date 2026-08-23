@@ -1,4 +1,4 @@
-﻿# Slide Decks：HTML幻灯片制作规范
+# Slide Decks：HTML幻灯片制作规范
 
 做幻灯片是设计工作的高频场景。这份文档说明怎么做好HTML幻灯片——从架构选型、单页设计，到 PDF/PPTX 导出的完整路径。
 

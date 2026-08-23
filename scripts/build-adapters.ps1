@@ -14,7 +14,7 @@
     .gemini/            -> Gemini CLI adapter (skills + commands/*.toml + agents + GEMINI.md)
     .agents/            -> Codex skill adapter (.agents/skills/<name>/SKILL.md + agents/openai.yaml)
     .codex/             -> Codex adapter (prompts/ + agents/)
-    .claude/            -> Claude Code adapter (commands/ + rules/)
+    .claude/            -> Claude Code adapter (skills/ + agents/ + commands/ + rules/)
     .claude-plugin/     -> Claude Code plugin manifest
     CLAUDE.md           -> Claude Code top-level project context (only if missing)
 
@@ -54,6 +54,23 @@ function Neutralize-Frontmatter($content) {
         $keep  = @()
         foreach ($l in ($fm -split "`r?`n")) {
             if ($l -match '^(argument-hint|user-invocable|allowed-tools|agent)\s*:') { continue }
+            $keep += $l
+        }
+        return $open + ($keep -join "`n") + $close + $body
+    }
+    return $content
+}
+
+function Neutralize-AgentFrontmatter($content) {
+    if ($content -match '(?s)^(---\r?\n)(.*?)(\r?\n---\r?\n)') {
+        $open  = $matches[1]
+        $fm    = $matches[2]
+        $close = $matches[3]
+        $body  = $content.Substring($matches[0].Length)
+        $keep  = @()
+        foreach ($l in ($fm -split "`r?`n")) {
+            if ($l -match '^(thinkingLevel|agentMode|subagent|enabled|enabledAutoRun)\s*:') { continue }
+            if ($l -match '^tools\s*:') { $l = $l -replace '(,\s*)?Task(,\s*)?', '' }
             $keep += $l
         }
         return $open + ($keep -join "`n") + $close + $body
@@ -101,6 +118,65 @@ function Copy-Tree($src, $dst, [switch]$NeutralizeSkill, [switch]$RewriteRefs) {
     }
 }
 
+# Map the canonical CodeBuddy model tier to each platform's native model IDs.
+# The source skills use DeepSeek-V4-Pro/Flash as stable complexity markers;
+# adapters must emit models understood by their own host runtime.
+$PlatformModels = @{
+    'claude' = @{
+        'DeepSeek-V4-Pro' = 'opus'
+        'DeepSeek-V4-Flash' = 'sonnet'
+    }
+    'codex' = @{
+        'DeepSeek-V4-Pro' = 'gpt-5.6-sol'
+        'DeepSeek-V4-Flash' = 'gpt-5.6-terra'
+    }
+    'gemini' = @{
+        'DeepSeek-V4-Pro' = 'gemini-2.5-pro'
+        'DeepSeek-V4-Flash' = 'gemini-2.5-flash'
+    }
+}
+
+function Get-PlatformModel([string]$sourceModel, [string]$platform) {
+    if (-not $PlatformModels.ContainsKey($platform)) {
+        throw "Unsupported skill platform: $platform"
+    }
+    $models = $PlatformModels[$platform]
+    if (-not $models.ContainsKey($sourceModel)) {
+        throw "Unsupported canonical skill model: $sourceModel"
+    }
+    return $models[$sourceModel]
+}
+
+function Set-SkillPlatformModel([string]$path, [string]$platform) {
+    $content = Get-Content -Raw -Path $path
+    $sourceModel = if ($content -match '(?m)^model:\s*(.+?)\s*$') { $matches[1].Trim() } else { return }
+    $targetModel = Get-PlatformModel $sourceModel $platform
+    $content = $content -replace '(?m)^model:\s*.+?\s*$', "model: $targetModel"
+    Set-Content -NoNewline -Path $path -Value $content -Encoding UTF8
+}
+
+function Set-AgentPlatformModel([string]$path, [string]$platform) {
+    $content = Get-Content -Raw -Path $path
+    $agentName = if ($content -match '(?m)^name:\s*(.+?)\s*$') { $matches[1].Trim() } else { throw "Agent name missing: $path" }
+    $highReasoningAgents = @('cs-code-reviewer', 'cs-security-auditor')
+    $isHighReasoning = $highReasoningAgents -contains $agentName
+    $targetModel = switch ($platform) {
+        'claude' { if ($isHighReasoning) { 'opus' } else { 'sonnet' } }
+        'codex'  { if ($isHighReasoning) { 'gpt-5.6-sol' } else { 'gpt-5.6-terra' } }
+        'gemini' { if ($isHighReasoning) { 'gemini-2.5-pro' } else { 'gemini-2.5-flash' } }
+        default  { throw "Unsupported agent platform: $platform" }
+    }
+    $content = $content -replace '(?m)^model:\s*.+?\s*$', "model: $targetModel"
+    Set-Content -NoNewline -Path $path -Value $content -Encoding UTF8
+}
+
+function Copy-AgentPlatform([string]$source, [string]$destination, [string]$platform) {
+    $content = Get-Content -Raw -Path $source
+    if ($platform -eq 'claude') { $content = Neutralize-AgentFrontmatter $content }
+    Set-Content -NoNewline -Path $destination -Value $content -Encoding UTF8
+    Set-AgentPlatformModel $destination $platform
+}
+
 # ---------------------------------------------------------------------------
 # 1. Skills  ->  skills/  +  .gemini/skills/  +  .agents/skills/
 # ---------------------------------------------------------------------------
@@ -114,9 +190,15 @@ Clear-Dir $dstSkillsCanon; Clear-Dir $dstSkillsGem; Clear-Dir $dstSkillsCodex; C
 
 foreach ($sd in $skillDirs) {
     Copy-Tree -src $sd.FullName -dst (Join-Path $dstSkillsCanon  $sd.Name) -NeutralizeSkill -RewriteRefs
-    Copy-Tree -src $sd.FullName -dst (Join-Path $dstSkillsGem    $sd.Name) -NeutralizeSkill -RewriteRefs
-    Copy-Tree -src $sd.FullName -dst (Join-Path $dstSkillsCodex  $sd.Name) -NeutralizeSkill -RewriteRefs
-    Copy-Tree -src $sd.FullName -dst (Join-Path $dstSkillsClaude $sd.Name) -NeutralizeSkill -RewriteRefs
+    $geminiSkill = Join-Path $dstSkillsGem $sd.Name
+    $codexSkill = Join-Path $dstSkillsCodex $sd.Name
+    $claudeSkill = Join-Path $dstSkillsClaude $sd.Name
+    Copy-Tree -src $sd.FullName -dst $geminiSkill -NeutralizeSkill -RewriteRefs
+    Copy-Tree -src $sd.FullName -dst $codexSkill -NeutralizeSkill -RewriteRefs
+    Copy-Tree -src $sd.FullName -dst $claudeSkill -NeutralizeSkill -RewriteRefs
+    Set-SkillPlatformModel (Join-Path $geminiSkill 'SKILL.md') 'gemini'
+    Set-SkillPlatformModel (Join-Path $codexSkill 'SKILL.md') 'codex'
+    Set-SkillPlatformModel (Join-Path $claudeSkill 'SKILL.md') 'claude'
 }
 Write-Host "Skills: $($skillDirs.Count) -> skills/ .gemini/skills/ .agents/skills/ .claude/skills/"
 
@@ -226,18 +308,22 @@ foreach ($rf in (Get-ChildItem -Path $SrcRefs -File)) {
 Write-Host "References: $((Get-ChildItem -Path $SrcRefs -File).Count) -> references/ .gemini/references/ .agents/references/ .claude/references/"
 
 # ---------------------------------------------------------------------------
-# 3. Agents  ->  agents/  +  .gemini/agents/  +  .codex/agents/
+# 3. Agents  ->  agents/  +  .gemini/agents/  +  .codex/agents/  +  .claude/agents/
 # ---------------------------------------------------------------------------
 $dstAgentsCanon = Join-Path $Repo 'agents'
 $dstAgentsGem   = Join-Path $Repo '.gemini\agents'
 $dstAgentsCodex = Join-Path $Repo '.codex\agents'
-Clear-Dir $dstAgentsCanon; Clear-Dir $dstAgentsGem; Clear-Dir $dstAgentsCodex
-foreach ($ag in (Get-ChildItem -Path $SrcAgents -File)) {
-    foreach ($d in @($dstAgentsCanon, $dstAgentsGem, $dstAgentsCodex)) {
-        Copy-Item -Path $ag.FullName -Destination (Join-Path $d $ag.Name) -Force
-    }
+$dstAgentsClaude = Join-Path $Repo '.claude\agents'
+foreach ($d in @($dstAgentsCanon, $dstAgentsGem, $dstAgentsCodex, $dstAgentsClaude)) {
+    New-Item -ItemType Directory -Force -Path $d | Out-Null
 }
-Write-Host "Agents: $((Get-ChildItem -Path $SrcAgents -File).Count) -> agents/ .gemini/agents/ .codex/agents/"
+foreach ($ag in (Get-ChildItem -Path $SrcAgents -File)) {
+    Copy-Item -Path $ag.FullName -Destination (Join-Path $dstAgentsCanon $ag.Name) -Force
+    Copy-AgentPlatform $ag.FullName (Join-Path $dstAgentsGem $ag.Name) 'gemini'
+    Copy-AgentPlatform $ag.FullName (Join-Path $dstAgentsCodex $ag.Name) 'codex'
+    Copy-AgentPlatform $ag.FullName (Join-Path $dstAgentsClaude $ag.Name) 'claude'
+}
+Write-Host "Agents: $((Get-ChildItem -Path $SrcAgents -File).Count) -> agents/ .gemini/agents/ .codex/agents/ .claude/agents/"
 
 # ---------------------------------------------------------------------------
 # 4. Commands
@@ -386,21 +472,33 @@ This pack already covers most of the development lifecycle, so most new-skill id
 Set-Content -NoNewline -Path (Join-Path $dstRulesClaude 'skills-contributing.md') -Value $ruleBody -Encoding UTF8
 Write-Host "Claude rules: 1 -> .claude/rules/skills-contributing.md"
 
-# 5c. Plugin manifest. Letting the pack load via `.claude-plugin/plugin.json`
-# makes it installable through the plugin marketplace without duplicating skill
-# files at `~/.claude/skills/<name>/`. The marketplace reads this manifest and
-# points at the repo-local `skills/` directory we just generated.
-$pluginDir = Join-Path $Repo '.claude-plugin'
-if (-not (Test-Path $pluginDir)) { New-Item -ItemType Directory -Force -Path $pluginDir | Out-Null }
+# 5c. Claude plugin package. A plugin discovers `skills/` and `agents/` from
+# its own root, so it must use a dedicated Claude-adapted tree rather than the
+# platform-neutral top-level `skills/` and `agents/` directories.
+$dstClaudePluginPackage = Join-Path $Repo 'plugins\claude'
+Clear-Dir $dstClaudePluginPackage
+Copy-Tree -src $dstSkillsClaude -dst (Join-Path $dstClaudePluginPackage 'skills')
+Copy-Tree -src $dstAgentsClaude -dst (Join-Path $dstClaudePluginPackage 'agents')
+Copy-Tree -src $dstCmdClaude -dst (Join-Path $dstClaudePluginPackage 'commands')
+Copy-Tree -src $dstRulesClaude -dst (Join-Path $dstClaudePluginPackage 'rules')
+$dstClaudePluginMeta = Join-Path $dstClaudePluginPackage '.claude-plugin'
+New-Item -ItemType Directory -Force -Path $dstClaudePluginMeta | Out-Null
 $pluginJson = @'
 {
   "name": "agent-skills-cs",
   "version": "1.0.0",
-  "description": "Production-grade engineering workflow skills (cs-*) for Claude Code, sourced from .codebuddy/. Install via /plugin or copy the repo.",
+  "description": "Production-grade engineering workflow skills (cs-*) for Claude Code, sourced from .codebuddy/.",
   "author": { "name": "agent-skills" }
 }
 '@
-Set-Content -NoNewline -Path (Join-Path $pluginDir 'plugin.json') -Value $pluginJson -Encoding UTF8
+Set-Content -NoNewline -Path (Join-Path $dstClaudePluginMeta 'plugin.json') -Value $pluginJson -Encoding UTF8
+
+# The root marketplace selects the dedicated package. Remove the old root
+# plugin manifest so a direct install cannot accidentally discover neutral
+# DeepSeek-configured artifacts.
+$pluginDir = Join-Path $Repo '.claude-plugin'
+if (-not (Test-Path $pluginDir)) { New-Item -ItemType Directory -Force -Path $pluginDir | Out-Null }
+Remove-Item -Force -ErrorAction SilentlyContinue (Join-Path $pluginDir 'plugin.json')
 
 # Marketplace manifest so the pack can also be added as a local plugin
 # marketplace: `claude plugin marketplace add <path>` then install from it.
@@ -409,12 +507,12 @@ $marketplaceJson = @'
   "name": "agent-skills-cs",
   "owner": { "name": "agent-skills" },
   "plugins": [
-    { "source": "./" }
+    { "source": "./plugins/claude" }
   ]
 }
 '@
 Set-Content -NoNewline -Path (Join-Path $pluginDir 'marketplace.json') -Value $marketplaceJson -Encoding UTF8
-Write-Host "Claude plugin manifest: 2 -> .claude-plugin/plugin.json + marketplace.json"
+Write-Host "Claude plugin package: 1 -> plugins/claude; marketplace: 1 -> .claude-plugin/marketplace.json"
 
 # 5d. CLAUDE.md (top-level Claude project context). Generated only when no
 # user-owned CLAUDE.md already exists at the repo root — that file is the

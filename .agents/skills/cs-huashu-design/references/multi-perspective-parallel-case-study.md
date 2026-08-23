@@ -1,4 +1,4 @@
-﻿# 多视角并行实验 · Case Study
+# 多视角并行实验 · Case Study
 
 > huashu-md-html v2.0 launch film 项目 · 2026-05-11
 > 6 位艺术家视角的并行 director's notes + HTML + 关键帧实验
