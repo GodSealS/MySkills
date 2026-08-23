@@ -42,13 +42,13 @@ assert_contains "$ROOT/.claude/agents/cs-backend-lead.md" 'model: opus'
 assert_contains "$ROOT/.gemini/agents/cs-test-engineer.md" 'model: gemini-2.5-flash'
 assert_contains "$ROOT/.codex/agents/cs-web-perf-auditor.md" 'model: gpt-5.6-terra'
 
-for command in build plan spec; do
+for command in cs-build cs-plan cs-spec; do
   assert_same "$ROOT/.codebuddy/commands/$command.md" "$ROOT/commands/$command.md"
   assert_same "$ROOT/.codebuddy/commands/$command.md" "$ROOT/.claude/commands/$command.md"
 done
-assert_contains "$ROOT/.gemini/commands/build.toml" 'routed by primary owner'
-assert_contains "$ROOT/.gemini/commands/plan.toml" 'primary owner'
-assert_contains "$ROOT/.gemini/commands/spec.toml" 'cs-architect'
+assert_contains "$ROOT/.gemini/commands/cs-build.toml" 'routed by primary owner'
+assert_contains "$ROOT/.gemini/commands/cs-plan.toml" 'primary owner'
+assert_contains "$ROOT/.gemini/commands/cs-spec.toml" 'cs-architect'
 assert_contains "$ROOT/.codex/prompts/cs-incremental.md" 'Invoke the cs-incremental skill'
 
 printf '%s\n' 'test-adapters.sh: passed'

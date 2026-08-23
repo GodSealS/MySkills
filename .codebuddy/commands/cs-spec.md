@@ -12,4 +12,4 @@ Begin by understanding what the user wants to build. Ask clarifying questions ab
 
 Then generate a structured spec covering all six core areas: objective, commands, project structure, code style, testing strategy, and boundaries.
 
-Save the spec as `SPEC.md` in the project root. After the objective is approved, FAN-OUT to `cs-architect` to produce the architecture and ADRs (via `cs-docs-adrs`, stored in `docs/adr/`). Then run `/grill-me SPEC.md` before planning, or add a `## Grill Review` section that explicitly records the decision to skip the review and accept its risks. Confirm the recorded decision with the user before proceeding.
+Save the spec as `SPEC.md` in the project root. After the objective is approved, FAN-OUT to `cs-architect` to produce the architecture and ADRs (via `cs-docs-adrs`, stored in `docs/adr/`). Then run `/cs-grill-me SPEC.md` before planning, or add a `## Grill Review` section that explicitly records the decision to skip the review and accept its risks. Confirm the recorded decision with the user before proceeding.

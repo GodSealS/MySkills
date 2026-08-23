@@ -79,7 +79,7 @@ Ask if the user wants to address the vulnerabilities now or proceed with awarene
 - `cs-spec-driven`: upstream — produces the spec that should be grilled before planning
 - `cs-planning`: downstream — break the grilled-and-hardened design into tasks
 - `cs-doubt-driven`: post-decision artifact review (grill the code/spec, not the plan)
-- `/plan` and `/build`: workflow gates that require the resulting `## Grill Review` decision before planning or autonomous implementation
+- `/cs-plan` and `/cs-build`: workflow gates that require the resulting `## Grill Review` decision before planning or autonomous implementation
 
 ## Verification
 

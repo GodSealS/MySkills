@@ -20,14 +20,14 @@ Load these proactively as standing context:
 
 ## Slash commands
 
-- `/spec` — start spec-driven development
-- `/plan` — plan and break down tasks
-- `/build` — incremental delivery
-- `/test` — test-driven development
-- `/review` — five-axis code review
-- `/webperf` — web performance audit
-- `/code-simplify` — simplify code
-- `/ship` — shipping and launch checklist
+- `/cs-spec` — start spec-driven development
+- `/cs-plan` — plan and break down tasks
+- `/cs-build` — incremental delivery
+- `/cs-test` — test-driven development
+- `/cs-review` — five-axis code review
+- `/cs-webperf` — web performance audit
+- `/cs-code-simplify` — simplify code
+- `/cs-ship` — shipping and launch checklist
 
 ## Conventions
 

@@ -28,7 +28,7 @@ fi
 
 [ -z "$FILE_PATH" ] && exit 0
 
-# Design document path patterns, including the default /spec output.
+# Design document path patterns, including the default /cs-spec output.
 DESIGN_PATTERNS="(^|/)SPEC\\.md$|docs/ideas/|design/|Idea/|ProjectDoc/|\\.spec\\.md|design-.*\\.md|architecture.*\\.md"
 
 IS_DESIGN_DOC=0
@@ -51,9 +51,9 @@ if [ "$IS_DESIGN_DOC" -eq 1 ]; then
     jq -cn \
       --arg file "$DISPLAY_NAME" \
       --arg path "$FILE_PATH" \
-      '{priority: "ADVISORY", message: ("\n💡 你刚刚写入了设计文档: \($file)\n   建议运行 /grill-me 对其进行压力测试，发现隐含假设和潜在风险后再进入实现阶段。\n   Usage: /grill-me \($path)\n")}'
+      '{priority: "ADVISORY", message: ("\n💡 你刚刚写入了设计文档: \($file)\n   建议运行 /cs-grill-me 对其进行压力测试，发现隐含假设和潜在风险后再进入实现阶段。\n   Usage: /cs-grill-me \($path)\n")}'
   else
-    printf '{"priority":"ADVISORY","message":"\n💡 你刚刚写入了设计文档: %s\n   建议运行 /grill-me 对其进行压力测试，发现隐含假设和潜在风险后再进入实现阶段。\n   Usage: /grill-me %s\n"}\n' "$DISPLAY_NAME" "$FILE_PATH"
+    printf '{"priority":"ADVISORY","message":"\n💡 你刚刚写入了设计文档: %s\n   建议运行 /cs-grill-me 对其进行压力测试，发现隐含假设和潜在风险后再进入实现阶段。\n   Usage: /cs-grill-me %s\n"}\n' "$DISPLAY_NAME" "$FILE_PATH"
   fi
 fi
 

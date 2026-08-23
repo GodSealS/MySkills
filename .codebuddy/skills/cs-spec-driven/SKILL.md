@@ -96,7 +96,7 @@ ASSUMPTIONS I'M MAKING:
 
 ## Grill Review
 - Status: pending
-- Findings: [Run `/grill-me SPEC.md` and summarize the vulnerabilities, or explicitly record a skip decision.]
+- Findings: [Run `/cs-grill-me SPEC.md` and summarize the vulnerabilities, or explicitly record a skip decision.]
 - Decision: [Address now / proceed with accepted risks / skipped with accepted risks]
 ```
 
@@ -114,7 +114,7 @@ Execute tasks one at a time following `cs-incremental` and `cs-tdd`.
 
 ## Grill Review Gate
 
-Before invoking `cs-planning`, run `/grill-me <spec-path>` and replace the `pending` Grill Review entry with the vulnerabilities found and the user's decision. A review may be skipped only when the spec explicitly records the accepted risks.
+Before invoking `cs-planning`, run `/cs-grill-me <spec-path>` and replace the `pending` Grill Review entry with the vulnerabilities found and the user's decision. A review may be skipped only when the spec explicitly records the accepted risks.
 
 ## Keeping the Spec Alive
 

@@ -391,10 +391,10 @@ foreach ($sd in $skillDirs) {
 # `.claude-plugin/plugin.json` + `marketplace.json` so the pack can be loaded
 # as a plugin or a local marketplace.
 #
-# Slash command names mirror the upstream agent-skills short workflow names
-# (build/spec/plan/review/test/ship/code-simplify/webperf) instead of the
-# `cs-<skill>` names used for Codex / Gemini. Each command body still invokes
-# the underlying `cs-<skill>` so the canonical skill is the single source of truth.
+# Slash command names use the `cs-` prefix (cs-build/cs-spec/cs-plan/...) and
+# mirror the underlying `cs-<skill>` names used for Codex / Gemini. Each command
+# body still invokes the underlying `cs-<skill>` so the canonical skill is the
+# single source of truth.
 # ---------------------------------------------------------------------------
 $dstCmdClaude = Join-Path $Repo '.claude\commands'
 $dstRulesClaude = Join-Path $Repo '.claude\rules'
@@ -429,7 +429,7 @@ foreach ($cmd in (Get-ChildItem -Path $SrcCommands -File -Filter *.md)) {
 }
 
 # 5a1. Detect `/command` references that have no matching file in
-# .claude/commands/ (e.g. `/grill-me` in spec/plan/build) and generate a thin
+# .claude/commands/ (e.g. `/cs-grill-me` in spec/plan/build) and generate a thin
 # wrapper that routes to the underlying `cs-<name>` skill.
 $missingRefs = [System.Collections.Generic.SortedSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 foreach ($cmd in (Get-ChildItem -Path $SrcCommands -File -Filter *.md)) {
@@ -440,11 +440,12 @@ foreach ($cmd in (Get-ChildItem -Path $SrcCommands -File -Filter *.md)) {
     }
 }
 foreach ($name in $missingRefs) {
-    $skillMd = Join-Path $SrcSkills "cs-$name\SKILL.md"
+    $skillName = if ($name -like 'cs-*') { $name } else { "cs-$name" }
+    $skillMd = Join-Path $SrcSkills "$skillName\SKILL.md"
     if (-not (Test-Path $skillMd)) { continue }
     $skillRaw = Get-Content -Raw -Path $skillMd
     $desc = if ($skillRaw -match '(?m)^description:\s*(.+?)\s*$') { $matches[1].Trim().Trim('"') } else { $name }
-    $wrapper = "---`ndescription: `"$desc`"`n---`n`nInvoke the ``cs-$name`` skill and follow its workflow.`n"
+    $wrapper = "---`ndescription: `"$desc`"`n---`n`nInvoke the ``$skillName`` skill and follow its workflow.`n"
     Set-Content -NoNewline -Path (Join-Path $dstCmdClaude "$name.md") -Value $wrapper -Encoding UTF8
     $claudeCmdCount++
 }

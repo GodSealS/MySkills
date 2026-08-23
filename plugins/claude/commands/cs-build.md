@@ -6,8 +6,8 @@ Invoke `cs-incremental` alongside `cs-tdd`.
 
 ## Modes
 
-- **`/build`** — implement the *next* pending task, then stop (careful, one slice at a time).
-- **`/build auto`** — generate the plan if needed, get a single approval, then implement *every* task without stopping between them.
+- **`/cs-build`** — implement the *next* pending task, then stop (careful, one slice at a time).
+- **`/cs-build auto`** — generate the plan if needed, get a single approval, then implement *every* task without stopping between them.
 
 `$ARGUMENTS` selects the mode. Treat `auto` or `all` as autonomous mode; anything else (or empty) is the default single-task mode.
 
@@ -24,12 +24,12 @@ Pick the next pending task from the plan. Then:
 7. Commit with a descriptive message
 8. Mark the task complete and stop
 
-## Autonomous: the whole plan (`/build auto`)
+## Autonomous: the whole plan (`/cs-build auto`)
 
 Use this once a spec exists and you want to collapse plan + build into one run. It removes the manual stepping between tasks — **not** the verification. Every task still earns a passing test and its own commit.
 
-1. **Require a spec.** Look for `SPEC.md` at repo root, `docs/SPEC.md`, or under `spec/`. If none exists, stop and tell the user to run `/spec` first.
-2. **Require a Grill Review decision.** The selected spec must contain `## Grill Review` with either completed `/grill-me` findings and a decision, or an explicit skip plus accepted risks. Otherwise stop and direct the user to complete or formally skip the review.
+1. **Require a spec.** Look for `SPEC.md` at repo root, `docs/SPEC.md`, or under `spec/`. If none exists, stop and tell the user to run `/cs-spec` first.
+2. **Require a Grill Review decision.** The selected spec must contain `## Grill Review` with either completed `/cs-grill-me` findings and a decision, or an explicit skip plus accepted risks. Otherwise stop and direct the user to complete or formally skip the review.
 3. **Establish a clean baseline.** Run `git status --porcelain`. If there are uncommitted changes outside planning artifacts, stop and ask the user to commit, stash, or confirm.
 4. **Plan if needed.** If no `tasks/plan.md`, invoke `cs-planning` to generate one.
 5. **Single checkpoint.** Present the full plan and wait for an unambiguous affirmative. This is the only human gate — after approval, run autonomously.

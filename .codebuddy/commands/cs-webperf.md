@@ -2,7 +2,7 @@
 description: "Run a web performance audit via the web-performance-auditor persona / 通过Web性能审计角色运行Web性能审计"
 ---
 
-`/webperf` targets web applications specifically. Do not use it for utility libraries, CLIs, or server-only code with no browser-facing output.
+`/cs-webperf` targets web applications specifically. Do not use it for utility libraries, CLIs, or server-only code with no browser-facing output.
 
 ## Determine the mode
 
