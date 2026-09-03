@@ -25,6 +25,7 @@ Task arrives
     ├── Have a rough concept, need variants? → cs-idea-refine
     ├── New project/feature/change? ──→ cs-spec-driven
     ├── Have a spec, need tasks? ──────→ cs-planning
+    ├── Design doc, want a team? ──────→ cs-team-build
     ├── Implementing code? ────────────→ cs-incremental
     │   ├── UI work? ─────────────────→ cs-frontend-ui
     │   ├── API work? ────────────────→ cs-api-design
@@ -112,6 +113,7 @@ Every skill includes a verification step. "Seems right" is never sufficient — 
 | Define | cs-idea-refine | Refine ideas through structured thinking |
 | Define | cs-spec-driven | Requirements before code |
 | Plan | cs-planning | Decompose into verifiable tasks |
+| Build | cs-team-build | Agent team implements a design doc with review loops |
 | Build | cs-incremental | Thin vertical slices |
 | Build | cs-source-driven | Verify against official docs |
 | Build | cs-doubt-driven | Adversarial review of decisions |

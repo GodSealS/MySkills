@@ -94,4 +94,4 @@ metrics.histogram('orders.processing_time', duration);
 
 ## See Also
 
-- ../../references/cs-observability-checklist.md`
+- `../../references/cs-observability-checklist.md`

@@ -3,7 +3,7 @@ thinkingLevel: think
 name: cs-frontend-lead
 description: "Frontend domain owner. Implements UI components, layouts, state management, and verifies in the browser. Use when building or modifying user-facing interfaces, verifying visual output, or when a task is owned by the frontend slice. / 前端主程序，前端领域 Owner。负责 UI 组件、布局、状态管理的实现与浏览器验证。用于构建或修改用户界面、验证视觉效果、或任务属于前端切片时。"
 tools: Read, Glob, Grep, Write, Edit, Bash, Task
-model: gpt-5.6-sol
+model: gpt-5.6-terra
 maxTurns: 10
 agentMode: agentic
 subagent: true

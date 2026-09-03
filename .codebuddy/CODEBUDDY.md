@@ -30,6 +30,7 @@ Skills encode the workflows, quality gates, and best practices that senior engin
 │   ├── cs-doubt-driven/ Build
 │   ├── cs-frontend-ui/  Build
 │   ├── cs-api-design/   Build
+│   ├── cs-team-build/   Build
 │   ├── cs-browser-test/ Verify
 │   ├── cs-debugging/    Verify
 │   ├── cs-code-review/  Review
@@ -42,15 +43,16 @@ Skills encode the workflows, quality gates, and best practices that senior engin
 │   ├── cs-docs-adrs/    Ship
 │   ├── cs-observability/Ship
 │   └── cs-shipping/     Ship
-├── commands/                 → 8 slash commands (orchestration layer)
-│   ├── spec.md
-│   ├── plan.md
-│   ├── build.md
-│   ├── test.md
-│   ├── review.md
-│   ├── webperf.md
-│   ├── code-simplify.md
-│   └── ship.md
+├── commands/                 → 9 slash commands (orchestration layer)
+│   ├── cs-spec.md
+│   ├── cs-plan.md
+│   ├── cs-build.md
+│   ├── cs-team.md
+│   ├── cs-test.md
+│   ├── cs-review.md
+│   ├── cs-webperf.md
+│   ├── cs-code-simplify.md
+│   └── cs-ship.md
 ├── hooks/                    → Session lifecycle hooks
 │   ├── cs-session-start.sh
 │   ├── cs-sdd-cache-pre.sh
@@ -73,7 +75,7 @@ Skills encode the workflows, quality gates, and best practices that senior engin
 
 **Define:** cs-interview-me, cs-idea-refine, grill-me, cs-spec-driven
 **Plan:** cs-planning
-**Build:** cs-incremental, cs-tdd, cs-context-eng, cs-source-driven, cs-doubt-driven, cs-frontend-ui, cs-api-design
+**Build:** cs-incremental, cs-tdd, cs-context-eng, cs-source-driven, cs-doubt-driven, cs-frontend-ui, cs-api-design, cs-team-build
 **Verify:** cs-browser-test, cs-debugging
 **Review:** cs-code-review, cs-simplify, cs-security, cs-perf-opt
 **Ship:** cs-git-workflow, cs-cicd, cs-deprecation, cs-docs-adrs, cs-observability, cs-shipping
@@ -116,13 +118,13 @@ CodeBuddy discovers and activates skills based on `AGENTS.md` intent mapping. Wh
 
 | Agent | Role | Use When | Invoked by (skill fan-out) |
 |-------|------|----------|-----------------------------|
-| cs-architect | System Architect | Module boundaries, dependency direction, tech stack, ADRs | cs-spec-driven, cs-planning |
-| cs-frontend-lead | Frontend Lead | UI implementation, state, browser verification | frontend-owned cs-incremental, cs-frontend-ui, cs-browser-test, cs-tdd, security, performance |
-| cs-backend-lead | Backend Lead | API implementation, data layer, server security/perf | backend-owned cs-incremental, cs-api-design, cs-tdd, security, performance |
-| cs-code-reviewer | Senior Staff Engineer | Five-axis code review | cs-code-review, cs-shipping |
-| cs-security-auditor | Security Engineer | Vulnerability detection, threat modeling | cs-security, cs-shipping |
-| cs-test-engineer | QA Specialist | Test strategy, coverage analysis | cs-tdd, cs-shipping |
-| cs-web-perf-auditor | Web Perf Engineer | Core Web Vitals audit | cs-perf-opt, cs-shipping |
+| cs-architect | System Architect | Module boundaries, dependency direction, tech stack, ADRs | cs-spec-driven, cs-planning, cs-team-build |
+| cs-frontend-lead | Frontend Lead | UI implementation, state, browser verification | frontend-owned cs-incremental, cs-frontend-ui, cs-browser-test, cs-tdd, security, performance, cs-team-build |
+| cs-backend-lead | Backend Lead | API implementation, data layer, server security/perf | backend-owned cs-incremental, cs-api-design, cs-tdd, security, performance, cs-team-build |
+| cs-code-reviewer | Senior Staff Engineer | Five-axis code review | cs-code-review, cs-shipping, cs-team-build |
+| cs-security-auditor | Security Engineer | Vulnerability detection, threat modeling | cs-security, cs-shipping, cs-team-build |
+| cs-test-engineer | QA Specialist | Test strategy, coverage analysis | cs-tdd, cs-shipping, cs-team-build |
+| cs-web-perf-auditor | Web Perf Engineer | Core Web Vitals audit | cs-perf-opt, cs-shipping, cs-team-build |
 
 Personas follow the composition rule: **only the user (or AGENTS.md intent mapping) is the orchestrator. Personas do not invoke other personas.** A persona may invoke skills. **Agents are triggered by skills** (fan-out) when their owning skill enters the relevant phase — no user command needed.
 

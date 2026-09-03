@@ -104,4 +104,4 @@ Each increment should be independently revertable.
 
 ## See Also
 
-See ../../references/cs-definition-of-done.md` for the project-wide bar.
+See `../../references/cs-definition-of-done.md` for the project-wide bar.

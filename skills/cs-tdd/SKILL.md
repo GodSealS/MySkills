@@ -115,4 +115,4 @@ it('marks overdue tasks when deadline has passed', () => {
 
 ## See Also
 
-See ../../references/cs-testing-patterns.md` for detailed patterns and framework-specific examples.
+See `../../references/cs-testing-patterns.md` for detailed patterns and framework-specific examples.

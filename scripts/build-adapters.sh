@@ -70,11 +70,14 @@ strip_claude_agent_frontmatter() {
 fix_refs() (
   target_file=$1
   # Resolve shared reference paths for generated adapter trees.
+  # The leading character class excludes backticks so a markdown-inline
+  # `references/<file>` keeps its opening backtick after rewriting.
+  bt='`'
   for ref in "$SRC_REFS"/*.md; do
     [ -f "$ref" ] || continue
     name=$(basename "$ref")
     tmp="$target_file.tmp.$$"
-    sed "s#[^[:space:]]*references/$name#../../references/$name#g; s#\.codebuddy/skills/code-query/##g" "$target_file" > "$tmp"
+    sed "s#[^[:space:]$bt]*references/$name#../../references/$name#g; s#\.codebuddy/skills/code-query/##g" "$target_file" > "$tmp"
     mv "$tmp" "$target_file"
   done
 )
@@ -176,6 +179,7 @@ PLUGIN="$ROOT/plugins/claude"
 mkdir -p "$PLUGIN"
 copy_tree "$ROOT/.claude/skills" "$PLUGIN/skills"
 copy_tree "$ROOT/.claude/agents" "$PLUGIN/agents"
+copy_tree "$ROOT/.claude/references" "$PLUGIN/references"
 copy_tree "$ROOT/.claude/commands" "$PLUGIN/commands"
 copy_tree "$ROOT/.claude/rules" "$PLUGIN/rules"
 mkdir -p "$PLUGIN/.claude-plugin" "$ROOT/.claude-plugin"

@@ -14,6 +14,7 @@ Task arrives
     ├── Design ready, need stress-test? ─────→ grill-me
     ├── New project/feature/change? ─────────→ cs-spec-driven
     ├── Have a spec, need tasks? ────────────→ cs-planning
+    ├── Design doc, want a team? ────────────→ cs-team-build
     ├── Implementing code? ──────────────────→ cs-incremental
     │   ├── UI work? ────────────────────────→ cs-frontend-ui
     │   ├── API work? ───────────────────────→ cs-api-design
@@ -51,15 +52,15 @@ Task arrives
 
 | Agent | File | Role | Invoked by |
 |-------|------|------|------------|
-| Architect | `.codebuddy/agents/cs-architect.md` | Module boundaries, dependency direction, ADRs | `cs-spec-driven`, `cs-planning` fan-out |
-| Frontend Lead | `.codebuddy/agents/cs-frontend-lead.md` | Frontend domain owner: UI, state, browser verification | frontend-owned `cs-incremental`, `cs-frontend-ui`, `cs-browser-test`, `cs-tdd`, security, and performance work |
-| Backend Lead | `.codebuddy/agents/cs-backend-lead.md` | Backend domain owner: API, data, server security/perf | backend-owned `cs-incremental`, `cs-api-design`, `cs-tdd`, security, and performance work |
-| Code Reviewer | `.codebuddy/agents/cs-code-reviewer.md` | Five-axis code review | `cs-code-review`, `cs-shipping` fan-out |
-| Security Auditor | `.codebuddy/agents/cs-security-auditor.md` | Vulnerability detection | `cs-security`, `cs-shipping` fan-out |
-| Test Engineer | `.codebuddy/agents/cs-test-engineer.md` | Test strategy & coverage | `cs-tdd`, `cs-shipping` fan-out |
-| Web Perf Auditor | `.codebuddy/agents/cs-web-perf-auditor.md` | Core Web Vitals audit | `cs-perf-opt`, `cs-shipping` fan-out |
+| Architect | `.codebuddy/agents/cs-architect.md` | Module boundaries, dependency direction, ADRs | `cs-spec-driven`, `cs-planning` fan-out; `cs-team-build` (decompose, triage, synthesize) |
+| Frontend Lead | `.codebuddy/agents/cs-frontend-lead.md` | Frontend domain owner: UI, state, browser verification | frontend-owned `cs-incremental`, `cs-frontend-ui`, `cs-browser-test`, `cs-tdd`, security, performance, and `cs-team-build` work |
+| Backend Lead | `.codebuddy/agents/cs-backend-lead.md` | Backend domain owner: API, data, server security/perf | backend-owned `cs-incremental`, `cs-api-design`, `cs-tdd`, security, performance, and `cs-team-build` work |
+| Code Reviewer | `.codebuddy/agents/cs-code-reviewer.md` | Five-axis code review | `cs-code-review`, `cs-shipping` fan-out; `cs-team-build` (every round) |
+| Security Auditor | `.codebuddy/agents/cs-security-auditor.md` | Vulnerability detection | `cs-security`, `cs-shipping`, `cs-team-build` fan-out |
+| Test Engineer | `.codebuddy/agents/cs-test-engineer.md` | Test strategy & coverage | `cs-tdd`, `cs-shipping`, `cs-team-build` fan-out |
+| Web Perf Auditor | `.codebuddy/agents/cs-web-perf-auditor.md` | Core Web Vitals audit | `cs-perf-opt`, `cs-shipping`, `cs-team-build` fan-out |
 
-**Orchestration model:** Agents are invoked **by skills** (fan-out), not by user commands. The three domain agents (Architect / Frontend Lead / Backend Lead) are the *build-side* owners; the four audit agents are the *review-side* owners. Both are triggered automatically when their owning skill enters the relevant phase.
+**Orchestration model:** Agents are invoked **by skills** (fan-out), not by user commands. `cs-team-build` is the one skill that *sequences* both families across a multi-round loop — it issues every fan-out itself so personas never call each other. The three domain agents (Architect / Frontend Lead / Backend Lead) are the *build-side* owners; the four audit agents are the *review-side* owners. Both are triggered automatically when their owning skill enters the relevant phase.
 
 ## Core Operating Behaviors
 
@@ -86,6 +87,7 @@ Task arrives
 | Define | grill-me | Stress-test design before committing |
 | Define | cs-spec-driven | Requirements before code |
 | Plan | cs-planning | Decompose into verifiable tasks |
+| Build | cs-team-build | Agent team implements a design doc with review loops |
 | Build | cs-incremental | Thin vertical slices |
 | Build | cs-tdd | Failing test first, then make it pass |
 | Build | cs-context-eng | Right context at right time |

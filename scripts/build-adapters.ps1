@@ -42,6 +42,15 @@ function Clear-Dir($path) {
     New-Item -ItemType Directory -Force -Path $path | Out-Null
 }
 
+# Write text as UTF-8 **without** a BOM.
+# PowerShell 5.1's `Set-Content -Encoding UTF8` always writes a BOM, which
+# rewrites every generated file on each rebuild (a one-line diff per file).
+$Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+function Write-TextFile($path, $content) {
+    $full = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($path)
+    [System.IO.File]::WriteAllText($full, $content, $Utf8NoBom)
+}
+
 function Neutralize-Frontmatter($content) {
     # Keep name + description; strip CodeBuddy-only fields
     # (argument-hint, user-invocable, allowed-tools, agent).
@@ -91,7 +100,10 @@ function Fix-Refs($text, [string[]]$publicRefs) {
     # (e.g. cs-huashu-design/references/brand-asset-protocol.md) are left intact.
     foreach ($name in $publicRefs) {
         $esc = [regex]::Escape($name)
-        $text = $text -replace "(?i)\S*references/$esc", "../../references/$name"
+        # Exclude backticks from the path prefix so a markdown-inline
+        # `references/<file>` keeps its opening backtick after rewriting.
+        $refPattern = '(?i)[^\s`]*references/' + $esc
+        $text = $text -replace $refPattern, "../../references/$name"
     }
     # cs-code-query references its own sub-files via an absolute .codebuddy path.
     # Rewrite to a relative path so it resolves from within the skill directory
@@ -111,7 +123,7 @@ function Copy-Tree($src, $dst, [switch]$NeutralizeSkill, [switch]$RewriteRefs) {
             $c = Get-Content -Raw -Path $item.FullName
             if ($NeutralizeSkill -and ($item.Name -eq 'SKILL.md')) { $c = Neutralize-Frontmatter $c }
             if ($RewriteRefs) { $c = Fix-Refs $c $PublicRefNames }
-            Set-Content -NoNewline -Path $target -Value $c -Encoding UTF8
+            Write-TextFile $target $c
         } else {
             Copy-Item -Path $item.FullName -Destination $target -Force
         }
@@ -152,7 +164,7 @@ function Set-SkillPlatformModel([string]$path, [string]$platform) {
     $sourceModel = if ($content -match '(?m)^model:\s*(.+?)\s*$') { $matches[1].Trim() } else { return }
     $targetModel = Get-PlatformModel $sourceModel $platform
     $content = $content -replace '(?m)^model:\s*.+?\s*$', "model: $targetModel"
-    Set-Content -NoNewline -Path $path -Value $content -Encoding UTF8
+    Write-TextFile $path $content
 }
 
 function Set-AgentPlatformModel([string]$path, [string]$platform) {
@@ -169,13 +181,13 @@ function Set-AgentPlatformModel([string]$path, [string]$platform) {
     }
     $targetModel = Get-PlatformModel $tier $platform
     $content = $content -replace '(?m)^model:\s*.+?\s*$', "model: $targetModel"
-    Set-Content -NoNewline -Path $path -Value $content -Encoding UTF8
+    Write-TextFile $path $content
 }
 
 function Copy-AgentPlatform([string]$source, [string]$destination, [string]$platform) {
     $content = Get-Content -Raw -Path $source
     if ($platform -eq 'claude') { $content = Neutralize-AgentFrontmatter $content }
-    Set-Content -NoNewline -Path $destination -Value $content -Encoding UTF8
+    Write-TextFile $destination $content
     Set-AgentPlatformModel $destination $platform
 }
 
@@ -289,7 +301,7 @@ interface:
   display_name: "$displayName"
   short_description: "$shortDesc"
 "@
-    Set-Content -NoNewline -Path (Join-Path $agentDir 'openai.yaml') -Value $yaml -Encoding UTF8
+    Write-TextFile (Join-Path $agentDir 'openai.yaml') $yaml
     $codexMetaCount++
 }
 Write-Host "Codex UI metadata: $codexMetaCount skills -> .agents/skills/*/agents/openai.yaml"
@@ -357,7 +369,7 @@ foreach ($cmd in (Get-ChildItem -Path $SrcCommands -File -Filter *.md)) {
         $promptStr = "'''$body'''"
     }
     $toml = "description = `"$descEsc`"`n`nprompt = $promptStr`n"
-    Set-Content -NoNewline -Path (Join-Path $dstCmdGem "$base.toml") -Value $toml -Encoding UTF8
+    Write-TextFile (Join-Path $dstCmdGem "$base.toml") $toml
 
 }
 Write-Host "Commands: $((Get-ChildItem -Path $SrcCommands -File -Filter *.md).Count) -> commands/ .gemini/commands/"
@@ -379,7 +391,7 @@ foreach ($sd in $skillDirs) {
     $skillDesc = $skillDesc.Replace('"', '\"')
 
     $codexPrompt = "---`ndescription: `"$skillDesc`"`nargument-hint: `"[args]`"`n---`n`nInvoke the $skillName skill and follow its workflow for: `$ARGUMENTS"
-    Set-Content -NoNewline -Path (Join-Path $dstCmdCodex "$skillName.md") -Value $codexPrompt -Encoding UTF8
+    Write-TextFile (Join-Path $dstCmdCodex "$skillName.md") $codexPrompt
 }
 # ---------------------------------------------------------------------------
 # 5. Claude Code adapter
@@ -423,7 +435,7 @@ foreach ($cmd in (Get-ChildItem -Path $SrcCommands -File -Filter *.md)) {
         $clean = '---' + "`n" + ($keep -join "`n") + "`n---" + "`n" + $body
     }
 
-    Set-Content -NoNewline -Path (Join-Path $dstCmdClaude "$base.md") -Value $clean -Encoding UTF8
+    Write-TextFile (Join-Path $dstCmdClaude "$base.md") $clean
     $claudeCmdCount++
     $claudeCmdNames[$base] = $true
 }
@@ -446,7 +458,7 @@ foreach ($name in $missingRefs) {
     $skillRaw = Get-Content -Raw -Path $skillMd
     $desc = if ($skillRaw -match '(?m)^description:\s*(.+?)\s*$') { $matches[1].Trim().Trim('"') } else { $name }
     $wrapper = "---`ndescription: `"$desc`"`n---`n`nInvoke the ``$skillName`` skill and follow its workflow.`n"
-    Set-Content -NoNewline -Path (Join-Path $dstCmdClaude "$name.md") -Value $wrapper -Encoding UTF8
+    Write-TextFile (Join-Path $dstCmdClaude "$name.md") $wrapper
     $claudeCmdCount++
 }
 Write-Host "Claude commands: $claudeCmdCount -> .claude/commands/"
@@ -472,7 +484,7 @@ This pack already covers most of the development lifecycle, so most new-skill id
 
 `CLAUDE.md` (Claude Code), `AGENTS.md` (Codex / CodeBuddy router) and `GEMINI.md` (Gemini CLI router) are the single source of truth for the skill catalog — do not duplicate their content here, link to them.
 '@
-Set-Content -NoNewline -Path (Join-Path $dstRulesClaude 'skills-contributing.md') -Value $ruleBody -Encoding UTF8
+Write-TextFile (Join-Path $dstRulesClaude 'skills-contributing.md') $ruleBody
 Write-Host "Claude rules: 1 -> .claude/rules/skills-contributing.md"
 
 # 5c. Claude plugin package. A plugin discovers `skills/` and `agents/` from
@@ -482,6 +494,7 @@ $dstClaudePluginPackage = Join-Path $Repo 'plugins\claude'
 Clear-Dir $dstClaudePluginPackage
 Copy-Tree -src $dstSkillsClaude -dst (Join-Path $dstClaudePluginPackage 'skills')
 Copy-Tree -src $dstAgentsClaude -dst (Join-Path $dstClaudePluginPackage 'agents')
+Copy-Tree -src $dstRefsClaude -dst (Join-Path $dstClaudePluginPackage 'references')
 Copy-Tree -src $dstCmdClaude -dst (Join-Path $dstClaudePluginPackage 'commands')
 Copy-Tree -src $dstRulesClaude -dst (Join-Path $dstClaudePluginPackage 'rules')
 $dstClaudePluginMeta = Join-Path $dstClaudePluginPackage '.claude-plugin'
@@ -494,7 +507,7 @@ $pluginJson = @'
   "author": { "name": "agent-skills" }
 }
 '@
-Set-Content -NoNewline -Path (Join-Path $dstClaudePluginMeta 'plugin.json') -Value $pluginJson -Encoding UTF8
+Write-TextFile (Join-Path $dstClaudePluginMeta 'plugin.json') $pluginJson
 
 # The root marketplace selects the dedicated package. Remove the old root
 # plugin manifest so a direct install cannot accidentally discover neutral
@@ -514,7 +527,7 @@ $marketplaceJson = @'
   ]
 }
 '@
-Set-Content -NoNewline -Path (Join-Path $pluginDir 'marketplace.json') -Value $marketplaceJson -Encoding UTF8
+Write-TextFile (Join-Path $pluginDir 'marketplace.json') $marketplaceJson
 Write-Host "Claude plugin package: 1 -> plugins/claude; marketplace: 1 -> .claude-plugin/marketplace.json"
 
 # 5d. CLAUDE.md (top-level Claude project context). Generated only when no
@@ -541,7 +554,7 @@ Skills are discovered from `.claude/skills/<name>/SKILL.md` (project) and `~/.cl
 - Every skill follows the same anatomy — frontmatter (`name`, `description`) + body (`Overview`, `When to Use`, `Process`, `Common Rationalizations`, `Red Flags`, `Verification`).
 - Cross-reference other skills instead of paraphrasing their content.
 '@
-    Set-Content -NoNewline -Path $dstClaudeMd -Value $claudeMdBody -Encoding UTF8
+    Write-TextFile $dstClaudeMd $claudeMdBody
     Write-Host "Claude project context: 1 -> CLAUDE.md (created)"
 } else {
     Write-Host "Claude project context: existing CLAUDE.md preserved"

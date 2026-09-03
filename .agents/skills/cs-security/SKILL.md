@@ -100,4 +100,4 @@ Secrets in environment variables. Encrypt data in transit and at rest.
 
 ## See Also
 
-- ../../references/cs-security-checklist.md`
+- `../../references/cs-security-checklist.md`

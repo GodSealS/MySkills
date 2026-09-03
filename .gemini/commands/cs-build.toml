@@ -1,7 +1,6 @@
 description = "Implement tasks incrementally — build, test, verify, commit. Add \\\"auto\\\" to run the whole plan in one approved pass. / 增量实现任务——构建、测试、验证、提交。添加\\\"auto\\\"一次性执行完整计划。"
 
-prompt = '''
-Invoke `cs-incremental` alongside `cs-tdd`.
+prompt = '''Invoke `cs-incremental` alongside `cs-tdd`.
 
 ## Modes
 
@@ -39,4 +38,5 @@ Use this once a spec exists and you want to collapse plan + build into one run. 
    - A task is high-risk or irreversible → follow `cs-doubt-driven` and get explicit sign-off
 8. **Summarize at the end:** tasks completed, tests added, commits made, anything skipped.
 
-If any step fails, follow `cs-debugging`.'''
+If any step fails, follow `cs-debugging`.
+'''

@@ -71,4 +71,4 @@ Confirm the optimization actually improved the metric. If not, revert and try a 
 
 ## See Also
 
-- ../../references/cs-performance-checklist.md`
+- `../../references/cs-performance-checklist.md`

@@ -107,7 +107,7 @@ Codex uses GPT-5.6 Sol/Terra, and Gemini uses Gemini Pro/Flash.
 ## Skill phases
 Define: cs-interview-me, cs-idea-refine, cs-grill-me, cs-spec-driven
 Plan: cs-planning
-Build: cs-incremental, cs-tdd, cs-context-eng, cs-source-driven, cs-doubt-driven, cs-frontend-ui, cs-api-design
+Build: cs-incremental, cs-tdd, cs-context-eng, cs-source-driven, cs-doubt-driven, cs-frontend-ui, cs-api-design, cs-team-build
 Verify: cs-browser-test, cs-debugging
 Review: cs-code-review, cs-simplify, cs-security, cs-perf-opt
 Ship: cs-git-workflow, cs-cicd, cs-deprecation, cs-docs-adrs, cs-observability, cs-shipping

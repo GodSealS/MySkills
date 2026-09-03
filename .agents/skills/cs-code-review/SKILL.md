@@ -108,5 +108,5 @@ Walk through code with the five axes in mind.
 
 ## See Also
 
-- ../../references/cs-security-checklist.md`
-- ../../references/cs-performance-checklist.md`
+- `../../references/cs-security-checklist.md`
+- `../../references/cs-performance-checklist.md`

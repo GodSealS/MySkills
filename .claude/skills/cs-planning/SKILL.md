@@ -131,4 +131,4 @@ Arrange tasks so dependencies are satisfied and verification checkpoints occur e
 
 ## See Also
 
-See ../../references/cs-definition-of-done.md` for the project-wide bar every task clears.
+See `../../references/cs-definition-of-done.md` for the project-wide bar every task clears.

@@ -2,7 +2,7 @@
 name: cs-code-reviewer
 description: "Senior code reviewer that evaluates changes across five dimensions — correctness, readability, architecture, security, and performance. Use for thorough code review before merge. / 资深代码审查员，从正确性、可读性、架构、安全性、性能五个维度评估变更。用于合并前的全面代码审查。"
 tools: Read, Glob, Grep, Write, Edit, Bash
-model: opus
+model: sonnet
 maxTurns: 10
 ---
 
