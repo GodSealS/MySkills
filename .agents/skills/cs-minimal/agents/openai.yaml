@@ -1,0 +1,3 @@
+interface:
+  display_name: "CS Minimal"
+  short_description: "Guides minimal-solution selection before writing code: confirm a change is needed, then reuse in-repo code, the standard library, platform-native."

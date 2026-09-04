@@ -32,6 +32,7 @@ Identify the development phase of the incoming task, then apply the matching ski
 
 **Build**
 - `cs-incremental` — deliver changes in small, working vertical slices
+- `cs-minimal` — choose the minimal solution before writing code (reuse → stdlib → native → installed dependency)
 - `cs-tdd` — drive implementation with tests (RED→GREEN→REFACTOR)
 - `cs-context-eng` — optimize agent context setup
 - `cs-source-driven` — ground every decision in official docs

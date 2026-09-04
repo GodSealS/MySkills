@@ -1,6 +1,6 @@
 # Agent-Skills (multi-platform prompt pack)
 
-29+ production-grade engineering workflow skills (ported from
+Production-grade engineering workflow skills (ported from
 [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills), MIT) adapted to install
 into **Codex**, **CodeBuddy**, **Claude Code**, and **Gemini CLI** from a single source of truth.
 
@@ -107,7 +107,7 @@ Codex uses GPT-5.6 Sol/Terra, and Gemini uses Gemini Pro/Flash.
 ## Skill phases
 Define: cs-interview-me, cs-idea-refine, cs-grill-me, cs-spec-driven
 Plan: cs-planning
-Build: cs-incremental, cs-tdd, cs-context-eng, cs-source-driven, cs-doubt-driven, cs-frontend-ui, cs-api-design, cs-team-build
+Build: cs-incremental, cs-minimal, cs-tdd, cs-context-eng, cs-source-driven, cs-doubt-driven, cs-frontend-ui, cs-api-design, cs-team-build
 Verify: cs-browser-test, cs-debugging
 Review: cs-code-review, cs-simplify, cs-security, cs-perf-opt
 Ship: cs-git-workflow, cs-cicd, cs-deprecation, cs-docs-adrs, cs-observability, cs-shipping

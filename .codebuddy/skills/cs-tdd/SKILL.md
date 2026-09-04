@@ -14,6 +14,8 @@ agent: cs-test-engineer
 
 Write a failing test before writing the code that makes it pass. For bug fixes, reproduce the bug with a test before attempting a fix. Tests are proof — "seems right" is not done.
 
+**Boundary with `cs-minimal`:** when both are active, RED-GREEN-REFACTOR takes full priority. `cs-minimal` may remove worthless scaffolding only, and never limits fixtures, parameterization, or test case count.
+
 ## When to Use
 
 - Implementing any new logic or behavior

@@ -18,6 +18,18 @@ copy_tree() (
   cp -R "$source_path"/. "$destination_path"/
 )
 
+# Read a simple single-line frontmatter value. Source skills use both quoted
+# and unquoted descriptions, so normalize either form before adapting it.
+frontmatter_value() {
+  key=$1
+  file=$2
+  value=$(sed -n "s/^${key}:[[:space:]]*//p" "$file" | head -n 1)
+  case "$value" in
+    \"*\") value=${value#\"}; value=${value%\"} ;;
+  esac
+  printf '%s' "$value"
+}
+
 source_model() {
   awk '$1 == "model:" { print $2; exit }' "$1"
 }
@@ -150,7 +162,7 @@ for src in "$ROOT/.codebuddy/commands"/*.md; do
   cp "$src" "$ROOT/commands/$name"
   cp "$src" "$ROOT/.claude/commands/$name"
 
-  description=$(sed -n 's/^description:[[:space:]]*"\(.*\)"[[:space:]]*$/\1/p' "$src" | head -n 1)
+  description=$(frontmatter_value description "$src")
   [ -n "$description" ] || description=${name%.md}
   body=$(awk 'BEGIN { delimiters = 0 } /^---[[:space:]]*$/ { delimiters++; next } delimiters >= 2 { print }' "$src")
   escaped_description=$(printf '%s' "$description" | sed 's/\\/\\\\/g; s/"/\\"/g')
@@ -169,7 +181,7 @@ for src in "$SRC_SKILLS"/*/SKILL.md; do
   [ -f "$src" ] || continue
   skill_name=$(sed -n 's/^name:[[:space:]]*\([^[:space:]]*\)[[:space:]]*$/\1/p' "$src" | head -n 1)
   [ -n "$skill_name" ] || skill_name=$(basename "$(dirname "$src")")
-  skill_description=$(sed -n 's/^description:[[:space:]]*"\(.*\)"[[:space:]]*$/\1/p' "$src" | head -n 1)
+  skill_description=$(frontmatter_value description "$src")
   escaped_description=$(printf '%s' "$skill_description" | sed 's/\\/\\\\/g; s/"/\\"/g')
   printf '%s\n' '---' "description: \"$escaped_description\"" 'argument-hint: "[args]"' '---' '' "Invoke the $skill_name skill and follow its workflow for: \$ARGUMENTS" > "$ROOT/.codex/prompts/$skill_name.md"
 done

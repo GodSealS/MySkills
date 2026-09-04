@@ -1,4 +1,4 @@
-﻿---
+---
 description: Anti-duplication guardrail for adding or changing skills
 paths:
   - "skills/**"

@@ -1,6 +1,6 @@
 # Agent Skills for CodeBuddy
 
-This directory contains the **agent-skills** collection — 24 production-grade engineering skills, 4 specialist agent personas, lifecycle hooks, and reference checklists — ported from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) (MIT License).
+This directory contains the **agent-skills** collection — production-grade engineering skills, specialist agent personas, lifecycle hooks, and reference checklists — ported from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) (MIT License).
 
 ## Skill Discovery
 
@@ -16,6 +16,7 @@ Task arrives
     ├── Have a spec, need tasks? ────────────→ cs-planning
     ├── Design doc, want a team? ────────────→ cs-team-build
     ├── Implementing code? ──────────────────→ cs-incremental
+    │   ├── Choosing minimal solution? ───────→ cs-minimal
     │   ├── UI work? ────────────────────────→ cs-frontend-ui
     │   ├── API work? ───────────────────────→ cs-api-design
     │   ├── Need better context? ────────────→ cs-context-eng
@@ -89,6 +90,7 @@ Task arrives
 | Plan | cs-planning | Decompose into verifiable tasks |
 | Build | cs-team-build | Agent team implements a design doc with review loops |
 | Build | cs-incremental | Thin vertical slices |
+| Build | cs-minimal | Minimal solution before writing code |
 | Build | cs-tdd | Failing test first, then make it pass |
 | Build | cs-context-eng | Right context at right time |
 | Build | cs-source-driven | Verify against official docs |

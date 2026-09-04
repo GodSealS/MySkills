@@ -542,7 +542,7 @@ This is the **agent-skills** pack — production-grade engineering workflow skil
 
 ## Skills
 
-Skills are discovered from `.claude/skills/<name>/SKILL.md` (project) and `~/.claude/skills/<name>/SKILL.md` (personal) — 29 skills, all `cs-` prefixed. Claude auto-invokes a skill when its `description` matches the task; you can also type the skill name directly to call it. The slash command shortcuts in `.claude/commands/` cover the main workflows.
+Skills are discovered from `.claude/skills/<name>/SKILL.md` (project) and `~/.claude/skills/<name>/SKILL.md` (personal), all `cs-` prefixed. Claude auto-invokes a skill when its `description` matches the task; you can also type the skill name directly to call it. The slash command shortcuts in `.claude/commands/` cover the main workflows.
 
 ## Router
 

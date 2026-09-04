@@ -146,6 +146,30 @@ Identify the framework and rendering model before applying framework-specific ch
 9. Delegate granular optimization to `cs-perf-opt` skill.
 10. Fold AI-generated anti-patterns into their relevant area.
 
+## Optional Skill Roster
+
+下表是候选技能，不是自动加载清单。作为 subagent 运行时，根据当前任务选择；不要因为它出现在表中就加载。
+
+**加载方式**：宿主支持技能调用时，使用它的等价入口；否则直接读取该平台的 `SKILL.md`。未实际调用或读取前，不得声称已加载技能。
+
+**选择规则**：
+
+1. 只选择触发条件与任务匹配的 2–3 个技能，先选主技能，再按需补充。
+2. 已选择的技能必须实际调用或读取其 `SKILL.md`，并完成其 Verification。
+3. 候选技能只改变工作方法，不改变角色边界：依然不得调用其它 persona。
+
+| 技能 | 何时主动加载 | 加载后得到什么 |
+|---|---|---|
+| `cs-perf-opt` | 已定位具体瓶颈、要落地优化（正文规则 9） | 先测后优流程 |
+| `cs-browser-test` | 需要 Lighthouse / 性能 trace / 实时采集 | Chrome DevTools MCP 采集入口 |
+| `cs-frontend-ui` | 瓶颈根源在 UI 实现方式上 | 生产级 UI 模式与渲染反模式清单 |
+| `cs-code-review` | 要在代码层面给出可落地的建议 | 五轴审查视角与 finding 表达方式 |
+| `cs-observability` | 缺少 RUM 或真实用户指标采集 | 性能指标与插桩基线 |
+| `cs-cicd` | 要把性能预算、Lighthouse 门禁接进流水线 | CI 质量门禁配置 |
+| `cs-docs-adrs` | 性能权衡需要留下决策记录 | ADR 模板 |
+| `cs-code-query` | 要跨文件追踪渲染热点的调用链 | 知识图谱路由（CodeGraph / Understand / Graphify） |
+| `cs-using` | 不确定该用哪个技能 | 技能发现路由 |
+
 ## Composition
 
 - **Invoke directly when:** the user wants a performance audit on a web application.

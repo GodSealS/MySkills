@@ -34,6 +34,35 @@ Multi-dimensional code review with quality gates. Every change gets reviewed bef
 - Are abstractions earning their complexity?
 - Are there dead code artifacts?
 
+#### Lean Pass (over-engineering check)
+
+An optional focused sub-step of this axis, adapted from Ponytail's over-engineering review. It reviews the current diff by default; scan the whole repository only when the user explicitly asks for a full-repo review. It surfaces findings only — it never modifies code.
+
+Each finding records location, tag, evidence, and a verifiable alternative:
+
+```text
+src/example.ts:L12: stdlib: 27 行自定义格式化可由 Intl.DateTimeFormat 覆盖。
+src/repository.py:L88: yagni: AbstractRepository 只有一个实现；出现第二个独立实现时再抽象。
+```
+
+Allowed tags:
+
+| Tag | Meaning |
+|---|---|
+| `delete:` | Uncalled code, speculative feature, or unused flexibility. Alternative: nothing. |
+| `stdlib:` | The standard library already has this capability. Name the specific API. |
+| `native:` | A platform-native feature already covers it. Name the specific feature. |
+| `yagni:` | An abstraction, config, or indirection layer not yet justified. State the future trigger. |
+| `shrink:` | The same logic can be expressed more directly without losing readability, behavior, or convention. Give the alternative. |
+
+Boundaries:
+
+- Safety, correctness, performance, and data-integrity issues belong to their own axes, not the Lean pass.
+- Tests, validation, error handling, and accessibility must never be tagged `delete:`.
+- Do not emit an unreliable "N lines removable" estimate.
+
+When there is nothing to cut, output `Lean pass: no findings.`
+
 ### 3. Architecture
 - Does it follow existing patterns or introduce a new one?
 - Does it maintain clean module boundaries?
@@ -108,5 +137,6 @@ Walk through code with the five axes in mind.
 
 ## See Also
 
+- `cs-minimal` — minimal-solution selection before writing code (the Lean pass is this axis's over-engineering check)
 - `../../references/cs-security-checklist.md`
 - `../../references/cs-performance-checklist.md`

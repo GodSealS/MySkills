@@ -23,6 +23,7 @@ Task arrives
     ├── Have a spec, need tasks? ──────→ cs-planning
     ├── Design doc, want a team? ──────→ cs-team-build
     ├── Implementing code? ────────────→ cs-incremental
+    │   ├── Choosing minimal solution? → cs-minimal
     │   ├── UI work? ─────────────────→ cs-frontend-ui
     │   ├── API work? ────────────────→ cs-api-design
     │   ├── Need better context? ─────→ cs-context-eng
@@ -111,6 +112,7 @@ Every skill includes a verification step. "Seems right" is never sufficient — 
 | Plan | cs-planning | Decompose into verifiable tasks |
 | Build | cs-team-build | Agent team implements a design doc with review loops |
 | Build | cs-incremental | Thin vertical slices |
+| Build | cs-minimal | Minimal solution before writing code |
 | Build | cs-source-driven | Verify against official docs |
 | Build | cs-doubt-driven | Adversarial review of decisions |
 | Build | cs-context-eng | Right context at right time |

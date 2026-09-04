@@ -50,6 +50,8 @@ Tackle the riskiest or most uncertain piece first. If it fails, you discover it 
 ### Rule 0: Simplicity First
 Before writing any code, ask: "What is the simplest thing that could work?" Three similar lines of code is better than a premature abstraction.
 
+This skill owns *slicing*; `cs-minimal` owns the *solution selection inside each slice* (reuse → stdlib → native → installed dependency → minimal implementation). Slice first, then minimize: when a slice forces a choose-a-solution decision, apply `cs-minimal`.
+
 ### Rule 0.5: Scope Discipline
 Touch only what the task requires. Do NOT "clean up" adjacent code, refactor imports in unrelated files, remove comments you don't understand, or add features not in the spec.
 

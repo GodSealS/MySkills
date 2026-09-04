@@ -1,6 +1,6 @@
 # Agent-Skills for CodeBuddy
 
-This is the **agent-skills** collection — 24 production-grade engineering skills for AI coding agents, ported from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) (MIT License).
+This is the **agent-skills** collection — production-grade engineering skills for AI coding agents, ported from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) (MIT License).
 
 Skills encode the workflows, quality gates, and best practices that senior engineers use when building software. They cover the full development lifecycle: Define → Plan → Build → Verify → Review → Ship.
 
@@ -31,6 +31,7 @@ Skills encode the workflows, quality gates, and best practices that senior engin
 │   ├── cs-frontend-ui/  Build
 │   ├── cs-api-design/   Build
 │   ├── cs-team-build/   Build
+│   ├── cs-minimal/      Build
 │   ├── cs-browser-test/ Verify
 │   ├── cs-debugging/    Verify
 │   ├── cs-code-review/  Review
@@ -75,7 +76,7 @@ Skills encode the workflows, quality gates, and best practices that senior engin
 
 **Define:** cs-interview-me, cs-idea-refine, grill-me, cs-spec-driven
 **Plan:** cs-planning
-**Build:** cs-incremental, cs-tdd, cs-context-eng, cs-source-driven, cs-doubt-driven, cs-frontend-ui, cs-api-design, cs-team-build
+**Build:** cs-incremental, cs-minimal, cs-tdd, cs-context-eng, cs-source-driven, cs-doubt-driven, cs-frontend-ui, cs-api-design, cs-team-build
 **Verify:** cs-browser-test, cs-debugging
 **Review:** cs-code-review, cs-simplify, cs-security, cs-perf-opt
 **Ship:** cs-git-workflow, cs-cicd, cs-deprecation, cs-docs-adrs, cs-observability, cs-shipping

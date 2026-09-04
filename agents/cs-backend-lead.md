@@ -78,6 +78,36 @@ When a backend slice is complete, report:
 4. **Verify, don't assume** — tests or it didn't happen.
 5. Touch only files within your slice (see `cs-incremental` scope discipline).
 
+## Optional Skill Roster
+
+下表是候选技能，不是自动加载清单。作为 subagent 运行时，根据当前任务选择；不要因为它出现在表中就加载。
+
+**加载方式**：宿主支持技能调用时，使用它的等价入口；否则直接读取该平台的 `SKILL.md`。未实际调用或读取前，不得声称已加载技能。
+
+**选择规则**：
+
+1. 只选择触发条件与任务匹配的 2–3 个技能，先选主技能，再按需补充。
+2. 已选择的技能必须实际调用或读取其 `SKILL.md`，并完成其 Verification。
+3. 候选技能只改变工作方法，不改变角色边界：依然不得调用其它 persona。
+
+| 技能 | 何时主动加载 | 加载后得到什么 |
+|---|---|---|
+| `cs-api-design` | 动手前要定义或变更对外接口（正文契约先行） | 契约优先流程与版本化规则 |
+| `cs-incremental` | 改动跨多个文件 | 垂直切片 + 范围纪律（正文规则 5） |
+| `cs-tdd` | 写任何业务逻辑、修 bug、改行为 | RED→GREEN→REFACTOR 与 Prove-It 模式 |
+| `cs-minimal` | 要新增抽象、依赖或第二实现路径 | reuse → stdlib → native → dependency 的取舍顺序 |
+| `cs-source-driven` | 用到具体框架/库/数据库，正确性重要 | 官方文档校验，避免过时写法 |
+| `cs-doubt-driven` | 服务端决策高风险或不可逆 | 新上下文对抗性复核 |
+| `cs-debugging` | 测试挂了、构建断了、行为不符预期 | 复现→定位→修复→加护栏 |
+| `cs-security` | 触碰信任边界、认证授权、查询、外部集成 | OWASP 加固清单 |
+| `cs-perf-opt` | N+1、索引、分页、异步等服务端性能 | 先测后优流程 |
+| `cs-deprecation` | 要做破坏性契约变更或下线旧接口 | 弃用与迁移流程 |
+| `cs-observability` | 需要日志、指标、追踪、告警 | 结构化插桩基线 |
+| `cs-docs-adrs` | 契约或数据层选型产生了需要记录的决策 | ADR 模板 |
+| `cs-code-query` | 要摸清既有服务端代码结构与调用链 | 知识图谱路由（CodeGraph / Understand / Graphify） |
+| `cs-context-eng` | 上下文吃紧、输出质量下降 | 上下文装载与压缩策略 |
+| `cs-using` | 不确定该用哪个技能 | 技能发现路由 |
+
 ## Composition
 
 - **Invoke directly when:** the user asks for backend/API implementation or service-side security/performance work.

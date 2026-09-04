@@ -14,6 +14,8 @@ agent: cs-code-reviewer
 
 Simplify code by reducing complexity while preserving exact behavior. The goal is not fewer lines — it's code that is easier to read, understand, modify, and debug. Every simplification must pass a simple test: "Would a new team member understand this faster than the original?"
 
+**Boundary with `cs-minimal`:** this skill cleans up code that *already exists* (post-hoc readability). `cs-minimal` decides what to *write* (or not write) before implementation begins. When the two disagree, readability and project convention win over line count.
+
 ## When to Use
 
 - After a feature is working but the implementation feels heavier than needed
