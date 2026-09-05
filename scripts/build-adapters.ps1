@@ -18,6 +18,10 @@
     .claude-plugin/     -> Claude Code plugin manifest
     CLAUDE.md           -> Claude Code top-level project context (only if missing)
 
+  Skills never pin a model: any `model:` key in skill frontmatter is stripped for
+  every platform, so the host runs a skill with whatever model is active. Only the
+  persona agents (agents/) keep a per-role model, translated per host.
+
   CodeBuddy keeps its own .codebuddy/ tree and is unchanged by this script.
 
   Run:  powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-adapters.ps1
@@ -53,7 +57,8 @@ function Write-TextFile($path, $content) {
 
 function Neutralize-Frontmatter($content) {
     # Keep name + description; strip CodeBuddy-only fields
-    # (argument-hint, user-invocable, allowed-tools, agent).
+    # (argument-hint, user-invocable, allowed-tools, agent) and any `model:`
+    # pin — skills never select a model, the host's current model runs them.
     # Filtering (not rebuilding) preserves multi-line descriptions.
     if ($content -match '(?s)^(---\r?\n)(.*?)(\r?\n---\r?\n)') {
         $open  = $matches[1]
@@ -62,7 +67,7 @@ function Neutralize-Frontmatter($content) {
         $body  = $content.Substring($matches[0].Length)
         $keep  = @()
         foreach ($l in ($fm -split "`r?`n")) {
-            if ($l -match '^(argument-hint|user-invocable|allowed-tools|agent)\s*:') { continue }
+            if ($l -match '^(argument-hint|user-invocable|allowed-tools|agent|model)\s*:') { continue }
             $keep += $l
         }
         return $open + ($keep -join "`n") + $close + $body
@@ -131,8 +136,9 @@ function Copy-Tree($src, $dst, [switch]$NeutralizeSkill, [switch]$RewriteRefs) {
 }
 
 # Map the canonical CodeBuddy model tier to each platform's native model IDs.
-# The source skills use DeepSeek-V4-Pro/Flash as stable complexity markers;
-# adapters must emit models understood by their own host runtime.
+# Skills never pin a model (the host's current model runs them), so this table
+# only serves the persona agents under .codebuddy/agents/, which are still
+# pinned per role and translated to each host's own model IDs.
 $PlatformModels = @{
     'claude' = @{
         'DeepSeek-V4-Pro' = 'opus'
@@ -157,14 +163,6 @@ function Get-PlatformModel([string]$sourceModel, [string]$platform) {
         throw "Unsupported canonical skill model: $sourceModel"
     }
     return $models[$sourceModel]
-}
-
-function Set-SkillPlatformModel([string]$path, [string]$platform) {
-    $content = Get-Content -Raw -Path $path
-    $sourceModel = if ($content -match '(?m)^model:\s*(.+?)\s*$') { $matches[1].Trim() } else { return }
-    $targetModel = Get-PlatformModel $sourceModel $platform
-    $content = $content -replace '(?m)^model:\s*.+?\s*$', "model: $targetModel"
-    Write-TextFile $path $content
 }
 
 function Set-AgentPlatformModel([string]$path, [string]$platform) {
@@ -210,9 +208,6 @@ foreach ($sd in $skillDirs) {
     Copy-Tree -src $sd.FullName -dst $geminiSkill -NeutralizeSkill -RewriteRefs
     Copy-Tree -src $sd.FullName -dst $codexSkill -NeutralizeSkill -RewriteRefs
     Copy-Tree -src $sd.FullName -dst $claudeSkill -NeutralizeSkill -RewriteRefs
-    Set-SkillPlatformModel (Join-Path $geminiSkill 'SKILL.md') 'gemini'
-    Set-SkillPlatformModel (Join-Path $codexSkill 'SKILL.md') 'codex'
-    Set-SkillPlatformModel (Join-Path $claudeSkill 'SKILL.md') 'claude'
 }
 Write-Host "Skills: $($skillDirs.Count) -> skills/ .gemini/skills/ .agents/skills/ .claude/skills/"
 

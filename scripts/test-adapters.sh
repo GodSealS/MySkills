@@ -50,6 +50,13 @@ for agent in "$ROOT"/.codebuddy/agents/*.md "$ROOT"/.gemini/agents/*.md "$ROOT"/
   assert_contains "$agent" '候选技能，不是自动加载清单'
 done
 
+# Skills run on the host's active model, so no skill tree may pin one.
+for skill in "$ROOT"/.codebuddy/skills/*/SKILL.md "$ROOT"/skills/*/SKILL.md "$ROOT"/.agents/skills/*/SKILL.md "$ROOT"/.claude/skills/*/SKILL.md "$ROOT"/.gemini/skills/*/SKILL.md "$ROOT"/plugins/claude/skills/*/SKILL.md; do
+  if grep -Eq '^model:' "$skill"; then
+    fail "skill must not pin a model: $skill"
+  fi
+done
+
 for command in cs-build cs-plan cs-spec; do
   assert_same "$ROOT/.codebuddy/commands/$command.md" "$ROOT/commands/$command.md"
   assert_same "$ROOT/.codebuddy/commands/$command.md" "$ROOT/.claude/commands/$command.md"

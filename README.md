@@ -100,9 +100,10 @@ After editing anything under `.codebuddy/`, rebuild the platform trees. On macOS
 `cs-huashu-design` (browser/asset dependent) and `cs-code-query` (MCP-routing)
 are now synced to all platform adapters.
 
-Skill models are selected by complexity in `.codebuddy/`; persona-agent models are selected by role
-and translated per host during adapter generation: CodeBuddy uses DeepSeek, Claude uses Opus/Sonnet,
-Codex uses GPT-5.6 Sol/Terra, and Gemini uses Gemini Pro/Flash.
+Skills never pin a model: any `model:` key in skill frontmatter is stripped for every platform, so a
+skill always runs on the host's currently active model. Only the persona agents in `.codebuddy/agents/`
+are pinned by role and translated per host during adapter generation: CodeBuddy uses DeepSeek, Claude
+uses Opus/Sonnet, Codex uses GPT-5.6 Sol/Terra, and Gemini uses Gemini Pro/Flash.
 
 ## Skill phases
 Define: cs-interview-me, cs-idea-refine, cs-grill-me, cs-spec-driven

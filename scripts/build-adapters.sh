@@ -30,10 +30,8 @@ frontmatter_value() {
   printf '%s' "$value"
 }
 
-source_model() {
-  awk '$1 == "model:" { print $2; exit }' "$1"
-}
-
+# Skills never pin a model — the host runs them with its currently active
+# model. Only the persona agents keep a per-role model, mapped per platform.
 platform_model() {
   platform=$1
   model=$2
@@ -61,7 +59,7 @@ strip_skill_frontmatter() {
   tmp="$file.tmp.$$"
   awk '
     /^---[[:space:]]*$/ { in_fm = !in_fm; print; next }
-    in_fm && $0 ~ /^(argument-hint|user-invocable|allowed-tools|agent):[[:space:]]/ { next }
+    in_fm && $0 ~ /^(argument-hint|user-invocable|allowed-tools|agent|model):[[:space:]]/ { next }
     { print }
   ' "$file" > "$tmp"
   mv "$tmp" "$file"
@@ -95,8 +93,7 @@ fix_refs() (
 )
 
 build_skills() (
-  platform=$1
-  dst=$2
+  dst=$1
   mkdir -p "$dst"
   for src in "$SRC_SKILLS"/*; do
     [ -d "$src" ] || continue
@@ -106,9 +103,6 @@ build_skills() (
     definition="$target/SKILL.md"
     strip_skill_frontmatter "$definition"
     fix_refs "$definition"
-    if [ "$platform" != neutral ]; then
-      replace_model "$definition" "$(platform_model "$platform" "$(source_model "$src/SKILL.md")")"
-    fi
   done
 )
 
@@ -139,10 +133,10 @@ build_refs() (
   for src in "$SRC_REFS"/*.md; do [ -f "$src" ] && cp "$src" "$dst/"; done
 )
 
-build_skills neutral "$ROOT/skills"
-build_skills gemini "$ROOT/.gemini/skills"
-build_skills codex "$ROOT/.agents/skills"
-build_skills claude "$ROOT/.claude/skills"
+build_skills "$ROOT/skills"
+build_skills "$ROOT/.gemini/skills"
+build_skills "$ROOT/.agents/skills"
+build_skills "$ROOT/.claude/skills"
 
 build_agents neutral "$ROOT/agents"
 build_agents gemini "$ROOT/.gemini/agents"
