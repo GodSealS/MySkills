@@ -1,6 +1,5 @@
 ---
 name: cs-team-build
-model: opus
 description: "Runs a design document through a coordinated agent team — the architect decomposes it into tasks, domain leads implement them, a reviewer audits each slice, the architect triages findings, and a test engineer verifies the whole. Use when a design or spec document exists and you want it implemented by a multi-agent team with bounded review loops. / 用 Agent 团队把设计文档落地：架构师拆解任务、领域负责人实现、审查员逐片审查、架构师裁决修改意见、测试工程师整体验证。用于已有设计/规范文档、希望由多 Agent 团队带审查闭环交付时。"
 ---
 
@@ -264,6 +263,7 @@ Every handoff document is self-contained — the receiving agent must be able to
 - `cs-debugging` — the escape hatch when a test can't be made to pass
 - `cs-doubt-driven` — for high-risk or irreversible tasks before implementing
 - `cs-shipping` — downstream, once the final report says SHIP
+- `cs-sysdocs-update` / `SysDocs/` — when a `SysDocs/` library exists, the architect decomposes from SYSTEM_ROOT + relevant module docs instead of re-guessing boundaries
 
 ## See Also
 

@@ -39,6 +39,8 @@ Task arrives
     ├── CI/CD pipeline work? ──────────→ cs-cicd
     ├── Deprecating/migrating? ────────→ cs-deprecation
     ├── Writing docs/ADRs? ───────────→ cs-docs-adrs
+    ├── Building system docs? ────────→ cs-sysdocs-init / cs-sysdocs-update
+    ├── Fragmentary change, pre-design? → cs-vibe-coding
     ├── Adding logs/metrics/alerts? ───→ cs-observability
     └── Deploying/launching? ─────────→ cs-shipping
 ```
@@ -130,3 +132,6 @@ Every skill includes a verification step. "Seems right" is never sufficient — 
 | Ship | cs-docs-adrs | Document the why |
 | Ship | cs-observability | Structured logs, metrics, traces |
 | Ship | cs-shipping | Pre-launch checklist, rollback plan |
+| SysDocs | cs-sysdocs-init | One-time full SysDocs generation |
+| SysDocs | cs-sysdocs-update | Repair / incremental / rebuild-boundaries |
+| SysDocs | cs-vibe-coding | Fragmentary change pre-design |

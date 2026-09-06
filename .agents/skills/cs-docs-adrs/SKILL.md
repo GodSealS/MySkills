@@ -55,7 +55,7 @@ Document decisions, not just code. The most valuable documentation captures the 
 |-----------|----------|----------|
 | Architecture decision | ADR | `docs/adr/ADR-NNN.md` |
 | API reference | API docs | Inline JSDoc + generated docs |
-| How to use a module | README | `src/module/README.md` |
+| How to use a module | Module doc | `SysDocs/modules/<slug>.md` (see `cs-sysdocs-update`) |
 | Project setup | README | Root `README.md` |
 | Design rationale | Design doc | `docs/design/[feature].md` |
 | Changelog entries | CHANGELOG | `CHANGELOG.md` |
@@ -80,6 +80,10 @@ Document decisions, not just code. The most valuable documentation captures the 
 | "The code is self-documenting" | Code shows what; docs explain why. Both are needed. |
 | "I'll write docs later" | Context evaporates. Write docs while the reasoning is fresh. |
 | "Nobody reads documentation" | Future you will. And future agents. |
+
+## Interaction with Other Skills
+
+- `cs-sysdocs-init` / `cs-sysdocs-update`: SysDocs = what/how, ADR = why. Module docs link ADRs; this skill's "How to use a module" points to `SysDocs/modules/<slug>.md`, not `src/module/README.md` (avoid double-writing).
 
 ## Verification
 

@@ -1,6 +1,5 @@
 ---
 name: cs-spec-driven
-model: opus
 description: "Creates specs before coding. Use when starting a new project, feature, or significant change and no specification exists yet. Use when requirements are unclear, ambiguous, or only exist as a vague idea. / 编码前先创建规范。用于启动新项目、新功能或重大变更且尚无规范时——需求不明确、模糊或仅作为粗略想法存在时（SPECIFY→PLAN→TASKS→IMPLEMENT）。"
 ---
 
@@ -142,6 +141,7 @@ Before invoking `cs-planning`, run `/cs-grill-me <spec-path>` and replace the `p
 - `grill-me`: required gate before planning — stress-test the spec, then record the findings and decision in `## Grill Review`
 - `cs-architect` (agent): fan-out after the objective is approved — produces module boundaries, dependency direction, tech stack, and ADRs (via `cs-docs-adrs`, stored in `docs/adr/`)
 - `cs-planning`: downstream — break the spec into verifiable tasks
+- `cs-sysdocs-init` / `cs-sysdocs-update`: downstream — after the spec lands, initialize/refresh the SysDocs library (no code → skeleton; with code → full or update)
 
 ## Verification
 

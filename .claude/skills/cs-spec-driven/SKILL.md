@@ -141,6 +141,7 @@ Before invoking `cs-planning`, run `/cs-grill-me <spec-path>` and replace the `p
 - `grill-me`: required gate before planning — stress-test the spec, then record the findings and decision in `## Grill Review`
 - `cs-architect` (agent): fan-out after the objective is approved — produces module boundaries, dependency direction, tech stack, and ADRs (via `cs-docs-adrs`, stored in `docs/adr/`)
 - `cs-planning`: downstream — break the spec into verifiable tasks
+- `cs-sysdocs-init` / `cs-sysdocs-update`: downstream — after the spec lands, initialize/refresh the SysDocs library (no code → skeleton; with code → full or update)
 
 ## Verification
 

@@ -1,6 +1,5 @@
 ---
 name: cs-git-workflow
-model: sonnet
 description: "Structures git workflow practices. Use when making any code change. Use when committing, branching, resolving conflicts, or when you need to organize work across multiple parallel streams. / 结构化Git工作流实践。用于任何代码变更——提交、分支、冲突解决、多并行流工作组织。"
 ---
 
@@ -85,3 +84,7 @@ npx tsc --noEmit
 - [ ] No secrets in the diff
 - [ ] No formatting-only changes mixed with behavior changes
 - [ ] `.gitignore` covers standard exclusions
+
+## Interaction with Other Skills
+
+- `cs-sysdocs-update`: when a `SysDocs/` library exists, add one reminder before commit/PR — does the change drift the docs? Do not auto-refresh the whole library.

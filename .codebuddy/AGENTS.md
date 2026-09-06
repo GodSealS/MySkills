@@ -33,6 +33,8 @@ Task arrives
     ├── CI/CD pipeline work? ────────────────→ cs-cicd
     ├── Deprecating/migrating? ──────────────→ cs-deprecation
     ├── Writing docs/ADRs? ──────────────────→ cs-docs-adrs
+    ├── Building system docs? ────────────────→ cs-sysdocs-init / cs-sysdocs-update
+    ├── Fragmentary change, pre-design? ─────→ cs-vibe-coding
     ├── Adding logs/metrics/alerts? ─────────→ cs-observability
     └── Deploying/launching? ────────────────→ cs-shipping
 ```
@@ -109,6 +111,19 @@ Task arrives
 | Ship | cs-docs-adrs | Document the why |
 | Ship | cs-observability | Structured logs, metrics, traces |
 | Ship | cs-shipping | Pre-launch checklist, rollback plan |
+| SysDocs | cs-sysdocs-init | One-time full SysDocs generation |
+| SysDocs | cs-sysdocs-update | Repair / incremental / rebuild-boundaries |
+| SysDocs | cs-vibe-coding | Fragmentary change pre-design |
+
+## SysDocs — System Project Documentation
+
+`SysDocs/` is a project-documentation system (`SYSTEM_ROOT.md` + per-module docs) with three skills:
+
+- `cs-sysdocs-init` — one-time full generation (UNINITIALIZED only)
+- `cs-sysdocs-update` — the only maintenance entry (repair / incremental / rebuild-boundaries)
+- `cs-vibe-coding` — fragmentary change pre-design, architect-reviewed
+
+Shared templates + validator protocol live in `.codebuddy/references/sysdocs-*.md`. `SysDocs/` deploys on the consuming project's root.
 
 ## References
 
@@ -120,3 +135,4 @@ See `.codebuddy/references/` for checklists and detailed patterns:
 - Accessibility Checklist
 - Observability Checklist
 - Orchestration Patterns
+- SysDocs convention + overview/module/vibe templates

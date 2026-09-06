@@ -82,13 +82,15 @@ When asked to produce an architecture, return a structure that frontend/backend 
 | `cs-planning` | 已有设计文档/规范，要拆成带验收标准的任务（含依赖图校验） | 依赖顺序、垂直切片、验收标准 |
 | `cs-api-design` | 要定义模块之间 / 前后端之间的公共契约 | 稳定的接口形状与版本化规则 |
 | `cs-docs-adrs` | 每做完一个权衡决策（正文规则强制） | ADR 模板与 `docs/adr/ADR-NNN.md` 存放规范 |
-| `cs-team-build` | 用户想把设计文档交给多 Agent 团队落地 | 团队编队 + 3 轮上限的审查闭环 |
 | `cs-grill-me` | 架构方案交付前想先自己压力测试一轮 | 对抗性提问，暴露假设与盲点 |
 | `cs-minimal` | 方案要引入新抽象、新依赖或第二实现路径 | reuse → stdlib → native → dependency 的取舍顺序 |
 | `cs-simplify` | 结构比实际需要更复杂 | 保行为、降复杂度的重构手法 |
 | `cs-source-driven` | 技术选型落到具体框架/库/服务 | DETECT→FETCH→IMPLEMENT→CITE，避免过时写法 |
 | `cs-doubt-driven` | 决策不可逆、跨模块、或代码库不熟悉 | 新上下文对抗性复核 |
 | `cs-code-query` | 需要先摸清现有代码库的结构与调用关系 | 知识图谱路由（CodeGraph / Understand / Graphify） |
+| `cs-sysdocs-init` | 目标项目尚未初始化 SysDocs 文档库，需要一次性全量生成 | 三态门闩 + SYSTEM_ROOT + 模块文档生成 |
+| `cs-sysdocs-update` | 已初始化/部分初始化后的文档维护（repair/incremental/rebuild） | 漂移刷新、schema 迁移、vibe 四条件并入 |
+| `cs-vibe-coding` | 碎片需求需要前置设计审查 | vibe 文档 + 设计审查往返 |
 | `cs-observability` | 设计跨切面的日志、指标、追踪、告警 | 可观测性基线与插桩点 |
 | `cs-agent-brief-review` | 要把任务派发给 lead / 子 Agent 之前 | Brief 四轴自检（持久性/行为驱动/验收标准/范围边界） |
 | `cs-context-eng` | 上下文吃紧、输出质量下降、任务切换 | 上下文装载与压缩策略 |

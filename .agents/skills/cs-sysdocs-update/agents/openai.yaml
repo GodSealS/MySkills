@@ -1,0 +1,3 @@
+interface:
+  display_name: "CS Sysdocs Update"
+  short_description: "The single maintenance entry for a SysDocs documentation library: repair (partial-initialized), incremental (initialized, refresh drifted modules."

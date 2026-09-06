@@ -65,11 +65,16 @@ Identify the development phase of the incoming task, then apply the matching ski
 - `cs-agent-brief-review` — review an agent brief for readiness
 - `cs-skill-review` — review a skill for predictability
 
+**SysDocs / project documentation**
+- `cs-sysdocs-init` — one-time full generation of the SysDocs library (UNINITIALIZED only)
+- `cs-sysdocs-update` — the only maintenance entry: repair / incremental / rebuild-boundaries
+- `cs-vibe-coding` — fragmentary change pre-design, architect-reviewed (explicit call)
+
 ## Personas (agents/)
 
 | Agent | Role | Use when | Invoked by (skill fan-out) |
 |-------|------|----------|-----------------------------|
-| cs-architect | System Architect | module boundaries, dependency direction, tech stack, ADRs | cs-spec-driven, cs-planning, cs-team-build |
+| cs-architect | System Architect | module boundaries, dependency direction, tech stack, ADRs | cs-spec-driven, cs-planning, cs-team-build, cs-sysdocs-init, cs-sysdocs-update, cs-vibe-coding |
 | cs-frontend-lead | Frontend Lead | UI implementation, state, browser verification | frontend-owned cs-incremental, cs-frontend-ui, cs-browser-test, cs-tdd, security, performance, cs-team-build |
 | cs-backend-lead | Backend Lead | API implementation, data layer, server security/perf | backend-owned cs-incremental, cs-api-design, cs-tdd, security, performance, cs-team-build |
 | cs-code-reviewer | Senior Staff Engineer | five-axis code review | cs-code-review, cs-shipping, cs-team-build |

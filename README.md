@@ -33,6 +33,9 @@ into **Codex**, **CodeBuddy**, **Claude Code**, and **Gemini CLI** from a single
 └── scripts/
     ├── build-adapters.ps1   # regenerate all adapters from .codebuddy/
     ├── build-adapters.sh    # macOS/Linux adapter builder
+    ├── test-adapters.ps1     # isolated PowerShell adapter verification
+    ├── test-adapters.sh      # isolated POSIX adapter verification
+    ├── validate-sysdocs.py    # shared protocol validator for fixtures
     ├── install.sh            # macOS/Linux installer
     └── install.ps1          # copy a platform's files to a target location
 ```
@@ -113,3 +116,4 @@ Verify: cs-browser-test, cs-debugging
 Review: cs-code-review, cs-simplify, cs-security, cs-perf-opt
 Ship: cs-git-workflow, cs-cicd, cs-deprecation, cs-docs-adrs, cs-observability, cs-shipping
 Meta: cs-using, cs-code-query, cs-agent-brief-review, cs-skill-review
+SysDocs: cs-sysdocs-init, cs-sysdocs-update, cs-vibe-coding

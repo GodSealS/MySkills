@@ -1,0 +1,3 @@
+interface:
+  display_name: "CS Sysdocs Init"
+  short_description: "Generates the SysDocs system documentation set (SYSTEM_ROOT."

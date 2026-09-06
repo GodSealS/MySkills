@@ -43,7 +43,10 @@ Skills encode the workflows, quality gates, and best practices that senior engin
 │   ├── cs-deprecation/  Ship
 │   ├── cs-docs-adrs/    Ship
 │   ├── cs-observability/Ship
-│   └── cs-shipping/     Ship
+│   ├── cs-shipping/     Ship
+│   ├── cs-sysdocs-init/   SysDocs: one-time full doc generation
+│   ├── cs-sysdocs-update/ SysDocs: repair / incremental / rebuild-boundaries
+│   └── cs-vibe-coding/  SysDocs: fragmentary change pre-design
 ├── commands/                 → 9 slash commands (orchestration layer)
 │   ├── cs-spec.md
 │   ├── cs-plan.md
@@ -66,7 +69,11 @@ Skills encode the workflows, quality gates, and best practices that senior engin
 │   ├── cs-performance-checklist.md
 │   ├── cs-accessibility-checklist.md
 │   ├── cs-observability-checklist.md
-│   └── cs-orchestration-patterns.md
+│   ├── cs-orchestration-patterns.md
+│   ├── sysdocs-system.md
+│   ├── sysdocs-overview-template.md
+│   ├── sysdocs-module-template.md
+│   └── sysdocs-vibe-template.md
 ├── AGENTS.md                 → Skill discovery router and intent mapping
 ├── settings.json             → Hook registration and permissions
 └── CODEBUDDY.md              → This file
@@ -80,6 +87,7 @@ Skills encode the workflows, quality gates, and best practices that senior engin
 **Verify:** cs-browser-test, cs-debugging
 **Review:** cs-code-review, cs-simplify, cs-security, cs-perf-opt
 **Ship:** cs-git-workflow, cs-cicd, cs-deprecation, cs-docs-adrs, cs-observability, cs-shipping
+**SysDocs:** cs-sysdocs-init, cs-sysdocs-update, cs-vibe-coding
 
 ## How Skills Work
 
@@ -119,7 +127,7 @@ CodeBuddy discovers and activates skills based on `AGENTS.md` intent mapping. Wh
 
 | Agent | Role | Use When | Invoked by (skill fan-out) |
 |-------|------|----------|-----------------------------|
-| cs-architect | System Architect | Module boundaries, dependency direction, tech stack, ADRs | cs-spec-driven, cs-planning, cs-team-build |
+| cs-architect | System Architect | Module boundaries, dependency direction, tech stack, ADRs | cs-spec-driven, cs-planning, cs-team-build, cs-sysdocs-init, cs-sysdocs-update, cs-vibe-coding |
 | cs-frontend-lead | Frontend Lead | UI implementation, state, browser verification | frontend-owned cs-incremental, cs-frontend-ui, cs-browser-test, cs-tdd, security, performance, cs-team-build |
 | cs-backend-lead | Backend Lead | API implementation, data layer, server security/perf | backend-owned cs-incremental, cs-api-design, cs-tdd, security, performance, cs-team-build |
 | cs-code-reviewer | Senior Staff Engineer | Five-axis code review | cs-code-review, cs-shipping, cs-team-build |
@@ -138,6 +146,15 @@ Personas follow the composition rule: **only the user (or AGENTS.md intent mappi
 - References are in `references/`, not inside skill directories
 - Cross-references use the target skill's declared name, such as `cs-xxx` or `grill-me`
 - Agent personas have: `thinkingLevel`, `name`, `description`, `tools`, `model`, `maxTurns`, `agentMode`, `subagent`, `enabled`, `enabledAutoRun`
+
+## SysDocs — System Project Documentation
+
+The pack ships a project-documentation system (`SysDocs/`) plus three skills:
+`cs-sysdocs-init` (one-time full generation), `cs-sysdocs-update` (the only
+maintenance entry: repair / incremental / rebuild-boundaries), and
+`cs-vibe-coding` (fragmentary change pre-design, architect-reviewed). The shared
+templates and validator protocol live in `references/sysdocs-*.md`. `SysDocs/`
+deploys on the consuming project's root, not this skill-pack repo.
 
 ## Coexistence with CodeSquad
 

@@ -1,0 +1,3 @@
+interface:
+  display_name: "CS Vibe Coding"
+  short_description: "Captures a fragmentary change as a pre-design VibeCoding doc under SysDocs/VibeCoding/ and routes it through cs-architect design review before any."

@@ -267,6 +267,7 @@ Every handoff document is self-contained — the receiving agent must be able to
 - `cs-debugging` — the escape hatch when a test can't be made to pass
 - `cs-doubt-driven` — for high-risk or irreversible tasks before implementing
 - `cs-shipping` — downstream, once the final report says SHIP
+- `cs-sysdocs-update` / `SysDocs/` — when a `SysDocs/` library exists, the architect decomposes from SYSTEM_ROOT + relevant module docs instead of re-guessing boundaries
 
 ## See Also
 

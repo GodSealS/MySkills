@@ -84,3 +84,7 @@ npx tsc --noEmit
 - [ ] No secrets in the diff
 - [ ] No formatting-only changes mixed with behavior changes
 - [ ] `.gitignore` covers standard exclusions
+
+## Interaction with Other Skills
+
+- `cs-sysdocs-update`: when a `SysDocs/` library exists, add one reminder before commit/PR — does the change drift the docs? Do not auto-refresh the whole library.

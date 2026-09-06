@@ -1,6 +1,5 @@
 ---
 name: cs-planning
-model: opus
 description: "Breaks work into ordered tasks. Use when you have a spec or clear requirements and need to break work into implementable tasks. Use when a task feels too large to start, when you need to estimate scope, or when parallel work is possible. / 将工作拆分为有序任务。用于有规范或明确需求、需要估算范围、或并行工作可行时——依赖图、垂直切片、验收标准。"
 ---
 
@@ -128,6 +127,7 @@ Arrange tasks so dependencies are satisfied and verification checkpoints occur e
 - `cs-incremental`: downstream — execute tasks in thin vertical slices, routed by owner
 - `cs-frontend-lead` / `cs-backend-lead` (agents): downstream — implement primary-owner tasks and consult on listed collaborator boundaries
 - `cs-tdd`: downstream — test-driven implementation of individual tasks
+- `cs-sysdocs-update` / `SysDocs/`: when a `SysDocs/` library exists, derive task boundaries from its module manifest + dependency direction instead of re-guessing from source
 
 ## See Also
 

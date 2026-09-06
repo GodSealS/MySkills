@@ -1,6 +1,5 @@
 ---
 name: cs-docs-adrs
-model: sonnet
 description: "Records decisions and documentation. Use when making architectural decisions, changing public APIs, shipping features, or when you need to record context that future engineers and agents will need to understand the codebase. / 记录决策与文档。用于架构决策、变更公开API、发布功能、或记录未来工程师和Agent需要的上下文。"
 ---
 
@@ -56,7 +55,7 @@ Document decisions, not just code. The most valuable documentation captures the 
 |-----------|----------|----------|
 | Architecture decision | ADR | `docs/adr/ADR-NNN.md` |
 | API reference | API docs | Inline JSDoc + generated docs |
-| How to use a module | README | `src/module/README.md` |
+| How to use a module | Module doc | `SysDocs/modules/<slug>.md` (see `cs-sysdocs-update`) |
 | Project setup | README | Root `README.md` |
 | Design rationale | Design doc | `docs/design/[feature].md` |
 | Changelog entries | CHANGELOG | `CHANGELOG.md` |
@@ -81,6 +80,10 @@ Document decisions, not just code. The most valuable documentation captures the 
 | "The code is self-documenting" | Code shows what; docs explain why. Both are needed. |
 | "I'll write docs later" | Context evaporates. Write docs while the reasoning is fresh. |
 | "Nobody reads documentation" | Future you will. And future agents. |
+
+## Interaction with Other Skills
+
+- `cs-sysdocs-init` / `cs-sysdocs-update`: SysDocs = what/how, ADR = why. Module docs link ADRs; this skill's "How to use a module" points to `SysDocs/modules/<slug>.md`, not `src/module/README.md` (avoid double-writing).
 
 ## Verification
 

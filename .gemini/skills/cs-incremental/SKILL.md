@@ -106,3 +106,5 @@ Each increment should be independently revertable.
 ## See Also
 
 See `../../references/cs-definition-of-done.md` for the project-wide bar.
+
+If a `SysDocs/` library exists in the project, remind the user before each slice commit whether `cs-sysdocs-update` should run — do not auto-refresh the whole library.

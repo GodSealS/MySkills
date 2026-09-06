@@ -2,6 +2,19 @@
 set -eu
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+SOURCE_ROOT=$ROOT
+TMP_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/agent-skills-adapter-test.XXXXXX")
+trap 'rm -rf "$TMP_ROOT"' EXIT HUP INT TERM
+mkdir -p "$TMP_ROOT/.codebuddy/skills" "$TMP_ROOT/.codebuddy/agents" "$TMP_ROOT/.codebuddy/references" "$TMP_ROOT/.codebuddy/commands" "$TMP_ROOT/.claude/rules" "$TMP_ROOT/scripts"
+for skill in cs-sysdocs-init cs-sysdocs-update cs-vibe-coding cs-incremental cs-agent-brief-review cs-skill-review; do
+  cp -R "$SOURCE_ROOT/.codebuddy/skills/$skill" "$TMP_ROOT/.codebuddy/skills/"
+done
+cp -R "$SOURCE_ROOT/.codebuddy/agents/." "$TMP_ROOT/.codebuddy/agents/"
+cp -R "$SOURCE_ROOT/.codebuddy/references/." "$TMP_ROOT/.codebuddy/references/"
+cp -R "$SOURCE_ROOT/.codebuddy/commands/." "$TMP_ROOT/.codebuddy/commands/"
+cp -R "$SOURCE_ROOT/.claude/rules/." "$TMP_ROOT/.claude/rules/"
+cp "$SOURCE_ROOT/scripts/build-adapters.sh" "$TMP_ROOT/scripts/"
+ROOT=$TMP_ROOT
 
 fail() {
   printf '%s\n' "test-adapters.sh: $*" >&2
@@ -13,7 +26,9 @@ assert_contains() {
 }
 
 assert_not_contains() {
-  grep -Fq "$2" "$1" && fail "expected $1 not to contain: $2"
+  if grep -Fq "$2" "$1"; then
+    fail "expected $1 not to contain: $2"
+  fi
 }
 
 assert_same() {
@@ -56,6 +71,31 @@ for skill in "$ROOT"/.codebuddy/skills/*/SKILL.md "$ROOT"/skills/*/SKILL.md "$RO
     fail "skill must not pin a model: $skill"
   fi
 done
+
+# SysDocs deliverables must be present in every generated adapter and shared
+# references must remain resolvable from each adapter's skill directory.
+for tree in "$ROOT"/skills "$ROOT"/.agents/skills "$ROOT"/.gemini/skills "$ROOT"/.claude/skills "$ROOT"/plugins/claude/skills; do
+  for skill in cs-sysdocs-init cs-sysdocs-update cs-vibe-coding; do
+    [ -f "$tree/$skill/SKILL.md" ] || fail "missing $tree/$skill/SKILL.md"
+    assert_not_contains "$tree/$skill/SKILL.md" '.codebuddy/'
+  done
+done
+for refs in "$ROOT"/references "$ROOT"/.agents/references "$ROOT"/.gemini/references "$ROOT"/.claude/references "$ROOT"/plugins/claude/references; do
+  for ref in sysdocs-system.md sysdocs-overview-template.md sysdocs-module-template.md sysdocs-vibe-template.md; do
+    [ -f "$refs/$ref" ] || fail "missing $refs/$ref"
+  done
+done
+
+for skill in cs-sysdocs-init cs-sysdocs-update cs-vibe-coding; do
+  assert_contains "$ROOT/plugins/claude/skills/$skill/SKILL.md" '../../references/sysdocs-system.md'
+done
+for ref in sysdocs-system.md sysdocs-overview-template.md sysdocs-module-template.md sysdocs-vibe-template.md; do
+  [ -f "$ROOT/plugins/claude/references/$ref" ] || fail "missing plugin reference $ref"
+done
+
+[ ! -f "$ROOT/.codebuddy/commands/cs-sysdocs-init.md" ] || fail 'SysDocs must not add command source files'
+[ ! -f "$ROOT/.codebuddy/commands/cs-sysdocs-update.md" ] || fail 'SysDocs must not add command source files'
+[ ! -f "$ROOT/.codebuddy/commands/cs-vibe-coding.md" ] || fail 'SysDocs must not add command source files'
 
 for command in cs-build cs-plan cs-spec; do
   assert_same "$ROOT/.codebuddy/commands/$command.md" "$ROOT/commands/$command.md"

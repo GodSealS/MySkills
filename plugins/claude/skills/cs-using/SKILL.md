@@ -1,6 +1,5 @@
 ---
 name: cs-using
-model: sonnet
 description: "Discovers and invokes agent skills. Use when starting a session or when you need to discover which skill applies to the current task. This is the meta-skill that governs how all other skills are discovered and invoked. / 发现和调用Agent技能。用于启动会话或发现当前任务适用哪个技能——这是管理所有其他技能发现与调用的元技能。"
 ---
 
@@ -40,6 +39,8 @@ Task arrives
     ├── CI/CD pipeline work? ──────────→ cs-cicd
     ├── Deprecating/migrating? ────────→ cs-deprecation
     ├── Writing docs/ADRs? ───────────→ cs-docs-adrs
+    ├── Building system docs? ────────→ cs-sysdocs-init / cs-sysdocs-update
+    ├── Fragmentary change, pre-design? → cs-vibe-coding
     ├── Adding logs/metrics/alerts? ───→ cs-observability
     └── Deploying/launching? ─────────→ cs-shipping
 ```
@@ -131,3 +132,6 @@ Every skill includes a verification step. "Seems right" is never sufficient — 
 | Ship | cs-docs-adrs | Document the why |
 | Ship | cs-observability | Structured logs, metrics, traces |
 | Ship | cs-shipping | Pre-launch checklist, rollback plan |
+| SysDocs | cs-sysdocs-init | One-time full SysDocs generation |
+| SysDocs | cs-sysdocs-update | Repair / incremental / rebuild-boundaries |
+| SysDocs | cs-vibe-coding | Fragmentary change pre-design |
