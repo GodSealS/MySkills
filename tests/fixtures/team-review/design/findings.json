@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "findings": [
+    {
+      "id": "design-F01",
+      "aliases": [],
+      "severity": "Suggestion",
+      "locators": [
+        "design/review-plan.md:1"
+      ],
+      "category": "clarity",
+      "summary": "design fixture finding",
+      "evidence": [
+        "fixture evidence"
+      ],
+      "fix": "Improve the fixture target.",
+      "domains": [
+        "architecture"
+      ],
+      "lifecycle": "open",
+      "sources": [
+        "design"
+      ],
+      "fingerprint": "3e44f101841999dc621f32efdc0bec490199daf4542e9b016285c98cf44e2a7e",
+      "expert_reviews": []
+    }
+  ]
+}

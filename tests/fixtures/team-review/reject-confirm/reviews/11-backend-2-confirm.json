@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "domain": "backend-2",
+  "agent": "fixture-agent",
+  "run": "tasks/team-review/example/",
+  "target_manifest_sha256": "f252caa4286923f97b584f50d8d38949a77c1e26bccaae5a82c4ea9b789f43e2",
+  "responses": [
+    {
+      "finding_id": "code-F01",
+      "decision": "REJECT",
+      "reason": "not a problem"
+    }
+  ],
+  "new_findings": []
+}

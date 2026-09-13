@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "case": "manifest-drift",
+  "expected_valid": false,
+  "expected_status": "blocked",
+  "expected_error": "sha256 does not match file"
+}

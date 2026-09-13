@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "domain": "architecture",
+  "agent": "fixture-agent",
+  "run": "tasks/team-review/example/",
+  "target_manifest_sha256": "f742ffbb7f9587510aa8f34184610b996dc6bb0b0ffd8074bc56687023c8655f",
+  "responses": [
+    {
+      "finding_id": "design-F01",
+      "decision": "CONFIRM",
+      "fix": "Improve the fixture target.",
+      "evidence": [
+        "fixture evidence"
+      ]
+    }
+  ],
+  "new_findings": []
+}

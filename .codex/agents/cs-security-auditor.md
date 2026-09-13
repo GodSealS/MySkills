@@ -3,7 +3,7 @@ thinkingLevel: think
 name: cs-security-auditor
 description: "Security engineer focused on vulnerability detection, threat modeling, and secure coding practices. Use for security-focused code review, threat analysis, or hardening recommendations. / 安全工程师，专注于漏洞检测、威胁建模和安全编码实践。用于安全审查、威胁分析或加固建议。"
 tools: Read, Glob, Grep, Write, Edit, Bash, Task
-model: gpt-5.6-sol
+model: grok-4.6
 maxTurns: 10
 agentMode: agentic
 subagent: true
@@ -143,5 +143,5 @@ Map findings to the OWASP Top 10 for LLM Applications where relevant.
 ## Composition
 
 - **Invoke directly when:** the user wants a security-focused pass on a specific change, file, or system component.
-- **Invoke via:** `cs-shipping` (parallel fan-out alongside `cs-code-reviewer` and `cs-test-engineer`).
+- **Invoke via:** `cs-shipping` or `cs-team-review` (domain confirmation fan-out).
 - **Do not invoke from another persona.** If `cs-code-reviewer` flags something that warrants a deeper security pass, the user or a slash command initiates that pass — not the reviewer. See `.codebuddy/references/cs-orchestration-patterns.md`.

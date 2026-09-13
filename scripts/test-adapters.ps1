@@ -32,15 +32,21 @@ try {
     & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Temp 'scripts\build-adapters.ps1')
     if ($LASTEXITCODE -ne 0) { throw "builder exited with $LASTEXITCODE" }
 
-    $newSkills = @('cs-sysdocs-init', 'cs-sysdocs-update', 'cs-vibe-coding')
+    $newSkills = @('cs-sysdocs-init', 'cs-sysdocs-update', 'cs-vibe-coding', 'cs-team-review')
     foreach ($tree in @('skills', '.agents\skills', '.gemini\skills', '.claude\skills', 'plugins\claude\skills')) {
         foreach ($skill in $newSkills) {
             $file = Join-Path $Temp "$tree\$skill\SKILL.md"
             Assert "generated $tree/$skill" (Test-Path $file)
             $raw = Get-Content -Raw $file
             Assert "$tree/$skill has no model field" (-not ($raw -match '(?m)^model\s*:'))
-            Assert "$tree/$skill has resolvable reference path" ($raw -match '\.\./\.\./references/sysdocs-system\.md')
+            if ($skill -like 'cs-sysdocs-*' -or $skill -eq 'cs-vibe-coding') {
+                Assert "$tree/$skill has resolvable reference path" ($raw -match '\.\./\.\./references/sysdocs-system\.md')
+            }
         }
+    }
+    foreach ($tree in @('commands', '.gemini\commands', '.claude\commands', '.codex\prompts')) {
+        $suffix = if ($tree -eq '.gemini\commands') { '.toml' } elseif ($tree -eq '.codex\prompts') { '.md' } else { '.md' }
+        Assert "generated $tree/cs-team-review" (Test-Path (Join-Path $Temp "$tree\cs-team-review$suffix"))
     }
     foreach ($ref in @('sysdocs-system.md', 'sysdocs-overview-template.md', 'sysdocs-module-template.md', 'sysdocs-vibe-template.md')) {
         foreach ($tree in @('references', '.agents\references', '.gemini\references', '.claude\references', 'plugins\claude\references')) {

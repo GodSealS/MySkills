@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "case": "expert-timeout",
+  "expected_valid": true,
+  "expected_status": "blocked",
+  "fixture_mode": "portable"
+}

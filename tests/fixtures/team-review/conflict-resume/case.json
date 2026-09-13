@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "case": "conflict-resume",
+  "expected_valid": true,
+  "expected_status": "pending-human",
+  "fixture_mode": "portable"
+}

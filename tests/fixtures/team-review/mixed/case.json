@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "case": "mixed",
+  "expected_valid": true,
+  "expected_status": "complete",
+  "fixture_mode": "portable",
+  "expected_verdict": "APPROVE"
+}

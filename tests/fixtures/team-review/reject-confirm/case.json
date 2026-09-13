@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "case": "reject-confirm",
+  "expected_valid": false,
+  "expected_status": "complete",
+  "expected_error": "conflicting expert decisions"
+}

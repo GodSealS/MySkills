@@ -1,0 +1,6 @@
+{
+  "schema": 1, "domain": "backend", "agent": "cs-backend-lead", "run": "tasks/team-review/example/",
+  "target_manifest_sha256": "258ebf38da436087677d93b0a2e14396f52e6b0b65ab8114ac72c8a19b90b448",
+  "responses": [{"finding_id": "code-F01", "decision": "CONFIRM", "severity": "Suggestion", "fix": "Improve example", "evidence": ["read"]}],
+  "new_findings": []
+}

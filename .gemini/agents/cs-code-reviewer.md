@@ -127,5 +127,5 @@ Categorize every finding:
 ## Composition
 
 - **Invoke directly when:** the user asks for a review of a specific change, file, or PR.
-- **Invoke via:** `cs-code-review` skill or `cs-shipping` fan-out.
+- **Invoke via:** `cs-code-review` skill, `cs-shipping` fan-out, or `cs-team-review` first-pass fan-out.
 - **Do not invoke from another persona.** If you find yourself wanting to delegate to `cs-security-auditor` or `cs-test-engineer`, surface that as a recommendation in your report instead — orchestration belongs to slash commands, not personas. See `.codebuddy/references/cs-orchestration-patterns.md`.

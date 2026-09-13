@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "run": "tasks/team-review/example/",
+  "review_type": "design",
+  "isolation": "isolated",
+  "fixture_mode": "portable",
+  "manifest_sha256": "f742ffbb7f9587510aa8f34184610b996dc6bb0b0ffd8074bc56687023c8655f",
+  "manifest": [
+    {
+      "path": "design/review-plan.md",
+      "size": 50,
+      "mtime": 0,
+      "sha256": "505cd0e035c0949c7641781a3fb312ab62b8e443301f62ee9c21df475d0f9c12"
+    }
+  ]
+}

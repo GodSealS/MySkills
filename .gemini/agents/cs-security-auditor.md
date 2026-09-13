@@ -143,5 +143,5 @@ Map findings to the OWASP Top 10 for LLM Applications where relevant.
 ## Composition
 
 - **Invoke directly when:** the user wants a security-focused pass on a specific change, file, or system component.
-- **Invoke via:** `cs-shipping` (parallel fan-out alongside `cs-code-reviewer` and `cs-test-engineer`).
+- **Invoke via:** `cs-shipping` or `cs-team-review` (domain confirmation fan-out).
 - **Do not invoke from another persona.** If `cs-code-reviewer` flags something that warrants a deeper security pass, the user or a slash command initiates that pass — not the reviewer. See `.codebuddy/references/cs-orchestration-patterns.md`.

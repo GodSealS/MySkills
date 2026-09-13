@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "domains": [
+    {
+      "domain": "backend",
+      "status": "complete",
+      "finding_ids": [
+        "code-F01"
+      ]
+    },
+    {
+      "domain": "architecture",
+      "status": "complete",
+      "finding_ids": [
+        "design-F01"
+      ]
+    }
+  ]
+}

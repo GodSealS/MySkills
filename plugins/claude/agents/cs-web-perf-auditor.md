@@ -169,4 +169,5 @@ Identify the framework and rendering model before applying framework-specific ch
 
 - **Invoke directly when:** the user wants a performance audit on a web application.
 - **Invoke via:** `cs-web-perf` dedicated skill.
+- **Invoke via:** `cs-team-review` for domain confirmation when rendering/performance triggers match.
 - **Do not invoke from another persona.** See `.codebuddy/references/cs-orchestration-patterns.md`.

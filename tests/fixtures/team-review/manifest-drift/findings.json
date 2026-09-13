@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "findings": [
+    {
+      "id": "code-F01",
+      "aliases": [],
+      "severity": "Suggestion",
+      "locators": [
+        "src/example.py:1"
+      ],
+      "category": "clarity",
+      "summary": "code fixture finding",
+      "evidence": [
+        "fixture evidence"
+      ],
+      "fix": "Improve the fixture target.",
+      "domains": [
+        "backend"
+      ],
+      "lifecycle": "open",
+      "sources": [
+        "code"
+      ],
+      "fingerprint": "c4a3d424716d980b1ac02b6b3700fafa09b8f19b76a0c1722dc4add2c5e541bd",
+      "expert_reviews": []
+    }
+  ]
+}

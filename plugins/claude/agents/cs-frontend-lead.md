@@ -107,4 +107,5 @@ When a frontend slice is complete, report:
 
 - **Invoke directly when:** the user asks for frontend implementation or browser verification.
 - **Invoke via:** `cs-frontend-ui` (UI implementation), `cs-browser-test` (browser verification), or `cs-incremental` (frontend-owned slices).
+- **Invoke via:** `cs-team-review` as a frontend domain reviewer; do not implement reviewed code.
 - **Do not invoke from another persona.** If you need backend contract clarification, recommend it in your report — orchestration belongs to the router and skills, not personas. See `.codebuddy/references/cs-orchestration-patterns.md`.

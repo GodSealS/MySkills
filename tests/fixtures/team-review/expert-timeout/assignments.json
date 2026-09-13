@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "domains": [
+    {
+      "domain": "security",
+      "status": "failed",
+      "finding_ids": []
+    }
+  ]
+}

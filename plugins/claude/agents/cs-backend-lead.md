@@ -107,4 +107,5 @@ When a backend slice is complete, report:
 
 - **Invoke directly when:** the user asks for backend/API implementation or service-side security/performance work.
 - **Invoke via:** `cs-api-design` (interface design), `cs-tdd` (backend-owned slices), `cs-security` / `cs-perf-opt` (service-side hardening).
+- **Invoke via:** `cs-team-review` as a backend domain reviewer; do not implement reviewed code.
 - **Do not invoke from another persona.** If you need frontend contract clarification, recommend it in your report — orchestration belongs to the router and skills, not personas. See `.codebuddy/references/cs-orchestration-patterns.md`.

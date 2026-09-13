@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "run": "tasks/team-review/example/",
+  "owner": "fixture",
+  "pid": 123,
+  "created_at": "2026-09-13T00:00:00Z"
+}

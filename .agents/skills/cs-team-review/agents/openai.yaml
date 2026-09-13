@@ -1,0 +1,3 @@
+interface:
+  display_name: "CS Team Review"
+  short_description: "Runs a multi-agent team review of code, design, or mixed targets with deterministic findings, domain confirmation, and resumable file handoffs.."

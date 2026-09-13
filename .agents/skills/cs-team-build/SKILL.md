@@ -28,6 +28,7 @@ Two rules hold throughout:
 - Single-file or obvious-scope change → `cs-incremental`
 - No document yet, only an idea → `cs-spec-driven`
 - You just want a review of existing code → `cs-code-review`
+- You want a multi-agent review without implementation → `cs-team-review`
 - Emergency hotfix where a 3-round loop is the wrong shape → `cs-debugging`
 
 ## Team Roster

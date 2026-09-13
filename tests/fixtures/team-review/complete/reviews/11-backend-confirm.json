@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "domain": "backend",
+  "agent": "fixture-agent",
+  "run": "tasks/team-review/example/",
+  "target_manifest_sha256": "7e90b9a49d25b74ed868048a847073163eff2ee99e99c5c8458a0e3636cf1e08",
+  "responses": [
+    {
+      "finding_id": "code-F01",
+      "decision": "CONFIRM",
+      "fix": "Improve the fixture target.",
+      "evidence": [
+        "fixture evidence"
+      ]
+    }
+  ],
+  "new_findings": []
+}

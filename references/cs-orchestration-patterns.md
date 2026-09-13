@@ -29,7 +29,9 @@ Both families are invoked **by skills** — never by user slash commands directl
 
 ## Endorsed Pattern: Parallel Fan-Out with Merge
 
-Used by `cs-shipping` to run `cs-code-reviewer`, `cs-security-auditor`, and `cs-test-engineer` concurrently:
+`cs-team-build` and `cs-team-review` are the sanctioned skills that sequence multiple personas. Both issue fan-outs from the skill layer; personas never invoke one another.
+
+Used by `cs-shipping` and `cs-team-review` to run specialist personas concurrently:
 
 ```
 User invokes cs-shipping

@@ -16,6 +16,7 @@ Multi-dimensional code review with quality gates. Every change gets reviewed bef
 ## When to Use
 
 - Before merging any PR or change
+- For a single-agent five-axis review; use `cs-team-review` when the user requests a team or multi-agent review
 - After completing a feature implementation
 - When another agent or model produced code to evaluate
 - When refactoring existing code

@@ -3,7 +3,7 @@ thinkingLevel: think
 name: cs-code-reviewer
 description: "Senior code reviewer that evaluates changes across five dimensions — correctness, readability, architecture, security, and performance. Use for thorough code review before merge. / 资深代码审查员，从正确性、可读性、架构、安全性、性能五个维度评估变更。用于合并前的全面代码审查。"
 tools: Read, Glob, Grep, Write, Edit, Bash, Task
-model: DeepSeek-V4-Pro
+model: Hy4 preview
 maxTurns: 10
 agentMode: agentic
 subagent: true
@@ -127,5 +127,5 @@ Categorize every finding:
 ## Composition
 
 - **Invoke directly when:** the user asks for a review of a specific change, file, or PR.
-- **Invoke via:** `cs-code-review` skill or `cs-shipping` fan-out.
+- **Invoke via:** `cs-code-review` skill, `cs-shipping` fan-out, or `cs-team-review` first-pass fan-out.
 - **Do not invoke from another persona.** If you find yourself wanting to delegate to `cs-security-auditor` or `cs-test-engineer`, surface that as a recommendation in your report instead — orchestration belongs to slash commands, not personas. See `.codebuddy/references/cs-orchestration-patterns.md`.

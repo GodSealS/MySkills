@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "findings": [
+    {
+      "id": "code-F01",
+      "aliases": [],
+      "severity": "Suggestion",
+      "locators": [
+        "src/component.py:1"
+      ],
+      "category": "clarity",
+      "summary": "code fixture finding",
+      "evidence": [
+        "fixture evidence"
+      ],
+      "fix": "Improve the fixture target.",
+      "domains": [
+        "backend"
+      ],
+      "lifecycle": "open",
+      "sources": [
+        "code"
+      ],
+      "fingerprint": "c972d2246937ca1db26cdadbb1c2560f9549fd9f0bc9bd86f2dfbcd1ea96e848",
+      "expert_reviews": []
+    },
+    {
+      "id": "design-F01",
+      "aliases": [],
+      "severity": "Suggestion",
+      "locators": [
+        "design/component.md:1"
+      ],
+      "category": "clarity",
+      "summary": "design fixture finding",
+      "evidence": [
+        "fixture evidence"
+      ],
+      "fix": "Improve the fixture target.",
+      "domains": [
+        "architecture"
+      ],
+      "lifecycle": "open",
+      "sources": [
+        "design"
+      ],
+      "fingerprint": "9830282bba524dd107e26878d4154cdcf6f307ec90edb7f4a715d42d4ffe1b34",
+      "expert_reviews": []
+    }
+  ]
+}

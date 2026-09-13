@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "run": "tasks/team-review/example/",
+  "review_type": "code",
+  "isolation": "isolated",
+  "fixture_mode": "portable",
+  "manifest_sha256": "7e90b9a49d25b74ed868048a847073163eff2ee99e99c5c8458a0e3636cf1e08",
+  "manifest": [
+    {
+      "path": "src/complete.py",
+      "size": 43,
+      "mtime": 0,
+      "sha256": "d4135caa42452ff8598df8286c303ab8cefd69d9ca40824a4463a5030e12ac76"
+    }
+  ],
+  "phase0": {
+    "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "patch_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "patch_files": 1,
+    "patch_lines": 1,
+    "size": "small"
+  }
+}

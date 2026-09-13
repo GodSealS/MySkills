@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "conflicts": [
+    {
+      "finding_id": "design-F01",
+      "reason": "Experts disagree on a material fact."
+    }
+  ]
+}

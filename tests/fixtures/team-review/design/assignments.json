@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "domains": [
+    {
+      "domain": "architecture",
+      "status": "complete",
+      "finding_ids": [
+        "design-F01"
+      ]
+    }
+  ]
+}

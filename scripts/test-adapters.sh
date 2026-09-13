@@ -6,7 +6,7 @@ SOURCE_ROOT=$ROOT
 TMP_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/agent-skills-adapter-test.XXXXXX")
 trap 'rm -rf "$TMP_ROOT"' EXIT HUP INT TERM
 mkdir -p "$TMP_ROOT/.codebuddy/skills" "$TMP_ROOT/.codebuddy/agents" "$TMP_ROOT/.codebuddy/references" "$TMP_ROOT/.codebuddy/commands" "$TMP_ROOT/.claude/rules" "$TMP_ROOT/scripts"
-for skill in cs-sysdocs-init cs-sysdocs-update cs-vibe-coding cs-incremental cs-agent-brief-review cs-skill-review; do
+for skill in cs-sysdocs-init cs-sysdocs-update cs-vibe-coding cs-team-review cs-incremental cs-agent-brief-review cs-skill-review; do
   cp -R "$SOURCE_ROOT/.codebuddy/skills/$skill" "$TMP_ROOT/.codebuddy/skills/"
 done
 cp -R "$SOURCE_ROOT/.codebuddy/agents/." "$TMP_ROOT/.codebuddy/agents/"
@@ -89,6 +89,15 @@ done
 for skill in cs-sysdocs-init cs-sysdocs-update cs-vibe-coding; do
   assert_contains "$ROOT/plugins/claude/skills/$skill/SKILL.md" '../../references/sysdocs-system.md'
 done
+for tree in "$ROOT"/skills "$ROOT"/.agents/skills "$ROOT"/.gemini/skills "$ROOT"/.claude/skills "$ROOT"/plugins/claude/skills; do
+  [ -f "$tree/cs-team-review/SKILL.md" ] || fail "missing $tree/cs-team-review/SKILL.md"
+  assert_not_contains "$tree/cs-team-review/SKILL.md" 'DESIGN.md'
+done
+for command in "$ROOT/.codebuddy/commands/cs-team-review.md" "$ROOT/commands/cs-team-review.md" "$ROOT/.claude/commands/cs-team-review.md"; do
+  [ -f "$command" ] || fail "missing $command"
+done
+[ -f "$ROOT/.gemini/commands/cs-team-review.toml" ] || fail 'missing Gemini cs-team-review command'
+[ -f "$ROOT/.codex/prompts/cs-team-review.md" ] || fail 'missing Codex cs-team-review prompt'
 for ref in sysdocs-system.md sysdocs-overview-template.md sysdocs-module-template.md sysdocs-vibe-template.md; do
   [ -f "$ROOT/plugins/claude/references/$ref" ] || fail "missing plugin reference $ref"
 done

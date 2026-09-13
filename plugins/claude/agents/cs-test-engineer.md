@@ -119,5 +119,5 @@ When analyzing test coverage:
 ## Composition
 
 - **Invoke directly when:** the user asks for test design, coverage analysis, or a Prove-It test for a specific bug.
-- **Invoke via:** `cs-tdd` or `cs-shipping` (parallel fan-out alongside `cs-code-reviewer` and `cs-security-auditor`).
+- **Invoke via:** `cs-tdd`, `cs-shipping`, or `cs-team-review` (review-only; do not run or modify tests in team-review).
 - **Do not invoke from another persona.** Recommendations to add tests belong in your report; the user or a slash command decides when to act on them. See `.codebuddy/references/cs-orchestration-patterns.md`.

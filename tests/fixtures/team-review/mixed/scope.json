@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "run": "tasks/team-review/example/",
+  "review_type": "mixed",
+  "isolation": "isolated",
+  "fixture_mode": "portable",
+  "manifest_sha256": "82a3a86f8dd66268bbcbf097ccb35bd56f52a0b9fe97c5543e38993b3270d334",
+  "manifest": [
+    {
+      "path": "src/component.py",
+      "size": 44,
+      "mtime": 0,
+      "sha256": "db909390fc6f4a52a936998862e1621f219589af57382a42cf85e2db4706ddb6"
+    },
+    {
+      "path": "design/component.md",
+      "size": 59,
+      "mtime": 0,
+      "sha256": "dc65f5b9938ade08a0bc3eb951cca85a9698fea84f9fb900132b2f1b7c0c4255"
+    }
+  ],
+  "phase0": {
+    "head": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "patch_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "patch_files": 1,
+    "patch_lines": 1,
+    "size": "small"
+  }
+}
