@@ -6,7 +6,7 @@ SOURCE_ROOT=$ROOT
 TMP_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/agent-skills-adapter-test.XXXXXX")
 trap 'rm -rf "$TMP_ROOT"' EXIT HUP INT TERM
 mkdir -p "$TMP_ROOT/.codebuddy/skills" "$TMP_ROOT/.codebuddy/agents" "$TMP_ROOT/.codebuddy/references" "$TMP_ROOT/.codebuddy/commands" "$TMP_ROOT/.claude/rules" "$TMP_ROOT/scripts"
-for skill in cs-sysdocs-init cs-sysdocs-update cs-vibe-coding cs-team-review cs-incremental cs-agent-brief-review cs-skill-review; do
+for skill in cs-sysdocs-init cs-sysdocs-update cs-vibe-coding cs-team-review cs-team-build cs-incremental cs-agent-brief-review cs-skill-review; do
   cp -R "$SOURCE_ROOT/.codebuddy/skills/$skill" "$TMP_ROOT/.codebuddy/skills/"
 done
 cp -R "$SOURCE_ROOT/.codebuddy/agents/." "$TMP_ROOT/.codebuddy/agents/"
@@ -50,7 +50,7 @@ PY
 fi
 
 for target in agents .gemini/agents .codex/agents .claude/agents plugins/claude/agents; do
-  for agent in cs-architect cs-frontend-lead cs-backend-lead; do
+  for agent in cs-architect cs-frontend-lead cs-backend-lead cs-knowledge-base-admin; do
     [ -f "$ROOT/$target/$agent.md" ] || fail "missing $target/$agent.md"
   done
 done
@@ -59,11 +59,26 @@ assert_contains "$ROOT/.gemini/agents/cs-architect.md" 'model: gemini-2.5-pro'
 assert_contains "$ROOT/.codex/agents/cs-frontend-lead.md" 'model: gpt-5.6-sol'
 assert_contains "$ROOT/.claude/agents/cs-backend-lead.md" 'model: opus'
 assert_contains "$ROOT/.gemini/agents/cs-test-engineer.md" 'model: gemini-2.5-flash'
-assert_contains "$ROOT/.codex/agents/cs-web-perf-auditor.md" 'model: gpt-5.6-terra'
+for agent in cs-test-engineer cs-web-perf-auditor cs-knowledge-base-admin; do
+  assert_contains "$ROOT/.codex/agents/$agent.md" 'model: gpt-5.6-luna'
+done
 for agent in "$ROOT"/.codebuddy/agents/*.md "$ROOT"/.gemini/agents/*.md "$ROOT"/.codex/agents/*.md "$ROOT"/.claude/agents/*.md "$ROOT"/plugins/claude/agents/*.md; do
   assert_not_contains "$agent" 'skills:'
-  assert_contains "$agent" '候选技能，不是自动加载清单'
+  case "$agent" in
+    */cs-knowledge-base-admin.md)
+      assert_not_contains "$agent" '## Optional Skill Roster'
+      assert_contains "$agent" 'Use `cs-code-query` only for its existing-backend update protocols.'
+      assert_contains "$agent" 'At least one supported knowledge base must already exist'
+      assert_contains "$agent" 'TERMINATED — no supported knowledge base exists'
+      assert_not_contains "$agent" 'created, installed, repaired, or deleted'
+      ;;
+    *)
+      assert_contains "$agent" 'may autonomously load 2–3 skills when their triggers match; it must not load skills outside this roster'
+      assert_not_contains "$agent" '下表是本角色可自主加载的技能边界'
+      ;;
+  esac
 done
+assert_contains "$ROOT/.agents/skills/cs-team-build/SKILL.md" 'Skip the final knowledge-base-administrator step; Team Build owns its single invocation in Phase 5'
 
 # Skills run on the host's active model, so no skill tree may pin one.
 for skill in "$ROOT"/.codebuddy/skills/*/SKILL.md "$ROOT"/skills/*/SKILL.md "$ROOT"/.agents/skills/*/SKILL.md "$ROOT"/.claude/skills/*/SKILL.md "$ROOT"/.gemini/skills/*/SKILL.md "$ROOT"/plugins/claude/skills/*/SKILL.md; do

@@ -51,6 +51,7 @@ A team has **at least 3 members**. Two are mandatory:
 | `cs-security-auditor` | On demand, decided by the architect | Assists a round when the slice touches a trust boundary |
 | `cs-web-perf-auditor` | On demand, decided by the architect | Assists a round when the slice is user-facing or perf-budgeted |
 | `cs-test-engineer` | Phase 3 (always, once) | Runs the full suite, analyzes coverage, writes `<run-dir>/test-report.md` |
+| `cs-knowledge-base-admin` | Phase 5 (always, once) | Refreshes only knowledge bases that already exist in the project |
 
 The architect decides the roster — see Phase 1. A roster of exactly `cs-architect` + `cs-code-reviewer` + one domain lead is valid; `cs-architect` + `cs-code-reviewer` alone is not (nobody would implement).
 
@@ -69,7 +70,8 @@ tasks/team-build/<run-id>/
 │   ├── T01-r1-perf.md           # optional, only when the architect calls it
 │   └── T01-r1-fixes.md          # cs-architect's change directive for round 2
 ├── test-report.md               # cs-test-engineer (Phase 3)
-└── final-report.md              # cs-architect synthesis (Phase 4)
+├── final-report.md              # cs-architect synthesis (Phase 4)
+└── knowledge-base-report.md     # cs-knowledge-base-admin (Phase 5; only when at least one supported KB exists)
 ```
 
 ## Process
@@ -102,7 +104,7 @@ For each task `T<NN>` in dependency order, run at most **3 rounds**. A round has
 - `frontend` → `cs-frontend-lead`
 - `arch` → `cs-architect`
 
-Instruct the lead to follow `/cs-build` (`cs-incremental` + `cs-tdd`) for exactly this task: read acceptance criteria → RED → GREEN → regression suite → build → **stage only this task's files and stop before committing**. Team Build owns the single task commit after review approval.
+Instruct the lead to reuse only `/cs-build`'s implementation cycle (`cs-incremental` + `cs-tdd`) for exactly this task: read acceptance criteria → RED → GREEN → regression suite → build → **stage only this task's files and stop before committing**. Skip the final knowledge-base-administrator step; Team Build owns its single invocation in Phase 5. Team Build also owns the single task commit after review approval.
 
 For round 1 the input is `<run-dir>/plan.md#T<NN>`. For rounds 2-3 the input is `<run-dir>/reviews/T<NN>-r<k>-fixes.md` — the lead implements the directive, stages only this task's files, and does nothing else. Scope discipline applies: no drive-by refactors, no "while I'm here" changes.
 
@@ -200,6 +202,7 @@ If the verdict is `FIX FIRST`, do **not** auto-start the fixes. Present the prio
 ### Phase 5 — Wrap-up
 
 - Update `<run-dir>/todo.md` so every task shows a final status
+- **Final operational step — FAN-OUT to `cs-knowledge-base-admin`.** Pass the project root and `<run-dir>/knowledge-base-report.md`. The administrator checks only `.codegraph/`, `.understand-anything/`, and `graphify-out/` directly under that root. If all three are absent, it terminates with a prerequisite message, creates nothing, and does not write the report. Otherwise it refreshes each existing knowledge base independently; missing directories or unavailable update mechanisms are `SKIPPED`, not errors. Include its report or termination message in the final handoff.
 - Report to the human: tasks completed, rounds used per task, commits made, tests added, open P1/P2 items
 - Stop or dismiss any persistent team members using the host platform's supported lifecycle operation, if one was created; do not invent tool calls.
 
@@ -259,6 +262,7 @@ Every handoff document is self-contained — the receiving agent must be able to
 - [ ] `<run-dir>/test-report.md` records an actual run — commands, counts, coverage vs. acceptance criteria
 - [ ] `<run-dir>/final-report.md` has a verdict, prioritized fixes, a fix approach per item, deferred items, residual risk
 - [ ] `<run-dir>/todo.md` reflects final status for every task
+- [ ] If a supported knowledge base exists, `<run-dir>/knowledge-base-report.md` records every existing/missing supported knowledge base and confirms none was created; otherwise the final handoff records the administrator's prerequisite termination message
 
 ## Interaction with Other Skills
 
@@ -272,6 +276,7 @@ Every handoff document is self-contained — the receiving agent must be able to
 - `cs-doubt-driven` — for high-risk or irreversible tasks before implementing
 - `cs-shipping` — downstream, once the final report says SHIP
 - `cs-sysdocs-update` / `SysDocs/` — when a `SysDocs/` library exists, the architect decomposes from SYSTEM_ROOT + relevant module docs instead of re-guessing boundaries
+- `cs-knowledge-base-admin` — final subagent refreshes existing knowledge bases only; it never bootstraps one
 
 ## See Also
 

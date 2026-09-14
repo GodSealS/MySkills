@@ -8,14 +8,15 @@ Skills encode the workflows, quality gates, and best practices that senior engin
 
 ```
 .codebuddy/
-├── agents/                   → 7 reusable specialist personas
+├── agents/                   → 8 reusable specialist personas
 │   ├── cs-architect.md           (build-side: architecture, ADRs)
 │   ├── cs-frontend-lead.md       (build-side: frontend domain owner)
 │   ├── cs-backend-lead.md        (build-side: backend domain owner)
 │   ├── cs-code-reviewer.md
 │   ├── cs-security-auditor.md
 │   ├── cs-test-engineer.md
-│   └── cs-web-perf-auditor.md
+│   ├── cs-web-perf-auditor.md
+│   └── cs-knowledge-base-admin.md
 ├── skills/                   → Core skills (SKILL.md per directory)
 │   ├── cs-using/        Meta: skill discovery
 │   ├── cs-interview-me/ Define
@@ -136,8 +137,11 @@ CodeBuddy discovers and activates skills based on `AGENTS.md` intent mapping. Wh
 | cs-security-auditor | Security Engineer | Vulnerability detection, threat modeling | cs-security, cs-shipping; manual-only team workflows |
 | cs-test-engineer | QA Specialist | Test strategy, coverage analysis | cs-tdd, cs-shipping; manual-only team workflows |
 | cs-web-perf-auditor | Web Perf Engineer | Core Web Vitals audit | cs-perf-opt, cs-shipping; manual-only team workflows |
+| cs-knowledge-base-admin | Knowledge Base Administrator | Refresh existing project knowledge bases only | final subagent step of `/cs-build` and `cs-team-build` |
 
 Personas follow the composition rule: **only the user (or AGENTS.md intent mapping) is the orchestrator. Personas do not invoke other personas.** A persona may invoke skills. **Agents are triggered by skills** (fan-out) when their owning skill enters the relevant phase. `cs-team-build` and `cs-team-review` are sanctioned multi-persona orchestrators, but are manual-only: explicit skill invocation or `/cs-team-coding` / `/cs-team-review` is required.
+
+`cs-knowledge-base-admin` uses the lowest-cost model tier and runs only as the final subagent of `/cs-build` or `cs-team-build`. It refreshes existing `.codegraph/`, `.understand-anything/`, and `graphify-out/` directories without creating a knowledge base. If none exists, it terminates with a prerequisite message. Personas with an `Optional Skill Roster` may autonomously load only skills listed in their own roster.
 
 ## Conventions
 

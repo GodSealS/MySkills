@@ -146,7 +146,7 @@ $PlatformModels = @{
     }
     'codex' = @{
         'DeepSeek-V4-Pro' = 'gpt-5.6-sol'
-        'DeepSeek-V4-Flash' = 'gpt-5.6-terra'
+        'DeepSeek-V4-Flash' = 'gpt-5.6-luna'
     }
     'gemini' = @{
         'DeepSeek-V4-Pro' = 'gemini-2.5-pro'
@@ -169,7 +169,7 @@ function Set-AgentPlatformModel([string]$path, [string]$platform) {
     $content = Get-Content -Raw -Path $path
     $agentName = if ($content -match '(?m)^name:\s*(.+?)\s*$') { $matches[1].Trim() } else { throw "Agent name missing: $path" }
     $proAgents = @('cs-architect', 'cs-backend-lead', 'cs-frontend-lead', 'cs-code-reviewer', 'cs-security-auditor')
-    $flashAgents = @('cs-test-engineer', 'cs-web-perf-auditor')
+    $flashAgents = @('cs-test-engineer', 'cs-web-perf-auditor', 'cs-knowledge-base-admin')
     if ($proAgents -contains $agentName) {
         $tier = 'DeepSeek-V4-Pro'
     } elseif ($flashAgents -contains $agentName) {

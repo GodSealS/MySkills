@@ -20,7 +20,9 @@ Pick the next pending task from the plan. Then:
 5. Run the full test suite to check for regressions
 6. Run the build to verify compilation
 7. Commit with a descriptive message
-8. Mark the task complete and stop
+8. Mark the task complete
+9. **Final step — FAN-OUT to `cs-knowledge-base-admin`.** Pass the current project root. At least one of `.codegraph/`, `.understand-anything/`, or `graphify-out/` must already exist; if none exists, the administrator terminates and reports that prerequisite without creating anything. Otherwise it refreshes each existing knowledge base independently and records missing directories or unavailable update tools as skipped.
+10. Stop
 
 ## Autonomous: the whole plan (`/cs-build auto`)
 
@@ -36,7 +38,8 @@ Use this once a spec exists and you want to collapse plan + build into one run. 
    - A test can't be made to pass → follow `cs-debugging`
    - The spec is ambiguous or a task needs an uncovered decision
    - A task is high-risk or irreversible → follow `cs-doubt-driven` and get explicit sign-off
-8. **Summarize at the end:** tasks completed, tests added, commits made, anything skipped.
+8. **Final execution step — FAN-OUT to `cs-knowledge-base-admin`.** Pass the current project root. If none of `.codegraph/`, `.understand-anything/`, or `graphify-out/` exists, it terminates with a prerequisite message and creates nothing. Otherwise it refreshes every existing supported knowledge base independently.
+9. **Summarize the build:** tasks completed, tests added, commits made, anything skipped, and the administrator's update/skip/failure results.
 
 If any step fails, follow `cs-debugging`.
 '''

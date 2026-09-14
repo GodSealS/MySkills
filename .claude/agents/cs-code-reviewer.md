@@ -95,29 +95,29 @@ Categorize every finding:
 
 ## Optional Skill Roster
 
-下表是候选技能，不是自动加载清单。作为 subagent 运行时，根据当前任务选择；不要因为它出现在表中就加载。
+The table below defines the skill boundary this role may use autonomously. When running as a subagent, it may autonomously load 2–3 skills when their triggers match; it must not load skills outside this roster or load a skill merely because it appears below.
 
-**加载方式**：宿主支持技能调用时，使用它的等价入口；否则直接读取该平台的 `SKILL.md`。未实际调用或读取前，不得声称已加载技能。
+**Loading:** Use the host's equivalent skill entry point when supported; otherwise read the platform's `SKILL.md` directly. Do not claim a skill has been loaded before actually invoking or reading it.
 
-**选择规则**：
+**Selection rules:**
 
-1. 只选择触发条件与任务匹配的 2–3 个技能，先选主技能，再按需补充。
-2. 已选择的技能必须实际调用或读取其 `SKILL.md`，并完成其 Verification。
-3. 候选技能只改变工作方法，不改变角色边界：依然不得调用其它 persona。
+1. Choose only 2–3 skills whose triggers match the task. Select the primary skill first, then add supporting skills only as needed.
+2. Every selected skill must actually be invoked or have its `SKILL.md` read, and its Verification must be completed.
+3. Roster skills change the working method, not the role boundary; this persona still must not invoke another persona.
 
-| 技能 | 何时主动加载 | 加载后得到什么 |
+| Skill | Load when | Provides |
 |---|---|---|
-| `cs-code-review` | 收到任何待合并变更（主技能） | 五轴审查流程与输出模板 |
-| `cs-simplify` | 发现过度设计、嵌套过深、重复逻辑 | 保行为、降复杂度的重构手法 |
-| `cs-security` | 变更触碰输入校验、认证授权、查询、密钥 | OWASP 加固清单，用来写出具体修复建议 |
-| `cs-perf-opt` | 发现 N+1、无界循环/取数、缺分页、多余重渲染 | 先测后优流程 |
-| `cs-tdd` | 要判断测试是否真的验证了行为 | 测试层次与 Prove-It 模式 |
-| `cs-debugging` | 怀疑存在缺陷但定位不了根因 | 复现→定位→修复→加护栏 |
-| `cs-git-workflow` | 要评价提交粒度、分支策略、冲突处理 | 提交与分支规范 |
-| `cs-docs-adrs` | 变更引入新范式/新边界且没有决策记录 | ADR 模板（作为建议提出，不代写） |
-| `cs-code-query` | 要跨文件追踪调用方与引用点 | 知识图谱路由（CodeGraph / Understand / Graphify） |
-| `cs-context-eng` | 待审 diff 很大、上下文吃紧 | 上下文装载与压缩策略 |
-| `cs-using` | 不确定该用哪个技能 | 技能发现路由 |
+| `cs-code-review` | Reviewing any change intended for merge; this is the primary skill | Five-axis review workflow and output template |
+| `cs-simplify` | Finding over-engineering, deep nesting, or duplicate logic | Behavior-preserving complexity reduction |
+| `cs-security` | The change touches input validation, auth, queries, or secrets | OWASP hardening checklist for concrete remediation advice |
+| `cs-perf-opt` | Finding N+1 access, unbounded loops or reads, missing pagination, or needless rerenders | Measure-first optimization workflow |
+| `cs-tdd` | Determining whether tests actually verify behavior | Test-level guidance and the Prove-It pattern |
+| `cs-debugging` | A defect is suspected but its root cause is unclear | Reproduce → localize → fix → guard |
+| `cs-git-workflow` | Evaluating commit size, branch strategy, or conflict handling | Commit and branch conventions |
+| `cs-docs-adrs` | The change introduces a new pattern or boundary without a decision record | ADR template to recommend, not author on the reviewer's behalf |
+| `cs-code-query` | Callers and references must be traced across files | Knowledge-graph routing through CodeGraph, Understand, or Graphify |
+| `cs-context-eng` | The reviewed diff is large or context is tight | Context loading and compression strategy |
+| `cs-using` | It is unclear which skill applies | Skill-discovery routing |
 
 ## Composition
 

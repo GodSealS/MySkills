@@ -48,6 +48,38 @@ try {
         $suffix = if ($tree -eq '.gemini\commands') { '.toml' } elseif ($tree -eq '.codex\prompts') { '.md' } else { '.md' }
         Assert "generated $tree/cs-team-review" (Test-Path (Join-Path $Temp "$tree\cs-team-review$suffix"))
     }
+    $knowledgeBaseAdminModels = [ordered]@{
+        'agents' = 'DeepSeek-V4-Flash'
+        '.gemini\agents' = 'gemini-2.5-flash'
+        '.codex\agents' = 'gpt-5.6-luna'
+        '.claude\agents' = 'sonnet'
+        'plugins\claude\agents' = 'sonnet'
+    }
+    foreach ($tree in $knowledgeBaseAdminModels.Keys) {
+        $file = Join-Path $Temp "$tree\cs-knowledge-base-admin.md"
+        Assert "generated $tree/cs-knowledge-base-admin" (Test-Path $file)
+        $raw = Get-Content -Raw $file
+        $expectedModel = [regex]::Escape($knowledgeBaseAdminModels[$tree])
+        Assert "$tree/cs-knowledge-base-admin uses the platform low-cost model" ($raw -match "(?m)^model:\s*$expectedModel\s*$")
+    }
+    foreach ($agent in @('cs-test-engineer', 'cs-web-perf-auditor', 'cs-knowledge-base-admin')) {
+        $file = Join-Path $Temp ".codex\agents\$agent.md"
+        $raw = Get-Content -Raw $file
+        Assert ".codex/agents/$agent uses gpt-5.6-luna" ($raw -match '(?m)^model:\s*gpt-5\.6-luna\s*$')
+    }
+    $knowledgeBaseAdmin = Get-Content -Raw (Join-Path $Temp '.codex\agents\cs-knowledge-base-admin.md')
+    Assert 'knowledge-base admin requires an existing supported knowledge base' ($knowledgeBaseAdmin -match 'At least one supported knowledge base must already exist')
+    Assert 'knowledge-base admin terminates when no supported knowledge base exists' ($knowledgeBaseAdmin -match 'TERMINATED — no supported knowledge base exists')
+    Assert 'knowledge-base admin does not prohibit refresh-time deletion' ($knowledgeBaseAdmin -notmatch 'created, installed, repaired, or deleted')
+    foreach ($agent in @('cs-architect', 'cs-backend-lead', 'cs-frontend-lead', 'cs-code-reviewer', 'cs-security-auditor', 'cs-test-engineer', 'cs-web-perf-auditor')) {
+        $raw = Get-Content -Raw (Join-Path $Temp ".codex\agents\$agent.md")
+        Assert ".codex/agents/$agent limits autonomous skill loading to its own roster" ($raw -match 'may autonomously load 2–3 skills when their triggers match; it must not load skills outside this roster')
+        $roster = [regex]::Match($raw, '(?ms)^## Optional Skill Roster\s*(.*?)(?=^## |\z)').Groups[1].Value
+        Assert ".codex/agents/$agent has an Optional Skill Roster" ($roster.Length -gt 0)
+        Assert ".codex/agents/$agent Optional Skill Roster is English-only" ($roster -notmatch '[\u3400-\u9fff]')
+    }
+    $teamBuild = Get-Content -Raw (Join-Path $Temp '.agents\skills\cs-team-build\SKILL.md')
+    Assert 'team-build skips nested knowledge-base refreshes during task implementation' ($teamBuild -match 'Skip the final knowledge-base-administrator step; Team Build owns its single invocation in Phase 5')
     foreach ($ref in @('sysdocs-system.md', 'sysdocs-overview-template.md', 'sysdocs-module-template.md', 'sysdocs-vibe-template.md')) {
         foreach ($tree in @('references', '.agents\references', '.gemini\references', '.claude\references', 'plugins\claude\references')) {
             Assert "generated $tree/$ref" (Test-Path (Join-Path $Temp "$tree\$ref"))

@@ -39,7 +39,7 @@ platform_model() {
     claude:DeepSeek-V4-Pro) printf '%s\n' opus ;;
     claude:DeepSeek-V4-Flash) printf '%s\n' sonnet ;;
     codex:DeepSeek-V4-Pro) printf '%s\n' gpt-5.6-sol ;;
-    codex:DeepSeek-V4-Flash) printf '%s\n' gpt-5.6-terra ;;
+    codex:DeepSeek-V4-Flash) printf '%s\n' gpt-5.6-luna ;;
     gemini:DeepSeek-V4-Pro) printf '%s\n' gemini-2.5-pro ;;
     gemini:DeepSeek-V4-Flash) printf '%s\n' gemini-2.5-flash ;;
     *) die "unsupported model '$model' for platform '$platform'" ;;
@@ -119,7 +119,7 @@ build_agents() (
     if [ "$platform" != neutral ]; then
       case "$name" in
         cs-architect.md|cs-backend-lead.md|cs-frontend-lead.md|cs-code-reviewer.md|cs-security-auditor.md) tier=DeepSeek-V4-Pro ;;
-        cs-test-engineer.md|cs-web-perf-auditor.md) tier=DeepSeek-V4-Flash ;;
+        cs-test-engineer.md|cs-web-perf-auditor.md|cs-knowledge-base-admin.md) tier=DeepSeek-V4-Flash ;;
         *) die "unsupported persona $name" ;;
       esac
       replace_model "$target" "$(platform_model "$platform" "$tier")"

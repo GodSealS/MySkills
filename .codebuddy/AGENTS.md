@@ -62,8 +62,11 @@ Task arrives
 | Security Auditor | `.codebuddy/agents/cs-security-auditor.md` | Vulnerability detection | `cs-security`, `cs-shipping`; manual-only team workflows |
 | Test Engineer | `.codebuddy/agents/cs-test-engineer.md` | Test strategy & coverage | `cs-tdd`, `cs-shipping`; manual-only team workflows |
 | Web Perf Auditor | `.codebuddy/agents/cs-web-perf-auditor.md` | Core Web Vitals audit | `cs-perf-opt`, `cs-shipping`; manual-only team workflows |
+| Knowledge Base Administrator | `.codebuddy/agents/cs-knowledge-base-admin.md` | Refresh existing project knowledge bases only | final subagent step of `/cs-build` and `cs-team-build` |
 
 **Orchestration model:** Agents are invoked **by skills** (fan-out), not by user commands. `cs-team-build` and `cs-team-review` sequence multiple personas only after an explicit skill invocation or their approved commands (`/cs-team-coding`, `/cs-team-review`); intent routing must never auto-start either workflow.
+
+`cs-knowledge-base-admin` is a low-cost final-step subagent for `/cs-build` and `cs-team-build`. It updates only existing `.codegraph/`, `.understand-anything/`, and `graphify-out/` directories and never creates a knowledge base. If none of the three exists, it terminates with a prerequisite message. Personas with an `Optional Skill Roster` may autonomously load only skills listed in their own roster; personas without that section follow only their explicitly assigned skill protocol.
 
 ## Core Operating Behaviors
 

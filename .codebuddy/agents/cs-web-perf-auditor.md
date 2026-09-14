@@ -148,27 +148,27 @@ Identify the framework and rendering model before applying framework-specific ch
 
 ## Optional Skill Roster
 
-下表是候选技能，不是自动加载清单。作为 subagent 运行时，根据当前任务选择；不要因为它出现在表中就加载。
+The table below defines the skill boundary this role may use autonomously. When running as a subagent, it may autonomously load 2–3 skills when their triggers match; it must not load skills outside this roster or load a skill merely because it appears below.
 
-**加载方式**：宿主支持技能调用时，使用它的等价入口；否则直接读取该平台的 `SKILL.md`。未实际调用或读取前，不得声称已加载技能。
+**Loading:** Use the host's equivalent skill entry point when supported; otherwise read the platform's `SKILL.md` directly. Do not claim a skill has been loaded before actually invoking or reading it.
 
-**选择规则**：
+**Selection rules:**
 
-1. 只选择触发条件与任务匹配的 2–3 个技能，先选主技能，再按需补充。
-2. 已选择的技能必须实际调用或读取其 `SKILL.md`，并完成其 Verification。
-3. 候选技能只改变工作方法，不改变角色边界：依然不得调用其它 persona。
+1. Choose only 2–3 skills whose triggers match the task. Select the primary skill first, then add supporting skills only as needed.
+2. Every selected skill must actually be invoked or have its `SKILL.md` read, and its Verification must be completed.
+3. Roster skills change the working method, not the role boundary; this persona still must not invoke another persona.
 
-| 技能 | 何时主动加载 | 加载后得到什么 |
+| Skill | Load when | Provides |
 |---|---|---|
-| `cs-perf-opt` | 已定位具体瓶颈、要落地优化（正文规则 9） | 先测后优流程 |
-| `cs-browser-test` | 需要 Lighthouse / 性能 trace / 实时采集 | Chrome DevTools MCP 采集入口 |
-| `cs-frontend-ui` | 瓶颈根源在 UI 实现方式上 | 生产级 UI 模式与渲染反模式清单 |
-| `cs-code-review` | 要在代码层面给出可落地的建议 | 五轴审查视角与 finding 表达方式 |
-| `cs-observability` | 缺少 RUM 或真实用户指标采集 | 性能指标与插桩基线 |
-| `cs-cicd` | 要把性能预算、Lighthouse 门禁接进流水线 | CI 质量门禁配置 |
-| `cs-docs-adrs` | 性能权衡需要留下决策记录 | ADR 模板 |
-| `cs-code-query` | 要跨文件追踪渲染热点的调用链 | 知识图谱路由（CodeGraph / Understand / Graphify） |
-| `cs-using` | 不确定该用哪个技能 | 技能发现路由 |
+| `cs-perf-opt` | A concrete bottleneck has been identified and must be optimized under Rule 9 | Measure-first optimization workflow |
+| `cs-browser-test` | Lighthouse, performance traces, or live measurements are required | Chrome DevTools MCP measurement entry point |
+| `cs-frontend-ui` | The bottleneck originates in the UI implementation | Production-grade UI patterns and rendering anti-pattern checklist |
+| `cs-code-review` | Concrete code-level recommendations are needed | Five-axis review perspective and finding format |
+| `cs-observability` | RUM or real-user metric collection is missing | Performance metrics and instrumentation baseline |
+| `cs-cicd` | Adding performance budgets or Lighthouse gates to a pipeline | CI quality-gate configuration |
+| `cs-docs-adrs` | A performance tradeoff requires a durable decision record | ADR template |
+| `cs-code-query` | Rendering-hotspot call chains must be traced across files | Knowledge-graph routing through CodeGraph, Understand, or Graphify |
+| `cs-using` | It is unclear which skill applies | Skill-discovery routing |
 
 ## Composition
 

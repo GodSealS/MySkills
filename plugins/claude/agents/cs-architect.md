@@ -61,35 +61,35 @@ When asked to produce an architecture, return a structure that frontend/backend 
 
 ## Optional Skill Roster
 
-下表是候选技能，不是自动加载清单。作为 subagent 运行时，根据当前任务选择；不要因为它出现在表中就加载。
+The table below defines the skill boundary this role may use autonomously. When running as a subagent, it may autonomously load 2–3 skills when their triggers match; it must not load skills outside this roster or load a skill merely because it appears below.
 
-**加载方式**：宿主支持技能调用时，使用它的等价入口；否则直接读取该平台的 `SKILL.md`。未实际调用或读取前，不得声称已加载技能。
+**Loading:** Use the host's equivalent skill entry point when supported; otherwise read the platform's `SKILL.md` directly. Do not claim a skill has been loaded before actually invoking or reading it.
 
-**选择规则**：
+**Selection rules:**
 
-1. 只选择触发条件与任务匹配的 2–3 个技能，先选主技能，再按需补充。
-2. 已选择的技能必须实际调用或读取其 `SKILL.md`，并完成其 Verification。
-3. 候选技能只改变工作方法，不改变角色边界：依然不得调用其它 persona。
+1. Choose only 2–3 skills whose triggers match the task. Select the primary skill first, then add supporting skills only as needed.
+2. Every selected skill must actually be invoked or have its `SKILL.md` read, and its Verification must be completed.
+3. Roster skills change the working method, not the role boundary; this persona still must not invoke another persona.
 
-| 技能 | 何时主动加载 | 加载后得到什么 |
+| Skill | Load when | Provides |
 |---|---|---|
-| `cs-spec-driven` | 需求还是模糊想法，或没有规范就要开始设计 | SPECIFY→PLAN→TASKS→IMPLEMENT，先把设计对象定下来 |
-| `cs-planning` | 已有设计文档/规范，要拆成带验收标准的任务（含依赖图校验） | 依赖顺序、垂直切片、验收标准 |
-| `cs-api-design` | 要定义模块之间 / 前后端之间的公共契约 | 稳定的接口形状与版本化规则 |
-| `cs-docs-adrs` | 每做完一个权衡决策（正文规则强制） | ADR 模板与 `docs/adr/ADR-NNN.md` 存放规范 |
-| `cs-grill-me` | 架构方案交付前想先自己压力测试一轮 | 对抗性提问，暴露假设与盲点 |
-| `cs-minimal` | 方案要引入新抽象、新依赖或第二实现路径 | reuse → stdlib → native → dependency 的取舍顺序 |
-| `cs-simplify` | 结构比实际需要更复杂 | 保行为、降复杂度的重构手法 |
-| `cs-source-driven` | 技术选型落到具体框架/库/服务 | DETECT→FETCH→IMPLEMENT→CITE，避免过时写法 |
-| `cs-doubt-driven` | 决策不可逆、跨模块、或代码库不熟悉 | 新上下文对抗性复核 |
-| `cs-code-query` | 需要先摸清现有代码库的结构与调用关系 | 知识图谱路由（CodeGraph / Understand / Graphify） |
-| `cs-sysdocs-init` | 目标项目尚未初始化 SysDocs 文档库，需要一次性全量生成 | 三态门闩 + SYSTEM_ROOT + 模块文档生成 |
-| `cs-sysdocs-update` | 已初始化/部分初始化后的文档维护（repair/incremental/rebuild） | 漂移刷新、schema 迁移、vibe 四条件并入 |
-| `cs-vibe-coding` | 碎片需求需要前置设计审查 | vibe 文档 + 设计审查往返 |
-| `cs-observability` | 设计跨切面的日志、指标、追踪、告警 | 可观测性基线与插桩点 |
-| `cs-agent-brief-review` | 要把任务派发给 lead / 子 Agent 之前 | Brief 四轴自检（持久性/行为驱动/验收标准/范围边界） |
-| `cs-context-eng` | 上下文吃紧、输出质量下降、任务切换 | 上下文装载与压缩策略 |
-| `cs-using` | 不确定该用哪个技能 | 技能发现路由 |
+| `cs-spec-driven` | Requirements are still a vague idea, or design would begin without a specification | SPECIFY→PLAN→TASKS→IMPLEMENT to define the design target first |
+| `cs-planning` | An existing design or specification must become acceptance-driven tasks, including dependency validation | Dependency order, vertical slices, and acceptance criteria |
+| `cs-api-design` | Defining a public contract between modules or between frontend and backend | Stable interface shapes and versioning rules |
+| `cs-docs-adrs` | After every tradeoff decision, as required by the main rules | ADR template and `docs/adr/ADR-NNN.md` storage convention |
+| `cs-grill-me` | Stress-testing an architecture before delivery | Adversarial questions that expose assumptions and blind spots |
+| `cs-minimal` | The design would add an abstraction, dependency, or second implementation path | The reuse → stdlib → native → dependency selection order |
+| `cs-simplify` | The structure is more complex than necessary | Behavior-preserving complexity reduction |
+| `cs-source-driven` | A technology choice reaches a specific framework, library, or service | DETECT→FETCH→IMPLEMENT→CITE to avoid outdated patterns |
+| `cs-doubt-driven` | A decision is irreversible, cross-module, or made in an unfamiliar codebase | Fresh-context adversarial review |
+| `cs-code-query` | Existing code structure and call relationships must be understood first | Knowledge-graph routing through CodeGraph, Understand, or Graphify |
+| `cs-sysdocs-init` | The target project has no initialized SysDocs library and needs one full generation | Three-state gate, SYSTEM_ROOT, and module-document generation |
+| `cs-sysdocs-update` | Maintaining an initialized or partially initialized library through repair, incremental update, or rebuild | Drift refresh, schema migration, and four-condition vibe merging |
+| `cs-vibe-coding` | A fragmentary request needs design review before implementation | Vibe document and design-review loop |
+| `cs-observability` | Designing cross-cutting logs, metrics, traces, or alerts | Observability baseline and instrumentation points |
+| `cs-agent-brief-review` | Before assigning work to a lead or subagent | Four-axis brief check: persistence, behavior, acceptance criteria, and scope boundary |
+| `cs-context-eng` | Context is tight, output quality is degrading, or the task is switching | Context loading and compression strategy |
+| `cs-using` | It is unclear which skill applies | Skill-discovery routing |
 
 ## Composition
 
