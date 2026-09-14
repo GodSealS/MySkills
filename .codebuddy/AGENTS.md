@@ -14,8 +14,7 @@ Task arrives
     ├── Design ready, need stress-test? ─────→ grill-me
     ├── New project/feature/change? ─────────→ cs-spec-driven
     ├── Have a spec, need tasks? ────────────→ cs-planning
-    ├── Design doc, want a team? ────────────→ cs-team-build
-    ├── Team review of code/design? ─────────→ cs-team-review
+    ├── Team build/review requested? ─────────→ do not auto-select; require explicit skill or command invocation
     ├── Implementing code? ──────────────────→ cs-incremental
     │   ├── Choosing minimal solution? ───────→ cs-minimal
     │   ├── UI work? ────────────────────────→ cs-frontend-ui
@@ -56,15 +55,15 @@ Task arrives
 
 | Agent | File | Role | Invoked by |
 |-------|------|------|------------|
-| Architect | `.codebuddy/agents/cs-architect.md` | Module boundaries, dependency direction, ADRs | `cs-spec-driven`, `cs-planning` fan-out; `cs-team-build`; `cs-team-review` |
-| Frontend Lead | `.codebuddy/agents/cs-frontend-lead.md` | Frontend domain owner: UI, state, browser verification | frontend-owned build skills, `cs-team-build`; `cs-team-review` review-only |
-| Backend Lead | `.codebuddy/agents/cs-backend-lead.md` | Backend domain owner: API, data, server security/perf | backend-owned build skills, `cs-team-build`; `cs-team-review` review-only |
-| Code Reviewer | `.codebuddy/agents/cs-code-reviewer.md` | Five-axis code review | `cs-code-review`, `cs-shipping`, `cs-team-build`, `cs-team-review` |
-| Security Auditor | `.codebuddy/agents/cs-security-auditor.md` | Vulnerability detection | `cs-security`, `cs-shipping`, `cs-team-build`, `cs-team-review` |
-| Test Engineer | `.codebuddy/agents/cs-test-engineer.md` | Test strategy & coverage | `cs-tdd`, `cs-shipping`, `cs-team-build`, `cs-team-review` review-only |
-| Web Perf Auditor | `.codebuddy/agents/cs-web-perf-auditor.md` | Core Web Vitals audit | `cs-perf-opt`, `cs-shipping`, `cs-team-build`, `cs-team-review` |
+| Architect | `.codebuddy/agents/cs-architect.md` | Module boundaries, dependency direction, ADRs | `cs-spec-driven`, `cs-planning` fan-out; manual-only team workflows |
+| Frontend Lead | `.codebuddy/agents/cs-frontend-lead.md` | Frontend domain owner: UI, state, browser verification | frontend-owned build skills; manual-only team workflows |
+| Backend Lead | `.codebuddy/agents/cs-backend-lead.md` | Backend domain owner: API, data, server security/perf | backend-owned build skills; manual-only team workflows |
+| Code Reviewer | `.codebuddy/agents/cs-code-reviewer.md` | Five-axis code review | `cs-code-review`, `cs-shipping`; manual-only team workflows |
+| Security Auditor | `.codebuddy/agents/cs-security-auditor.md` | Vulnerability detection | `cs-security`, `cs-shipping`; manual-only team workflows |
+| Test Engineer | `.codebuddy/agents/cs-test-engineer.md` | Test strategy & coverage | `cs-tdd`, `cs-shipping`; manual-only team workflows |
+| Web Perf Auditor | `.codebuddy/agents/cs-web-perf-auditor.md` | Core Web Vitals audit | `cs-perf-opt`, `cs-shipping`; manual-only team workflows |
 
-**Orchestration model:** Agents are invoked **by skills** (fan-out), not by user commands. `cs-team-build` and `cs-team-review` are the two skills that sequence multiple personas — each issues every fan-out itself so personas never call each other. Team-review uses domain leads as reviewers and audit agents as specialists.
+**Orchestration model:** Agents are invoked **by skills** (fan-out), not by user commands. `cs-team-build` and `cs-team-review` sequence multiple personas only after an explicit skill invocation or their approved commands (`/cs-team-coding`, `/cs-team-review`); intent routing must never auto-start either workflow.
 
 ## Core Operating Behaviors
 
@@ -91,8 +90,8 @@ Task arrives
 | Define | grill-me | Stress-test design before committing |
 | Define | cs-spec-driven | Requirements before code |
 | Plan | cs-planning | Decompose into verifiable tasks |
-| Build | cs-team-build | Agent team implements a design doc with review loops |
-| Review | cs-team-review | Multi-agent review of code/design with deterministic handoffs |
+| Manual only | cs-team-build | Explicit skill/command invocation: agent team implements a design doc |
+| Manual only | cs-team-review | Explicit skill/command invocation: multi-agent review |
 | Build | cs-incremental | Thin vertical slices |
 | Build | cs-minimal | Minimal solution before writing code |
 | Build | cs-tdd | Failing test first, then make it pass |

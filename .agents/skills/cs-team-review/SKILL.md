@@ -1,6 +1,7 @@
 ---
 name: cs-team-review
-description: "Runs a multi-agent team review of code, design, or mixed targets with deterministic findings, domain confirmation, and resumable file handoffs. Use when the user asks for a team, joint, or multi-agent review; use cs-code-review for a single-agent review and cs-shipping for a release gate. / 用多 Agent 团队审查代码、设计或混合目标，生成确定性 findings、领域确认和可恢复文件交接。用户要求团队、联合或多专家审查时使用；单人审查用 cs-code-review，发布门禁用 cs-shipping。"
+description: "Manually runs a multi-agent team review of code, design, or mixed targets with deterministic findings, domain confirmation, and resumable file handoffs. Invoke only through an explicit skill request or the team-review command; never auto-select it from task intent. / 手动用多 Agent 团队审查代码、设计或混合目标：仅可由显式技能请求或团队审查命令触发，不得按任务意图自动选择。"
+disable-model-invocation: true
 ---
 
 # Team Review — Multi-Agent Review
@@ -28,7 +29,9 @@ The static audit checks artifact shape and consistency only. It does not prove t
 
 ## When to Use
 
-- The user explicitly asks for a team, joint, or multi-agent review of code or design.
+**Manual invocation only.** Run this workflow only when the user explicitly invokes `cs-team-review` or the `/cs-team-review` command. Do not select or start it solely because a request asks for a team, joint, or multi-agent review.
+
+- The user explicitly invokes the team-review skill or command for code, design, or mixed targets.
 - The target is a local path, directory, local git ref, or local diff.
 
 Use `cs-code-review` for a single-agent five-axis review, `cs-skill-review` for `SKILL.md`, `cs-agent-brief-review` for an AFK brief, and `cs-shipping` for release readiness.

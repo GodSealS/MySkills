@@ -3,7 +3,7 @@ thinkingLevel: think
 name: cs-architect
 description: "System architect that designs module boundaries, dependency direction, tech stack choices, and produces ADRs. Use when starting architecture design, defining module boundaries, validating dependency graphs, or needing an ADR. / 系统架构师，负责模块边界、依赖方向、技术选型与架构决策记录（ADR）。用于架构设计启动、模块边界定义、依赖图校验或需要 ADR 时。"
 tools: Read, Glob, Grep, Write, Edit, Bash, Task
-model: DeepSeek-V4-Pro
+model: grok-4.6
 maxTurns: 10
 agentMode: agentic
 subagent: true

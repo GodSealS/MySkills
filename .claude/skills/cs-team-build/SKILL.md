@@ -1,6 +1,7 @@
 ---
 name: cs-team-build
-description: "Runs a design document through a coordinated agent team — the architect decomposes it into tasks, domain leads implement them, a reviewer audits each slice, the architect triages findings, and a test engineer verifies the whole. Use when a design or spec document exists and you want it implemented by a multi-agent team with bounded review loops. / 用 Agent 团队把设计文档落地：架构师拆解任务、领域负责人实现、审查员逐片审查、架构师裁决修改意见、测试工程师整体验证。用于已有设计/规范文档、希望由多 Agent 团队带审查闭环交付时。"
+description: "Manually runs a design document through a coordinated agent team — the architect decomposes it into tasks, domain leads implement them, a reviewer audits each slice, the architect triages findings, and a test engineer verifies the whole. Invoke only through an explicit skill request or the team-build command; never auto-select it from task intent. / 手动用 Agent 团队把设计文档落地：仅可由显式技能请求或团队构建命令触发，不得按任务意图自动选择。"
+disable-model-invocation: true
 ---
 
 # Team Build — Multi-Agent Implementation
@@ -17,6 +18,8 @@ Two rules hold throughout:
 2. **Files are the handoff medium.** No "as we discussed" context. If it isn't in the handoff doc, it doesn't exist.
 
 ## When to Use
+
+**Manual invocation only.** Run this workflow only when the user explicitly invokes `cs-team-build` or an approved command that invokes it (currently `/cs-team-coding`). Do not select or start it solely because a request contains a design/spec document, spans multiple modules, or mentions a team.
 
 - You have a design/spec document and want it implemented end-to-end
 - The change spans modules or domains (frontend + backend), so one agent won't hold it all in context

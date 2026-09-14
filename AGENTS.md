@@ -39,7 +39,7 @@ Identify the development phase of the incoming task, then apply the matching ski
 - `cs-doubt-driven` — adversarial review of non-trivial decisions
 - `cs-frontend-ui` — build production-quality UI
 - `cs-api-design` — design stable APIs and interfaces
-- `cs-team-build` — implement a design document through a coordinated agent team
+- `cs-team-build` — manual-only: implement a design document through a coordinated agent team
 
 **Verify**
 - `cs-browser-test` — test in a real browser via DevTools
@@ -47,7 +47,7 @@ Identify the development phase of the incoming task, then apply the matching ski
 
 **Review**
 - `cs-code-review` — five-axis code review (correctness, readability, architecture, security, performance)
-- `cs-team-review` — multi-agent review of code, design, or mixed targets with resumable handoffs
+- `cs-team-review` — manual-only: multi-agent review of code, design, or mixed targets with resumable handoffs
 - `cs-simplify` — simplify code for clarity without changing behavior
 - `cs-security` — harden against vulnerabilities
 - `cs-perf-opt` — optimize performance / Core Web Vitals
@@ -75,15 +75,15 @@ Identify the development phase of the incoming task, then apply the matching ski
 
 | Agent | Role | Use when | Invoked by (skill fan-out) |
 |-------|------|----------|-----------------------------|
-| cs-architect | System Architect | module boundaries, dependency direction, tech stack, ADRs | cs-spec-driven, cs-planning, cs-team-build, cs-team-review, cs-sysdocs-init, cs-sysdocs-update, cs-vibe-coding |
-| cs-frontend-lead | Frontend Lead | UI implementation, state, browser verification | frontend-owned cs-incremental, cs-frontend-ui, cs-browser-test, cs-tdd, security, performance, cs-team-build, cs-team-review (reviewer role) |
-| cs-backend-lead | Backend Lead | API implementation, data layer, server security/perf | backend-owned cs-incremental, cs-api-design, cs-tdd, security, performance, cs-team-build, cs-team-review (reviewer role) |
-| cs-code-reviewer | Senior Staff Engineer | five-axis code review | cs-code-review, cs-shipping, cs-team-build, cs-team-review |
-| cs-security-auditor | Security Engineer | vulnerability detection, threat modeling | cs-security, cs-shipping, cs-team-build, cs-team-review |
-| cs-test-engineer | QA Specialist | test strategy, coverage analysis | cs-tdd, cs-shipping, cs-team-build, cs-team-review (review-only) |
-| cs-web-perf-auditor | Web Perf Engineer | Core Web Vitals audit | cs-perf-opt, cs-shipping, cs-team-build, cs-team-review |
+| cs-architect | System Architect | module boundaries, dependency direction, tech stack, ADRs | cs-spec-driven, cs-planning, cs-sysdocs-init, cs-sysdocs-update, cs-vibe-coding; manual-only team workflows |
+| cs-frontend-lead | Frontend Lead | UI implementation, state, browser verification | frontend-owned cs-incremental, cs-frontend-ui, cs-browser-test, cs-tdd, security, performance; manual-only team workflows |
+| cs-backend-lead | Backend Lead | API implementation, data layer, server security/perf | backend-owned cs-incremental, cs-api-design, cs-tdd, security, performance; manual-only team workflows |
+| cs-code-reviewer | Senior Staff Engineer | five-axis code review | cs-code-review, cs-shipping; manual-only team workflows |
+| cs-security-auditor | Security Engineer | vulnerability detection, threat modeling | cs-security, cs-shipping; manual-only team workflows |
+| cs-test-engineer | QA Specialist | test strategy, coverage analysis | cs-tdd, cs-shipping; manual-only team workflows |
+| cs-web-perf-auditor | Web Perf Engineer | Core Web Vitals audit | cs-perf-opt, cs-shipping; manual-only team workflows |
 
-Personas may invoke skills, but do not invoke other personas — only the user (or this router) orchestrates. Agents are triggered **by skills** (fan-out) when their owning skill enters the relevant phase — no user command needed. `cs-team-build` and `cs-team-review` are the two sanctioned skills that sequence multiple personas.
+Personas may invoke skills, but do not invoke other personas — only the user (or this router) orchestrates. `cs-team-build` and `cs-team-review` sequence multiple personas only after explicit invocation of the skill or its approved command (`/cs-team-coding`, `/cs-team-review`); intent routing must never auto-start either workflow.
 
 ## Process
 

@@ -84,9 +84,10 @@ Skills encode the workflows, quality gates, and best practices that senior engin
 
 **Define:** cs-interview-me, cs-idea-refine, grill-me, cs-spec-driven
 **Plan:** cs-planning
-**Build:** cs-incremental, cs-minimal, cs-tdd, cs-context-eng, cs-source-driven, cs-doubt-driven, cs-frontend-ui, cs-api-design, cs-team-build
+**Build:** cs-incremental, cs-minimal, cs-tdd, cs-context-eng, cs-source-driven, cs-doubt-driven, cs-frontend-ui, cs-api-design
 **Verify:** cs-browser-test, cs-debugging
-**Review:** cs-code-review, cs-team-review, cs-simplify, cs-security, cs-perf-opt
+**Review:** cs-code-review, cs-simplify, cs-security, cs-perf-opt
+**Manual only:** cs-team-build (explicit skill or `/cs-team-coding`), cs-team-review (explicit skill or `/cs-team-review`)
 **Ship:** cs-git-workflow, cs-cicd, cs-deprecation, cs-docs-adrs, cs-observability, cs-shipping
 **SysDocs:** cs-sysdocs-init, cs-sysdocs-update, cs-vibe-coding
 
@@ -128,15 +129,15 @@ CodeBuddy discovers and activates skills based on `AGENTS.md` intent mapping. Wh
 
 | Agent | Role | Use When | Invoked by (skill fan-out) |
 |-------|------|----------|-----------------------------|
-| cs-architect | System Architect | Module boundaries, dependency direction, tech stack, ADRs | cs-spec-driven, cs-planning, cs-team-build, cs-team-review, cs-sysdocs-init, cs-sysdocs-update, cs-vibe-coding |
-| cs-frontend-lead | Frontend Lead | UI implementation, state, browser verification | frontend-owned build skills, cs-team-build, cs-team-review (review-only) |
-| cs-backend-lead | Backend Lead | API implementation, data layer, server security/perf | backend-owned build skills, cs-team-build, cs-team-review (review-only) |
-| cs-code-reviewer | Senior Staff Engineer | Five-axis code review | cs-code-review, cs-shipping, cs-team-build, cs-team-review |
-| cs-security-auditor | Security Engineer | Vulnerability detection, threat modeling | cs-security, cs-shipping, cs-team-build, cs-team-review |
-| cs-test-engineer | QA Specialist | Test strategy, coverage analysis | cs-tdd, cs-shipping, cs-team-build, cs-team-review (review-only) |
-| cs-web-perf-auditor | Web Perf Engineer | Core Web Vitals audit | cs-perf-opt, cs-shipping, cs-team-build, cs-team-review |
+| cs-architect | System Architect | Module boundaries, dependency direction, tech stack, ADRs | cs-spec-driven, cs-planning, cs-sysdocs-init, cs-sysdocs-update, cs-vibe-coding; manual-only team workflows |
+| cs-frontend-lead | Frontend Lead | UI implementation, state, browser verification | frontend-owned build skills; manual-only team workflows |
+| cs-backend-lead | Backend Lead | API implementation, data layer, server security/perf | backend-owned build skills; manual-only team workflows |
+| cs-code-reviewer | Senior Staff Engineer | Five-axis code review | cs-code-review, cs-shipping; manual-only team workflows |
+| cs-security-auditor | Security Engineer | Vulnerability detection, threat modeling | cs-security, cs-shipping; manual-only team workflows |
+| cs-test-engineer | QA Specialist | Test strategy, coverage analysis | cs-tdd, cs-shipping; manual-only team workflows |
+| cs-web-perf-auditor | Web Perf Engineer | Core Web Vitals audit | cs-perf-opt, cs-shipping; manual-only team workflows |
 
-Personas follow the composition rule: **only the user (or AGENTS.md intent mapping) is the orchestrator. Personas do not invoke other personas.** A persona may invoke skills. **Agents are triggered by skills** (fan-out) when their owning skill enters the relevant phase — no user command needed. `cs-team-build` and `cs-team-review` are the sanctioned multi-persona orchestrators.
+Personas follow the composition rule: **only the user (or AGENTS.md intent mapping) is the orchestrator. Personas do not invoke other personas.** A persona may invoke skills. **Agents are triggered by skills** (fan-out) when their owning skill enters the relevant phase. `cs-team-build` and `cs-team-review` are sanctioned multi-persona orchestrators, but are manual-only: explicit skill invocation or `/cs-team-coding` / `/cs-team-review` is required.
 
 ## Conventions
 

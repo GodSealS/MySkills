@@ -1,5 +1,5 @@
 ---
-description: "Runs a multi-agent team review of code, design, or mixed targets with deterministic findings, domain confirmation, and resumable file handoffs. Use when the user asks for a team, joint, or multi-agent review; use cs-code-review for a single-agent review and cs-shipping for a release gate. / 用多 Agent 团队审查代码、设计或混合目标，生成确定性 findings、领域确认和可恢复文件交接。用户要求团队、联合或多专家审查时使用；单人审查用 cs-code-review，发布门禁用 cs-shipping。"
+description: "Manually runs a multi-agent team review of code, design, or mixed targets with deterministic findings, domain confirmation, and resumable file handoffs. Invoke only through an explicit skill request or the team-review command; never auto-select it from task intent. / 手动用多 Agent 团队审查代码、设计或混合目标：仅可由显式技能请求或团队审查命令触发，不得按任务意图自动选择。"
 argument-hint: "[args]"
 ---
 

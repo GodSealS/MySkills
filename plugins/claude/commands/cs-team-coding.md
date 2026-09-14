@@ -2,7 +2,7 @@
 description: "Implement a design doc with an agent team — architect decomposes, leads build, reviewer audits, test engineer verifies. / 用 Agent 团队实现设计文档——架构师拆解、领域负责人实现、审查员审查、测试工程师验证。"
 ---
 
-Invoke the `cs-team-build` skill with `$ARGUMENTS` as the path to the design document.
+This command is an approved manual entry point. Invoke the `cs-team-build` skill with `$ARGUMENTS` as the path to the design document.
 
 The skill is the orchestrator. It runs five phases and writes every handoff to a unique `tasks/team-build/<run-id>/` directory; it never overwrites a prior run:
 
