@@ -59,12 +59,15 @@ Task arrives
 | Frontend Lead | `.codebuddy/agents/cs-frontend-lead.md` | Frontend domain owner: UI, state, browser verification | frontend-owned build skills; manual-only team workflows |
 | Backend Lead | `.codebuddy/agents/cs-backend-lead.md` | Backend domain owner: API, data, server security/perf | backend-owned build skills; manual-only team workflows |
 | Code Reviewer | `.codebuddy/agents/cs-code-reviewer.md` | Five-axis code review | `cs-code-review`, `cs-shipping`; manual-only team workflows |
+| Review Advisor | `.codebuddy/agents/cs-review-advisor.md` | Design review and focused recommendations; experts verify advice | explicit review assignment; manual-only team workflows |
 | Security Auditor | `.codebuddy/agents/cs-security-auditor.md` | Vulnerability detection | `cs-security`, `cs-shipping`; manual-only team workflows |
 | Test Engineer | `.codebuddy/agents/cs-test-engineer.md` | Test strategy & coverage | `cs-tdd`, `cs-shipping`; manual-only team workflows |
 | Web Perf Auditor | `.codebuddy/agents/cs-web-perf-auditor.md` | Core Web Vitals audit | `cs-perf-opt`, `cs-shipping`; manual-only team workflows |
 | Knowledge Base Administrator | `.codebuddy/agents/cs-knowledge-base-admin.md` | Refresh existing project knowledge bases only | final subagent step of `/cs-build` and `cs-team-build` |
 
 **Orchestration model:** Agents are invoked **by skills** (fan-out), not by user commands. `cs-team-build` and `cs-team-review` sequence multiple personas only after an explicit skill invocation or their approved commands (`/cs-team-coding`, `/cs-team-review`); intent routing must never auto-start either workflow.
+
+`cs-review-advisor` reads its bundled Ponytail protocols as private role resources, never public skills or commands. The host supplies the installed persona/resource paths. Only `cs-code-query` and `cs-docs-adrs` are available as optional external skills; no minimum load count applies. Experts recheck the advice, blocking disagreements immediately go to the user, and findings remain open until repairs are independently verified.
 
 `cs-knowledge-base-admin` is a low-cost final-step subagent for `/cs-build` and `cs-team-build`. It updates only existing `.codegraph/`, `.understand-anything/`, and `graphify-out/` directories and never creates a knowledge base. If none of the three exists, it terminates with a prerequisite message. Personas with an `Optional Skill Roster` may autonomously load only skills listed in their own roster; personas without that section follow only their explicitly assigned skill protocol.
 

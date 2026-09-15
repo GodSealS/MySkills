@@ -113,6 +113,31 @@ are pinned by role and translated per host during adapter generation: CodeBuddy 
 uses Opus/Sonnet, Codex uses GPT-5.6 Sol/Terra, and Gemini uses Gemini Pro/Flash.
 
 ## Skill phases
+### Review advisor and private Ponytail resources
+
+`cs-review-advisor` reviews designs and gives focused recommendations after the independent
+`cs-code-reviewer` code review. The architect retains task decomposition and architecture
+decisions. Team workflows still start only through their explicit skill or command.
+
+Relevant experts recheck each recommendation and record whether it is wholly, partly, or
+not applicable. If rejected advice remains a blocking concern for the advisor, the host
+immediately presents the disagreement for the user's decision. Accepting a recommendation
+does not close a finding: the implementer must repair it and experts must verify the repair.
+
+The persona ships with `agents/cs-review-advisor/`, containing four private Ponytail
+`SKILL.txt` protocols plus LICENSE and `PROVENANCE.txt`. Their content uses Markdown;
+the `.txt` suffix prevents recursive agent discovery from registering them as personas.
+These are ordinary role resources, not entries in
+the public skill or slash-command catalog. Install the persona together with its resource
+directory; the host must provide their installed paths so loading works from any working
+directory. A missing bundle is an incomplete installation. The only optional external skills
+are `cs-code-query` and `cs-docs-adrs`, within the assigned read/write scope.
+
+Existing completed review runs remain immutable. Resume older runs under their recorded
+role protocol, or preserve them and create a new run when that protocol is unavailable.
+
+### Public skills
+
 Define: cs-interview-me, cs-idea-refine, cs-grill-me, cs-spec-driven
 Plan: cs-planning
 Build: cs-incremental, cs-minimal, cs-tdd, cs-context-eng, cs-source-driven, cs-doubt-driven, cs-frontend-ui, cs-api-design

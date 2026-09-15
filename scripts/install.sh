@@ -3,9 +3,11 @@ set -eu
 
 # macOS/POSIX installer. Run build-adapters.sh first when source files changed.
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+. "$ROOT/scripts/agent-resources.sh"
 TARGET=all
 DESTINATION=.
 USER_HOME=0
+USER_HOME_PATH=
 
 usage() {
   cat <<'EOF'
@@ -19,6 +21,7 @@ while [ "$#" -gt 0 ]; do
     --target) [ "$#" -ge 2 ] || { usage >&2; exit 2; }; TARGET=$2; shift 2 ;;
     --destination) [ "$#" -ge 2 ] || { usage >&2; exit 2; }; DESTINATION=$2; shift 2 ;;
     --user-home) USER_HOME=1; shift ;;
+    --user-home-path) [ "$#" -ge 2 ] || { usage >&2; exit 2; }; USER_HOME_PATH=$2; shift 2 ;;
     -h|--help) usage; exit 0 ;;
     *) usage >&2; exit 2 ;;
   esac
@@ -27,7 +30,7 @@ done
 case "$TARGET" in codebuddy|gemini|codex|claude|all) ;; *) usage >&2; exit 2 ;; esac
 
 if [ "$USER_HOME" -eq 1 ]; then
-  DESTINATION=${HOME:?HOME is not set}
+  DESTINATION=${USER_HOME_PATH:-${HOME:?HOME is not set}}
 fi
 DESTINATION=$(CDPATH= cd -- "$DESTINATION" 2>/dev/null && pwd || { mkdir -p "$DESTINATION"; CDPATH= cd -- "$DESTINATION" && pwd; })
 
@@ -37,9 +40,9 @@ copy_file_safe() (
   key=$3
   manifest=$4
   mkdir -p "$(dirname -- "$dst")"
-  source_hash=$(shasum -a 256 "$src" | awk '{print $1}')
+  source_hash=$(resource_sha256 "$src")
   known_hash=$(awk -v key="$key" '$1 == key { print $2; exit }' "$manifest" 2>/dev/null || true)
-  if [ ! -e "$dst" ] || cmp -s "$src" "$dst" || { [ -n "$known_hash" ] && [ "$(shasum -a 256 "$dst" | awk '{print $1}')" = "$known_hash" ]; }; then
+  if [ ! -e "$dst" ] || cmp -s "$src" "$dst" || { [ -n "$known_hash" ] && [ "$(resource_sha256 "$dst")" = "$known_hash" ]; }; then
     cp "$src" "$dst"
     tmp="$manifest.tmp.$$"
     awk -v key="$key" '$1 != key { print }' "$manifest" > "$tmp" 2>/dev/null || true
@@ -56,9 +59,19 @@ merge_tree_safe() (
   [ -d "$src" ] || return 0
   mkdir -p "$dst"
   manifest="$dst/.agent-skills-manifest"
+  # Check resource ancestors before ordinary persona files can be copied.
+  if [ "${src##*/}" = agents ]; then
+    sync_agent_resources "$src" "$dst"
+  elif [ -d "$src/agents" ]; then
+    sync_agent_resources "$src/agents" "$dst/agents"
+  fi
   [ -f "$manifest" ] || : > "$manifest"
   find "$src" -type f -print | while IFS= read -r file; do
     rel=${file#"$src"/}
+    case "$rel" in agents/*/*|agents/.agent-resources-manifest) continue ;; esac
+    if [ "${src##*/}" = agents ]; then
+      case "$rel" in */*|.agent-resources-manifest) continue ;; esac
+    fi
     copy_file_safe "$file" "$dst/$rel" "$rel" "$manifest"
   done
 )
@@ -80,7 +93,12 @@ install_gemini() (
 )
 
 install_codex() (
-  install_tree "$ROOT/.agents" "$DESTINATION/.agents"
+  if [ "$USER_HOME" -eq 1 ]; then
+    install_tree "$ROOT/.agents/skills" "$DESTINATION/.codex/skills"
+    install_tree "$ROOT/.agents/references" "$DESTINATION/.codex/references"
+  else
+    install_tree "$ROOT/.agents" "$DESTINATION/.agents"
+  fi
   install_tree "$ROOT/.codex" "$DESTINATION/.codex"
   copy_file_safe "$ROOT/AGENTS.md" "$DESTINATION/AGENTS.md" AGENTS.md "$DESTINATION/.agent-skills-root-manifest"
 )

@@ -79,12 +79,15 @@ Identify the development phase of the incoming task, then apply the matching ski
 | cs-frontend-lead | Frontend Lead | UI implementation, state, browser verification | frontend-owned cs-incremental, cs-frontend-ui, cs-browser-test, cs-tdd, security, performance; manual-only team workflows |
 | cs-backend-lead | Backend Lead | API implementation, data layer, server security/perf | backend-owned cs-incremental, cs-api-design, cs-tdd, security, performance; manual-only team workflows |
 | cs-code-reviewer | Senior Staff Engineer | five-axis code review | cs-code-review, cs-shipping; manual-only team workflows |
+| cs-review-advisor | Review Advisor | design review and focused advice; experts verify recommendations | explicit review assignment; manual-only team workflows |
 | cs-security-auditor | Security Engineer | vulnerability detection, threat modeling | cs-security, cs-shipping; manual-only team workflows |
 | cs-test-engineer | QA Specialist | test strategy, coverage analysis | cs-tdd, cs-shipping; manual-only team workflows |
 | cs-web-perf-auditor | Web Perf Engineer | Core Web Vitals audit | cs-perf-opt, cs-shipping; manual-only team workflows |
 | cs-knowledge-base-admin | Knowledge Base Administrator | refresh existing project knowledge bases only | final subagent step of `/cs-build` and `cs-team-build` |
 
 Personas may invoke skills, but do not invoke other personas — only the user (or this router) orchestrates. `cs-team-build` and `cs-team-review` sequence multiple personas only after explicit invocation of the skill or its approved command (`/cs-team-coding`, `/cs-team-review`); intent routing must never auto-start either workflow.
+
+`cs-review-advisor` loads its bundled Ponytail protocols only for assigned reviews. They are private role resources, not public skills or commands. Its external skill allowlist is limited to `cs-code-query` and `cs-docs-adrs`, loaded only as needed. The host supplies the installed persona and resource paths; experts verify its suggestions, and the host immediately asks the user when rejected advice remains a blocking dispute. Only verified repairs can close findings.
 
 `cs-knowledge-base-admin` runs only as the final subagent of `/cs-build` or `cs-team-build`, using the lowest-cost model tier. It refreshes only existing `.codegraph/`, `.understand-anything/`, and `graphify-out/` directories and never creates a knowledge base. If none of the three exists, it terminates with a prerequisite message. Personas with an `Optional Skill Roster` may autonomously load only skills listed in their own roster; personas without that section follow only their explicitly assigned skill protocol.
 

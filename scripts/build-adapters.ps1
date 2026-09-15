@@ -29,6 +29,7 @@
 
 $ErrorActionPreference = 'Stop'
 $Repo = Resolve-Path (Join-Path $PSScriptRoot '..')
+. (Join-Path $PSScriptRoot 'agent-resources.ps1')
 $SrcSkills   = Join-Path $Repo '.codebuddy\skills'
 $SrcAgents   = Join-Path $Repo '.codebuddy\agents'
 $SrcCommands = Join-Path $Repo '.codebuddy\commands'
@@ -168,7 +169,7 @@ function Get-PlatformModel([string]$sourceModel, [string]$platform) {
 function Set-AgentPlatformModel([string]$path, [string]$platform) {
     $content = Get-Content -Raw -Path $path
     $agentName = if ($content -match '(?m)^name:\s*(.+?)\s*$') { $matches[1].Trim() } else { throw "Agent name missing: $path" }
-    $proAgents = @('cs-architect', 'cs-backend-lead', 'cs-frontend-lead', 'cs-code-reviewer', 'cs-security-auditor')
+    $proAgents = @('cs-architect', 'cs-backend-lead', 'cs-frontend-lead', 'cs-code-reviewer', 'cs-security-auditor', 'cs-review-advisor')
     $flashAgents = @('cs-test-engineer', 'cs-web-perf-auditor', 'cs-knowledge-base-admin')
     if ($proAgents -contains $agentName) {
         $tier = 'DeepSeek-V4-Pro'
@@ -326,11 +327,14 @@ $dstAgentsClaude = Join-Path $Repo '.claude\agents'
 foreach ($d in @($dstAgentsCanon, $dstAgentsGem, $dstAgentsCodex, $dstAgentsClaude)) {
     New-Item -ItemType Directory -Force -Path $d | Out-Null
 }
-foreach ($ag in (Get-ChildItem -Path $SrcAgents -File)) {
+foreach ($ag in (Get-ChildItem -Path $SrcAgents -File -Filter '*.md')) {
     Copy-Item -Path $ag.FullName -Destination (Join-Path $dstAgentsCanon $ag.Name) -Force
     Copy-AgentPlatform $ag.FullName (Join-Path $dstAgentsGem $ag.Name) 'gemini'
     Copy-AgentPlatform $ag.FullName (Join-Path $dstAgentsCodex $ag.Name) 'codex'
     Copy-AgentPlatform $ag.FullName (Join-Path $dstAgentsClaude $ag.Name) 'claude'
+}
+foreach ($d in @($dstAgentsCanon, $dstAgentsGem, $dstAgentsCodex, $dstAgentsClaude)) {
+    Sync-AgentResources $SrcAgents $d
 }
 Write-Host "Agents: $((Get-ChildItem -Path $SrcAgents -File).Count) -> agents/ .gemini/agents/ .codex/agents/ .claude/agents/"
 
@@ -486,9 +490,15 @@ Write-Host "Claude rules: 1 -> .claude/rules/skills-contributing.md"
 # its own root, so it must use a dedicated Claude-adapted tree rather than the
 # platform-neutral top-level `skills/` and `agents/` directories.
 $dstClaudePluginPackage = Join-Path $Repo 'plugins\claude'
-Clear-Dir $dstClaudePluginPackage
+New-Item -ItemType Directory -Force -Path $dstClaudePluginPackage | Out-Null
+foreach ($child in @('skills', 'references', 'commands', 'rules', '.claude-plugin')) {
+    Clear-Dir (Join-Path $dstClaudePluginPackage $child)
+}
 Copy-Tree -src $dstSkillsClaude -dst (Join-Path $dstClaudePluginPackage 'skills')
-Copy-Tree -src $dstAgentsClaude -dst (Join-Path $dstClaudePluginPackage 'agents')
+$pluginAgents = Join-Path $dstClaudePluginPackage 'agents'
+New-Item -ItemType Directory -Force -Path $pluginAgents | Out-Null
+Get-ChildItem -LiteralPath $dstAgentsClaude -File -Filter '*.md' | Copy-Item -Destination $pluginAgents -Force
+Sync-AgentResources $SrcAgents $pluginAgents
 Copy-Tree -src $dstRefsClaude -dst (Join-Path $dstClaudePluginPackage 'references')
 Copy-Tree -src $dstCmdClaude -dst (Join-Path $dstClaudePluginPackage 'commands')
 Copy-Tree -src $dstRulesClaude -dst (Join-Path $dstClaudePluginPackage 'rules')

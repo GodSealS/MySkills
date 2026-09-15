@@ -1,0 +1,42 @@
+# Ponytail Private Review Package - Provenance
+
+- Upstream: https://github.com/DietrichGebert/ponytail
+- Version: `4.9.0` (upstream package.json).
+- Exact source commit: `2ed6c52c9d7e5e56942508591085fd45dea277d3`.
+- Extraction date: 2026-09-14.
+- Copyright (c) 2026 DietrichGebert. Distributed under the accompanying [MIT LICENSE](LICENSE), copied byte-for-byte from the pinned commit.
+- Source files were read directly using `git show <commit>:<path>` from the supplied local checkout. That checkout is not a runtime dependency. Untracked files were not used as source.
+
+## Source inventory
+
+Hashes are SHA-256 of original upstream Git blobs before adaptation, not the installed modified files.
+
+| Private method | Upstream path | Original SHA-256 |
+|---|---|---|
+| `ponytail-principles` | `skills/ponytail/SKILL.md` | `1316a2f3f95741d2300b116fe0c2d81ce4a9568656ed0a62643f54aaf09957f2` |
+| `ponytail-review` | `skills/ponytail-review/SKILL.md` | `40df33b58fc6ef889b93585733feb9566b76e9586efa7f376785c1e995197ac0` |
+| `ponytail-audit` | `skills/ponytail-audit/SKILL.md` | `5560b8e383dbe2ddfddc873a1e2bf2e586e23e0cd7d995537482b2315331f6d1` |
+| `ponytail-debt` | `skills/ponytail-debt/SKILL.md` | `c84fba75f0ca12bfe83f9a78ea02fd125c5dd3f1fbb18124105a489937f284e6` |
+
+LICENSE original SHA-256: `fb1bc6909ac3ef82d5c22106e32ef682b0cff66788fa915fb9b53b15c9d2f3ab`.
+
+## Extraction and local changes
+
+- [Principles](skills/ponytail-principles/SKILL.txt): extracted The ladder, its root-cause paragraph, selected Rules and When NOT to be lazy. Retained the ordered necessity -> repository -> standard library -> platform -> installed dependency -> direct expression -> new implementation decisions. Changed one-line supremacy to readability/correctness; shared repairs require matching caller semantics; single implementations are investigation signals; existing project tests and explicit requirements remain binding; implementation imperatives become read-only recommendation guidance. Omitted persistent modes, intensity, code-first output, aggressive demand reduction and the single-self-check limit.
+- [Review](skills/ponytail-review/SKILL.txt): extracted fixed-diff scope, Format/Tags and Boundaries. Added location/evidence/verification and contract-aware deletion criteria. Removed illustrative shortcuts that could weaken email validation, retries or public interfaces; omitted mandatory line savings and "Ship" conclusions. Tests and guardrails cannot be dismissed as complexity.
+- [Audit](skills/ponytail-audit/SKILL.txt): extracted scope, Hunt, ranked Output and Boundaries. Requires explicit scope authorization, shares the private review tag definitions, treats hunt targets as candidates and reports only supported savings. Zero findings is not a release verdict.
+- [Debt](skills/ponytail-debt/SKILL.txt): extracted marker Scan, per-marker Output, no-trigger and read-only Boundaries. Uses scoped rg searches and comment verification, records missing data/measurements as unknown and never equates zero markers with zero debt. Writes only pre-authorized report paths.
+
+Each private method records its own extraction and adaptations. None was copied from or depends on public `cs-minimal`, `cs-code-review` or `cs-simplify`. This package does not include Ponytail runtime/hooks, persistence, modes, MCP, benchmarks, gain cards or public help/commands. No benchmark is represented as measured benefit for the reviewed repository.
+
+## MySkills-authored protocol
+
+The adjacent `cs-review-advisor.md` role, design-readiness review, classification/assignment drafts, architecture-question handoff, output integration, permissions and expert-verification lifecycle are local protocols, not upstream Ponytail capabilities. Ponytail review/audit explicitly exclude correctness, security and performance review.
+
+The advisor only recommends; relevant experts independently assess advice as fully, partly or not acceptable. Blocking disagreements immediately go to the user through the host. Advice acceptance or user choice does not close a finding: repair plus expert verification on the repaired snapshot is required. The host owns orchestration and gates; architectural decisions stay with `cs-architect`.
+
+## Packaging
+
+These protocols are private to the adjacent advisor, not public skills. Resolve them from the installed agent location, never cwd or the original checkout. Preserve this provenance and LICENSE in all generated/installed resource trees. Private Markdown has no platform registration frontmatter, model declaration or slash-command entry.
+
+The installed protocol files use `SKILL.txt` and `PROVENANCE.txt` (Markdown content). The CodeBuddy loader recursively discovers every `.md` under agents, including files without persona frontmatter; non-registration extensions prevent private methods and provenance being mistaken for agents. Upstream source names above remain `SKILL.md` for traceability.

@@ -78,6 +78,9 @@ try {
         Assert ".codex/agents/$agent has an Optional Skill Roster" ($roster.Length -gt 0)
         Assert ".codex/agents/$agent Optional Skill Roster is English-only" ($roster -notmatch '[\u3400-\u9fff]')
     }
+    $advisor = Get-Content -Raw (Join-Path $Temp '.codex\agents\cs-review-advisor.md')
+    Assert 'advisor has no minimum skill count' ($advisor -match 'there is no minimum skill count')
+    Assert 'advisor allows only the two external auxiliaries' ($advisor -match 'Only the following external auxiliaries' -and $advisor -match '\| `cs-code-query` \|' -and $advisor -match '\| `cs-docs-adrs` \|')
     $teamBuild = Get-Content -Raw (Join-Path $Temp '.agents\skills\cs-team-build\SKILL.md')
     Assert 'team-build skips nested knowledge-base refreshes during task implementation' ($teamBuild -match 'Skip the final knowledge-base-administrator step; Team Build owns its single invocation in Phase 5')
     foreach ($ref in @('sysdocs-system.md', 'sysdocs-overview-template.md', 'sysdocs-module-template.md', 'sysdocs-vibe-template.md')) {

@@ -8,11 +8,13 @@ Skills encode the workflows, quality gates, and best practices that senior engin
 
 ```
 .codebuddy/
-├── agents/                   → 8 reusable specialist personas
+├── agents/                   → 9 reusable specialist personas
 │   ├── cs-architect.md           (build-side: architecture, ADRs)
 │   ├── cs-frontend-lead.md       (build-side: frontend domain owner)
 │   ├── cs-backend-lead.md        (build-side: backend domain owner)
 │   ├── cs-code-reviewer.md
+│   ├── cs-review-advisor.md     (advice only; experts recheck)
+│   ├── cs-review-advisor/       (private Ponytail resources, not public skills)
 │   ├── cs-security-auditor.md
 │   ├── cs-test-engineer.md
 │   ├── cs-web-perf-auditor.md
@@ -134,6 +136,7 @@ CodeBuddy discovers and activates skills based on `AGENTS.md` intent mapping. Wh
 | cs-frontend-lead | Frontend Lead | UI implementation, state, browser verification | frontend-owned build skills; manual-only team workflows |
 | cs-backend-lead | Backend Lead | API implementation, data layer, server security/perf | backend-owned build skills; manual-only team workflows |
 | cs-code-reviewer | Senior Staff Engineer | Five-axis code review | cs-code-review, cs-shipping; manual-only team workflows |
+| cs-review-advisor | Review Advisor | Design review and focused recommendations verified by experts | explicit review assignment; manual-only team workflows |
 | cs-security-auditor | Security Engineer | Vulnerability detection, threat modeling | cs-security, cs-shipping; manual-only team workflows |
 | cs-test-engineer | QA Specialist | Test strategy, coverage analysis | cs-tdd, cs-shipping; manual-only team workflows |
 | cs-web-perf-auditor | Web Perf Engineer | Core Web Vitals audit | cs-perf-opt, cs-shipping; manual-only team workflows |

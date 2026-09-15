@@ -1,6 +1,6 @@
 ---
 name: cs-team-build
-description: "Manually runs a design document through a coordinated agent team — the architect decomposes it into tasks, domain leads implement them, a reviewer audits each slice, the architect triages findings, and a test engineer verifies the whole. Invoke only through an explicit skill request or the team-build command; never auto-select it from task intent. / 手动用 Agent 团队把设计文档落地：仅可由显式技能请求或团队构建命令触发，不得按任务意图自动选择。"
+description: "Manually runs a design document through a coordinated agent team — the architect decomposes, leads implement, a reviewer audits, an advisor recommends fixes for expert verification, and a test engineer verifies the whole. Invoke only through an explicit skill request or the team-build command; never auto-select it from task intent. / 手动用 Agent 团队把设计文档落地：仅可由显式技能请求或团队构建命令触发，不得按任务意图自动选择。"
 disable-model-invocation: true
 ---
 
@@ -36,20 +36,21 @@ Two rules hold throughout:
 
 ## Team Roster
 
-A team has **at least 3 members**. Two are mandatory:
+A team has **at least 4 members**. Three are mandatory:
 
 | Member | Required | Role in the loop |
 |---|---|---|
-| `cs-architect` | **Always** | Reads the design doc, picks the rest of the team, decomposes into tasks, triages every review, writes fix directives, synthesizes the test report |
+| `cs-architect` | **Always** | Decomposes tasks, proposes implementation owners, implements structural artifacts, and answers architecture questions |
+| `cs-review-advisor` | **Always** | Reviews the plan, proposes focused fixes and report synthesis; relevant experts verify its advice |
 | `cs-code-reviewer` | **Always** | Five-axis review of every implemented slice (correctness, readability, architecture, security, performance) |
 | `cs-backend-lead` | If the doc implies API / data / server work | Implements backend-owned tasks via `/cs-build` |
 | `cs-frontend-lead` | If the doc implies UI / interaction / browser work | Implements frontend-owned tasks via `/cs-build` |
-| `cs-security-auditor` | On demand, decided by the architect | Assists a round when the slice touches a trust boundary |
-| `cs-web-perf-auditor` | On demand, decided by the architect | Assists a round when the slice is user-facing or perf-budgeted |
+| `cs-security-auditor` | On demand, triggered by the host | Assists a round when the slice touches a trust boundary |
+| `cs-web-perf-auditor` | On demand, triggered by the host | Assists a round when the slice is user-facing or perf-budgeted |
 | `cs-test-engineer` | Phase 3 (always, once) | Runs the full suite, analyzes coverage, writes `<run-dir>/test-report.md` |
 | `cs-knowledge-base-admin` | Phase 5 (always, once) | Refreshes only knowledge bases that already exist in the project |
 
-The architect decides the roster — see Phase 1. A roster of exactly `cs-architect` + `cs-code-reviewer` + one domain lead is valid; `cs-architect` + `cs-code-reviewer` alone is not (nobody would implement).
+The architect proposes implementation owners and the host validates the roster. The minimum is `cs-architect` + `cs-review-advisor` + `cs-code-reviewer` + one domain lead; these roles need not occupy simultaneous concurrency slots.
 
 ## Artifact Layout
 
@@ -61,12 +62,13 @@ tasks/team-build/<run-id>/
 ├── plan.md                      # cs-planning output — the task breakdown
 ├── todo.md                      # checklist: id, title, owner, status, rounds used
 ├── reviews/
+│   ├── 00-plan-review.md        # advisor recommendations + expert verification
 │   ├── T01-r1-code-review.md    # cs-code-reviewer, round 1
-│   ├── T01-r1-security.md       # optional, only when the architect calls it
-│   ├── T01-r1-perf.md           # optional, only when the architect calls it
-│   └── T01-r1-fixes.md          # cs-architect's change directive for round 2
+│   ├── T01-r1-security.md       # when the host trigger matches
+│   ├── T01-r1-perf.md           # when the host trigger matches
+│   └── T01-r1-fixes.md          # advisor recommendations + expert verification
 ├── test-report.md               # cs-test-engineer (Phase 3)
-├── final-report.md              # cs-architect synthesis (Phase 4)
+├── final-report.md              # advisor draft + expert evidence + host verdict
 └── knowledge-base-report.md     # cs-knowledge-base-admin (Phase 5; only when at least one supported KB exists)
 ```
 
@@ -77,18 +79,22 @@ tasks/team-build/<run-id>/
 1. Resolve the design doc from `$ARGUMENTS`. If missing or unreadable, **stop** and ask for the path.
 2. Confirm a clean baseline: `git status --porcelain`. If there are uncommitted changes outside the selected `<run-dir>/`, stop and ask the user to commit, stash, or confirm.
 3. Create a fresh `tasks/team-build/<run-id>/reviews/` directory (for example, a timestamp plus short random suffix). If the selected run directory already exists, stop and choose a new run id; never overwrite prior handoffs.
+4. Establish the SysDocs baseline using the three-state inventory in `../../references/sysdocs-system.md`. The host arranges `cs-sysdocs-init` for UNINITIALIZED (use `--type spec` when only a specification exists), `cs-sysdocs-update --mode repair` for PARTIAL-INITIALIZED, or incremental refresh for INITIALIZED. Complete required maintenance before decomposition; capture the resulting Git/document baseline and retain the existing approval rules for any maintenance changes. Read `SysDocs/SYSTEM_ROOT.md` and manifest-selected module documents, and record state, module IDs, document snapshot identities and report paths in `<run-dir>/team.md`. Unavailable or failed prerequisite evidence blocks implementation; directory existence alone is insufficient.
 
 ### Phase 1 — Architect decomposes (FAN-OUT → `cs-architect`)
 
-Fan-out to `cs-architect` with the design doc path. The architect:
+Fan-out to `cs-architect` with the design doc path and the preflight SysDocs context. The architect:
 
 1. Reads the whole design doc.
-2. **Decides the roster.** Which domain leads are actually needed — `cs-backend-lead`, `cs-frontend-lead`, or both — and says why in one line each. Record it in `<run-dir>/team.md`.
+2. **Proposes the roster, including the three mandatory roles.** Which domain leads are actually needed — `cs-backend-lead`, `cs-frontend-lead`, or both — and says why in one line each. Record it in `<run-dir>/team.md`; the host validates it.
 3. **Invokes the `cs-planning` skill** to break the doc into executable tasks. Vertical slices, not horizontal layers. Every task needs: id, title, description, **primary owner** (`arch` / `frontend` / `backend`), acceptance criteria, verification steps, dependencies, files likely touched.
 4. Writes `<run-dir>/plan.md` (full breakdown) and `<run-dir>/todo.md` (tracking checklist with a `Rounds` column).
 5. Constraint: `arch` tasks are limited to public contracts, module skeletons, and cross-cutting config. Business features go to a domain lead.
+6. Each task references affected SysDocs module IDs and boundaries, maps requirements to acceptance criteria, and names expected document updates or explains why none are needed. Proposed new boundaries require architect decisions and corresponding manifest updates, not invented module IDs treated as established facts.
 
-**Checkpoint:** present `<run-dir>/team.md` + `<run-dir>/plan.md` to the human. Get an unambiguous affirmative before any code is written. This is the only gate before the loop; after it, the team runs task by task without stopping.
+**Plan review:** the host fans out `cs-review-advisor` with the plan, constraints, preflight SysDocs context, allowed context and `<run-dir>/reviews/00-plan-review.md`. The advisor checks executability, module traceability and acceptance gaps. The host sends its recommendations to relevant experts under the Advice and verification protocol below; architecture questions return to `cs-architect`. Record how each plan finding was addressed or explicitly accepted as risk before presenting the plan. The host records `review-advisor-v1`, this skill path and its source version in `team.md`.
+
+**Checkpoint:** present `<run-dir>/team.md` + `<run-dir>/plan.md` + plan review to the human. Get an unambiguous affirmative before any code is written. After it, the team runs task by task, subject to the existing escalation gates and immediate blocking-dispute rule below.
 
 ### Phase 2 — Execution loop (per task, max 3 rounds)
 
@@ -100,30 +106,28 @@ For each task `T<NN>` in dependency order, run at most **3 rounds**. A round has
 - `frontend` → `cs-frontend-lead`
 - `arch` → `cs-architect`
 
-Instruct the lead to reuse only `/cs-build`'s implementation cycle (`cs-incremental` + `cs-tdd`) for exactly this task: read acceptance criteria → RED → GREEN → regression suite → build → **stage only this task's files and stop before committing**. Skip the final knowledge-base-administrator step; Team Build owns its single invocation in Phase 5. Team Build also owns the single task commit after review approval.
+Supply SYSTEM_ROOT and the task's affected module context to the lead. Instruct the lead to reuse only `/cs-build`'s implementation cycle (`cs-incremental` + `cs-tdd`) for exactly this task: read acceptance criteria → RED → GREEN → regression suite → build → **stage only this task's files and stop before committing**. Skip the final knowledge-base-administrator step; Team Build owns its single invocation in Phase 5. Team Build also owns the single task commit after review approval.
 
 For round 1 the input is `<run-dir>/plan.md#T<NN>`. For rounds 2-3 the input is `<run-dir>/reviews/T<NN>-r<k>-fixes.md` — the lead implements the directive, stages only this task's files, and does nothing else. Scope discipline applies: no drive-by refactors, no "while I'm here" changes.
+
+Before fixing the review snapshot in each round, the host arranges `cs-sysdocs-update` for the slice's documentation impact and obtains validator evidence. Stage the affected module/manifest updates with the task; preserve update reports in `SysDocs/.meta/reports/` and link the checked snapshot, result and unresolved drift in that round's handoff. Record a reason when no document edit is needed. If synchronization changes reviewed files later, invalidate affected reviews and verify the new snapshot before approval.
 
 **Step 2 — REVIEW.** FAN-OUT to `cs-code-reviewer` (`cs-code-review`). Review the task's staged diff (`git diff --cached`), not the whole branch; the handoff must include the base commit and the exact staged file list. Review across all five axes and write the result to `<run-dir>/reviews/T<NN>-r<k>-code-review.md` using the reviewer's standard output template, ending with a verdict:
 
 **Verdict:** `APPROVE` | `REQUEST CHANGES`
 
-**Step 3 — TRIAGE.** FAN-OUT to `cs-architect` with the review file. The architect:
-
-a. **Before deciding approval**, apply the specialist trigger table to every round. If the slice matches a trigger, run that audit even when the code reviewer says `APPROVE`; merge its findings into triage.
-
-b. **If the merged verdict is `APPROVE` with no Critical and no Important findings** → commit the staged task files once, mark the task DONE in `<run-dir>/todo.md`, and **move to the next task**. No extra round is burned on Suggestions alone; note them and carry on.
-
-c. **Otherwise** → decide the fix directive from the merged findings:
+**Step 3 — ADVICE AND EXPERT VERIFICATION.** The host applies the specialist triggers below in every round, even if the code reviewer says `APPROVE`. It fans out triggered specialists and then `cs-review-advisor` with all review files, original finding IDs, constraints, the fixed staged snapshot, and the allowed `-fixes.md` path. The advisor performs focused evidence review and proposes fixes or approval; it does not repeat an unrestricted five-axis review or commit files.
 
 | Specialist | Call it when the slice touches |
 |---|---|
 | `cs-security-auditor` | authn/authz, user input crossing a trust boundary, data access / queries / SQL, secrets or env, file upload, external integrations, payments |
 | `cs-web-perf-auditor` | user-facing UI, list/table/image rendering, bundle size, Core Web Vitals budget, animation or scroll paths |
 
-Optional assistants run **within the same round**; their findings are merged, not queued. Each writes `<run-dir>/reviews/T<NN>-r<k>-security.md` / `-perf.md`.
+Specialists run **within the same round**, writing `<run-dir>/reviews/T<NN>-r<k>-security.md` / `-perf.md`. The host sends advisor proposals to relevant experts for fresh detection under the protocol below and collects their evidence in the existing `-fixes.md` handoff. Use the relevant domain expert, code reviewer or test engineer for each recommendation; an implementer cannot independently approve its own structural or feature change. Missing verification blocks approval. Advisor discoveries retain their source and undergo expert confirmation rather than becoming facts through synthesis.
 
-Then write `<run-dir>/reviews/T<NN>-r<k>-fixes.md` — the change directive — and increment the round counter. Do not commit until a merged review approves the task; this preserves one commit per task across all rounds.
+The host merges original reviews and verified advice. Only `APPROVE` with no open Critical or Important findings, completed specialist triggers, required fix verification, and passing SysDocs synchronization/validation evidence for the reviewed snapshot permits the host to commit staged task files once (when authorized), mark DONE, and continue. A user instruction not to commit takes precedence; report the uncommitted result. Suggestions alone never consume another round.
+
+Otherwise the advisor writes actionable recommendations to `<run-dir>/reviews/T<NN>-r<k>-fixes.md`; the host records expert verification and accepted instructions there, then increments the round counter. Unresolved blocking disputes immediately follow the user escalation protocol below, before another implementation round. Architecture changes or repeated P0 require `cs-architect` consultation/re-slicing in Phase 1, retaining round and approval history.
 
 The directive is not a summary. It is an actionable work order:
 
@@ -146,7 +150,7 @@ Source: <run-dir>/reviews/T03-r1-code-review.md (+ -security.md, -perf.md)
 ## Definition of done for round 2
 - [ ] P0 and P1 closed
 - [ ] Full suite green, build green
-- [ ] Changes staged, this task's files only; Team Build commits once after approval
+- [ ] Changes staged, this task's files only; host commits once after approval when authorized
 ```
 
 **Round budget — 3. Enforced.** After round 3, if the task still fails review, **stop the loop and escalate to the human**: summarize the unresolved findings, the rounds spent, and the recommended path (re-slice the task / clarify the design doc / accept the risk). Never silently start a 4th round.
@@ -183,15 +187,16 @@ Fan-out to `cs-test-engineer` with `<run-dir>/plan.md` and `<run-dir>/todo.md`. 
 - Critical / High / Medium / Low
 ```
 
-### Phase 4 — Architect synthesis (FAN-OUT → `cs-architect`)
+### Phase 4 — Advisor synthesis (FAN-OUT → `cs-review-advisor`)
 
-Fan-out to `cs-architect` with `<run-dir>/test-report.md`. The architect does **not** re-review code line by line — it triages the report and writes `<run-dir>/final-report.md`:
+Before synthesis, the host arranges the final `cs-sysdocs-update` and validator check. Any resulting target changes return through the affected review and verification gates; prior evidence cannot certify a changed snapshot. Fan-out to `cs-review-advisor` with all still-open findings, their verification history, `<run-dir>/test-report.md`, and the final SysDocs context/update/validator evidence. It writes a draft in `<run-dir>/final-report.md` without replacing actual test evidence. The host obtains relevant expert verification of its recommendations, consults `cs-architect` only for architecture consequences, then records the final verdict in the same artifact:
 
 1. **Verdict:** `SHIP` | `FIX FIRST`
-2. **Fix priorities** — restated from the test report and promoted/demoted by architectural risk. A flaky integration test on a core flow outranks a missing unit test on a utility.
+2. **Fix priorities** — proposed from the test report and open findings, with relevant expert evidence; architectural consequences require architect consultation. A flaky integration test on a core flow outranks a missing unit test on a utility.
 3. **Fix approach per item** — for each P0/P1: which owner should take it, which files, the suggested technique, and the risk if it's done wrong. This is the part the test report does not provide.
 4. **Deferred items** — what is being accepted, with the rationale.
 5. **Residual risk** — what the human should know before shipping.
+6. **Documentation verification** — affected module IDs and document changes (or a reasoned no-change result), update report paths, validator method/result, checked snapshot and remaining drift. Missing/failed required evidence or unresolved drift requires `FIX FIRST`; knowledge-base refresh cannot replace SysDocs validation.
 
 If the verdict is `FIX FIRST`, do **not** auto-start the fixes. Present the prioritized list and get approval — then each fix re-enters Phase 2 as a new task with a fresh 3-round budget.
 
@@ -201,6 +206,26 @@ If the verdict is `FIX FIRST`, do **not** auto-start the fixes. Present the prio
 - **Final operational step — FAN-OUT to `cs-knowledge-base-admin`.** Pass the project root and `<run-dir>/knowledge-base-report.md`. The administrator checks only `.codegraph/`, `.understand-anything/`, and `graphify-out/` directly under that root. If all three are absent, it terminates with a prerequisite message, creates nothing, and does not write the report. Otherwise it refreshes each existing knowledge base independently; missing directories or unavailable update mechanisms are `SKIPPED`, not errors. Include its report or termination message in the final handoff.
 - Report to the human: tasks completed, rounds used per task, commits made, tests added, open P1/P2 items
 - Stop or dismiss any persistent team members using the host platform's supported lifecycle operation, if one was created; do not invent tool calls.
+
+## Advice and verification protocol
+
+The advisor only recommends. For every recommendation, the host assigns a relevant expert to examine the target again and record **全部可取 / 部分可取 / 完全不可取** (fully / partly / not acceptable), identifying accepted and rejected parts with finding ID, suggestion, target snapshot, method, result and unknowns. Record this separately from finding confirmation and repair verification in the current approved plan review, `-fixes.md`, or final report. Preserve original severities and sources; Suggestions must not be promoted merely to enforce preference.
+
+Every advisor brief includes the installed agent file and private resource directory as absolute paths, target/baseline snapshot, purpose, constraints, permitted context and exact output paths. Private resources resolve from that installed location, never the target cwd. Missing resources mean an incomplete installation, not permission to substitute public review skills. The host collects isolated drafts into approved handoffs; experts and advisors never overwrite one another's evidence.
+
+Mark the assignment as DDD and include the advisor's Documentation-driven review inputs in every brief: project root, inventory evidence, SYSTEM_ROOT and affected module snapshots, relevant spec/ADRs, and the update/validator evidence available for that phase. Include these documents in the permitted read context; their inclusion grants no advisor write access. The host owns maintenance and records coverage gaps in the existing plan review, round handoff or final report.
+
+Return the expert's rejected parts and evidence to the advisor, unless its recorded position already explicitly covers that rejection and supporting evidence. Allow at most one focused position confirmation to establish whether the rejected part remains blocking; do not infer its stance or start a debate loop. Missing confirmation blocks dependent approval; a confirmed blocking disagreement triggers the next paragraph immediately.
+
+If an expert rejects any part (including all) and the advisor still regards that rejected part as blocking, the host **immediately opens a user-choice dialog**, showing disputed parts, both evidence sets, impacts and available paths. Record the actual answer in the current handoff. Keep the task `pending-human` in its Markdown tracking record and pause dependent repair/approval until the user answers; do not spend another discussion round or wait for round 3. If the host has no dialog tool, ask the same question directly and await the answer. Fact disputes likewise require human resolution.
+
+Accepted advice does not close a finding. The implementer must complete the repair and the relevant expert must verify the repaired snapshot against the original finding before the host records it resolved. Record implementation and verification evidence separately; user risk choices are not repair evidence. Structural artifacts implemented by `cs-architect` still require independent first review and expert verification.
+
+For new modules, dependency changes, public contracts, technology choices or ADR tradeoffs, the advisor writes `Architecture questions` with finding ID, current constraints, alternatives, impacts and the exact decision needed. The host consults `cs-architect` and retains its answer in the current handoff. Unanswered questions stay open/blocked; fact disputes take precedence and become pending-human.
+
+## Run protocol compatibility
+
+New runs record `review-advisor-v1`, the skill path and source version in `team.md`. Completed runs stay unchanged. An in-progress legacy run completes under its recorded original role protocol; if that protocol cannot be reliably obtained, preserve the legacy run and start a new run from the same target. Never silently replace its authors or overwrite its history.
 
 ## Handoff Protocol
 
@@ -228,9 +253,9 @@ Every handoff document is self-contained — the receiving agent must be able to
 | "The reviewer approved, so it's done" | Verdict `APPROVE` with outstanding Important findings is not approval. Check the body, not the header. |
 | "One more round will fix it" | The budget is 3. Round 4 means the task was sliced wrong — re-slice. |
 | "We already wrote tests for that task" | Per-task tests prove the slice. Phase 3 proves the composition. Both are required. |
-| "The architect can just fix this line, it's faster" | The architect triages; the lead implements. Blur that line and you lose the review record. |
+| "The architect can just fix this line, it's faster" | The advisor recommends, experts verify, and the lead implements. Blur that line and you lose the review record. |
 | "Security/perf review can wait until the end" | By then every slice has been built on the same wrong assumption. Decide within the round. |
-| "Skip the roster, just use both leads" | An unnecessary lead writes code nobody asked for. The architect decides. |
+| "Skip the roster, just use both leads" | An unnecessary lead writes code nobody asked for. The architect proposes owners; the host validates the roster. |
 | "Suggestions are worth another round" | No. Note them, move to the next task. |
 | "The plan is approved, don't stop again" | The gate is per-run, not per-decision. Ambiguity and exhausted rounds still stop you. |
 
@@ -239,7 +264,7 @@ Every handoff document is self-contained — the receiving agent must be able to
 - A review document with no `file:line` references — the reviewer didn't actually read the diff
 - Two consecutive rounds with the same P0 — the task is mis-sliced, go back to Phase 1
 - An implementer committing files outside its task
-- The architect editing feature code instead of writing directives
+- The advisor editing target code or the architect implementing business features
 - `<run-dir>/reviews/` empty but all tasks marked DONE — the loop was skipped
 - Rounds consumed evenly at 3 across every task — systemic problem (unclear doc), not per-task variance
 - `<run-dir>/test-report.md` written from the plan instead of from an actual test run
@@ -247,18 +272,24 @@ Every handoff document is self-contained — the receiving agent must be able to
 
 ## Verification
 
-- [ ] `<run-dir>/team.md` lists ≥3 members, including `cs-architect` and `cs-code-reviewer`, with a reason for each
+- [ ] `<run-dir>/team.md` lists ≥4 members, including `cs-architect`, `cs-review-advisor`, and `cs-code-reviewer`, with a reason for each
+- [ ] Preflight records a usable SysDocs inventory and document baseline; plans reference module boundaries, and every advisor brief carries the corresponding permitted document context.
+- [ ] Each slice and final synthesis has snapshot-matched SysDocs update/validator evidence; documentation-impacting repairs were independently verified, and missing evidence or unresolved drift prevented DONE/SHIP.
 - [ ] `<run-dir>/plan.md` exists; every task has acceptance criteria, verification, and a primary owner
 - [ ] The human approved the roster + plan before implementation started
 - [ ] Every task ran ≤3 rounds; any task that hit the cap was escalated, not silently continued
 - [ ] Every round has a `<run-dir>/reviews/T<NN>-r<k>-code-review.md` with an explicit verdict and base commit/staged file list
 - [ ] Every non-approved round has a matching `-fixes.md` directive with P0/P1/P2 and concrete fixes
-- [ ] Optional security/perf audits were decided by the architect, with the trigger recorded
-- [ ] One commit per task, containing only that task's files, created after review approval
+- [ ] Required security/perf audits were issued by the host, with the trigger recorded
+- [ ] One host-owned commit per task only when authorized, containing only task files after approval; an explicit no-commit instruction is honored
 - [ ] `<run-dir>/test-report.md` records an actual run — commands, counts, coverage vs. acceptance criteria
 - [ ] `<run-dir>/final-report.md` has a verdict, prioritized fixes, a fix approach per item, deferred items, residual risk
 - [ ] `<run-dir>/todo.md` reflects final status for every task
 - [ ] If a supported knowledge base exists, `<run-dir>/knowledge-base-report.md` records every existing/missing supported knowledge base and confirms none was created; otherwise the final handoff records the administrator's prerequisite termination message
+
+- [ ] Plan advice and subsequent recommendations have itemized expert acceptability evidence; approval of advice was not treated as repair closure
+- [ ] Blocking disagreement caused immediate user choice and pending-human suspension; repair verification is required even after a user choice
+- [ ] Architecture questions were delegated by the host only; legacy run protocol and authorship were preserved
 
 ## Interaction with Other Skills
 
@@ -271,7 +302,7 @@ Every handoff document is self-contained — the receiving agent must be able to
 - `cs-debugging` — the escape hatch when a test can't be made to pass
 - `cs-doubt-driven` — for high-risk or irreversible tasks before implementing
 - `cs-shipping` — downstream, once the final report says SHIP
-- `cs-sysdocs-update` / `SysDocs/` — when a `SysDocs/` library exists, the architect decomposes from SYSTEM_ROOT + relevant module docs instead of re-guessing boundaries
+- `cs-sysdocs-init` / `cs-sysdocs-update` / `SysDocs/` — the host establishes the three-state baseline before decomposition and synchronizes/validates each slice and final delivery; the architect and advisor read SYSTEM_ROOT + relevant module docs
 - `cs-knowledge-base-admin` — final subagent refreshes existing knowledge bases only; it never bootstraps one
 
 ## See Also

@@ -14,6 +14,7 @@ cp -R "$SOURCE_ROOT/.codebuddy/references/." "$TMP_ROOT/.codebuddy/references/"
 cp -R "$SOURCE_ROOT/.codebuddy/commands/." "$TMP_ROOT/.codebuddy/commands/"
 cp -R "$SOURCE_ROOT/.claude/rules/." "$TMP_ROOT/.claude/rules/"
 cp "$SOURCE_ROOT/scripts/build-adapters.sh" "$TMP_ROOT/scripts/"
+cp "$SOURCE_ROOT/scripts/agent-resources.sh" "$TMP_ROOT/scripts/"
 ROOT=$TMP_ROOT
 
 fail() {
@@ -65,6 +66,12 @@ done
 for agent in "$ROOT"/.codebuddy/agents/*.md "$ROOT"/.gemini/agents/*.md "$ROOT"/.codex/agents/*.md "$ROOT"/.claude/agents/*.md "$ROOT"/plugins/claude/agents/*.md; do
   assert_not_contains "$agent" 'skills:'
   case "$agent" in
+    */cs-review-advisor.md)
+      assert_contains "$agent" 'there is no minimum skill count'
+      assert_contains "$agent" '| `cs-code-query` |'
+      assert_contains "$agent" '| `cs-docs-adrs` |'
+      assert_not_contains "$agent" 'may autonomously load 2–3 skills'
+      ;;
     */cs-knowledge-base-admin.md)
       assert_not_contains "$agent" '## Optional Skill Roster'
       assert_contains "$agent" 'Use `cs-code-query` only for its existing-backend update protocols.'

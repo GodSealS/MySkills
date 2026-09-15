@@ -36,6 +36,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $Repo = Resolve-Path (Join-Path $PSScriptRoot '..')
+. (Join-Path $PSScriptRoot 'agent-resources.ps1')
 
 if ($UserHome) {
     $homeBase = if ($UserHomePath) { [System.IO.Path]::GetFullPath($UserHomePath) } elseif ($env:USERPROFILE) { $env:USERPROFILE } else { $HOME }
@@ -65,8 +66,21 @@ if ($UserHome) {
 #>
 function Merge-Platform($src, $dst, [string]$label) {
     if (-not (Test-Path $src)) { Write-Warning "Source missing, skipped: $src"; return }
+    $agentDestination = if ((Split-Path -Leaf $src) -eq 'agents') { $dst } else { Join-Path $dst 'agents' }
+    Assert-ResourcePathNoLink $agentDestination
     if (-not (Test-Path $dst)) { New-Item -ItemType Directory -Force -Path $dst | Out-Null }
-    Copy-Item -Recurse -Force -Path (Join-Path $src '*') -Destination $dst
+    $agentRoot = if ((Split-Path -Leaf $src) -eq 'agents') { $src } else { Join-Path $src 'agents' }
+    foreach ($file in (Get-ChildItem -LiteralPath $src -Recurse -File)) {
+        $relative = $file.FullName.Substring($src.Length).TrimStart('\', '/')
+        # Private resources have a separate ownership manifest and must never
+        # be overwritten by the ordinary platform merge.
+        if (($file.FullName.StartsWith($agentRoot + '\') -or $file.FullName.StartsWith($agentRoot + '/')) -and
+            ($file.DirectoryName -ne $agentRoot -or $file.Name -eq '.agent-resources-manifest')) { continue }
+        $targetFile = Join-Path $dst $relative
+        New-Item -ItemType Directory -Force -Path (Split-Path -Parent $targetFile) | Out-Null
+        Copy-Item -LiteralPath $file.FullName -Destination $targetFile -Force
+    }
+    Sync-AgentResources $agentRoot $agentDestination
     Write-Host "Merged $label -> $dst"
 }
 
@@ -81,8 +95,26 @@ function Merge-Platform($src, $dst, [string]$label) {
 #>
 function Replace-Platform($src, $dst, [string]$label) {
     if (-not (Test-Path $src)) { Write-Warning "Source missing, skipped: $src"; return }
-    if (Test-Path $dst) { Remove-Item -Recurse -Force $dst }
-    Copy-Item -Recurse -Force -Path $src -Destination $dst
+    $resolvedDestination = [IO.Path]::GetFullPath($dst)
+    $resolvedRoot = [IO.Path]::GetFullPath($destRoot).TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar
+    if (-not $resolvedDestination.StartsWith($resolvedRoot, [StringComparison]::OrdinalIgnoreCase)) { throw "Clean target escapes install root: $dst" }
+    Assert-ResourcePathNoLink $resolvedDestination
+    # Preserve only the agents subtree; -Clean retains its existing replacement
+    # behavior for public skills, commands and other platform siblings.
+    if ((Split-Path -Leaf $src) -eq 'agents' -or (Test-Path -LiteralPath (Join-Path $src 'agents'))) {
+        if ((Split-Path -Leaf $src) -ne 'agents' -and (Test-Path -LiteralPath $resolvedDestination)) {
+            foreach ($child in (Get-ChildItem -LiteralPath $resolvedDestination -Force)) {
+                if ($child.Name -eq 'agents') { continue }
+                if (-not $child.FullName.StartsWith($resolvedDestination.TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
+                    ($child.Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw "Unsafe clean child: $($child.FullName)" }
+                Remove-Item -LiteralPath $child.FullName -Recurse -Force
+            }
+        }
+        Merge-Platform $src $dst $label
+        return
+    }
+    if (Test-Path -LiteralPath $resolvedDestination) { Remove-Item -LiteralPath $resolvedDestination -Recurse -Force }
+    Copy-Item -Recurse -Force -LiteralPath $src -Destination $dst
     Write-Host "Replaced $label -> $dst"
 }
 
@@ -135,12 +167,15 @@ function Install-CodexUserFile($src, $dst, [string]$key, $known, $next) {
 
 function Install-CodexUserTree($src, $dst, [string]$prefix, $known, $next) {
     if (-not (Test-Path $src)) { Write-Warning "Source missing, skipped: $src"; return }
+    if ($prefix -eq 'agents') { Assert-ResourcePathNoLink $dst }
 
     foreach ($file in (Get-ChildItem -Path $src -File -Recurse)) {
         $relativePath = $file.FullName.Substring($src.Length).TrimStart('\', '/')
+        if ($prefix -eq 'agents' -and ($relativePath -match '[/\\]' -or $relativePath -eq '.agent-resources-manifest')) { continue }
         $key = ($prefix + '/' + $relativePath).Replace('\', '/')
         Install-CodexUserFile $file.FullName (Join-Path $dst $relativePath) $key $known $next
     }
+    if ($prefix -eq 'agents') { Sync-AgentResources $src $dst }
 }
 
 function Install-CodexUserSkills($src, $dst, $known, $next) {

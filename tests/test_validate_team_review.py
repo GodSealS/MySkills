@@ -297,6 +297,53 @@ class TeamReviewValidatorTests(unittest.TestCase):
     def test_pending_human_accepts_documented_real_conflict(self):
         MODULE.validate(self.fixture.parent / "conflict-resume")
 
+    def test_advisor_role_handoff_preserves_schema_and_finding_identity(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = self._copy_fixture(temp)
+            before = (root / "findings.json").read_bytes()
+            (root / "team.md").write_text(
+                "# Team\n\nProtocol: review-advisor-v1\n"
+                "Code first review: cs-code-reviewer\n"
+                "Advice: cs-review-advisor\nExpert recheck: backend\n"
+                "Final verdict: host\n",
+                encoding="utf-8",
+            )
+            MODULE.validate(root)
+            self.assertEqual((root / "findings.json").read_bytes(), before)
+
+    def test_accepted_advice_cannot_approve_an_unrepaired_blocker(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = self._copy_fixture(temp)
+            path = root / "findings.json"
+            data = json.loads(path.read_text(encoding="utf-8"))
+            data["findings"][0].update(
+                severity="Important",
+                fix="Expert checked the advisor recommendation: wholly applicable; repair not implemented.",
+            )
+            path.write_text(json.dumps(data), encoding="utf-8")
+            with self.assertRaisesRegex(MODULE.ValidationError, "APPROVE cannot contain open"):
+                MODULE.validate(root)
+
+    def test_rejected_blocking_advice_requires_human_pending_state(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "run"
+            shutil.copytree(self.fixture.parent / "conflict-resume", root)
+            conflict = root / "reviews/90-conflicts.json"
+            data = json.loads(conflict.read_text(encoding="utf-8"))
+            data["conflicts"][0]["reason"] = (
+                "Expert rechecked advice and rejected part of it; advisor maintains "
+                "that the rejected part is blocking. User choice requested immediately."
+            )
+            conflict.write_text(json.dumps(data), encoding="utf-8")
+            MODULE.validate(root)
+            state = root / "state.json"
+            data = json.loads(state.read_text(encoding="utf-8"))
+            data["status"] = "running"
+            state.write_text(json.dumps(data), encoding="utf-8")
+            (root / "run-status.md").write_text("status: running\n", encoding="utf-8")
+            with self.assertRaisesRegex(MODULE.ValidationError, "unresolved conflicts require pending-human"):
+                MODULE.validate(root)
+
     def test_complete_rejects_unconfirmed_domains(self):
         with tempfile.TemporaryDirectory() as temp:
             root = self._copy_fixture(temp)

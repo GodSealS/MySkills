@@ -3,6 +3,7 @@ set -eu
 
 # macOS/POSIX adapter builder. .codebuddy is the source of truth.
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+. "$ROOT/scripts/agent-resources.sh"
 SRC_SKILLS="$ROOT/.codebuddy/skills"
 SRC_AGENTS="$ROOT/.codebuddy/agents"
 SRC_REFS="$ROOT/.codebuddy/references"
@@ -118,13 +119,14 @@ build_agents() (
     if [ "$platform" = claude ]; then strip_claude_agent_frontmatter "$target"; fi
     if [ "$platform" != neutral ]; then
       case "$name" in
-        cs-architect.md|cs-backend-lead.md|cs-frontend-lead.md|cs-code-reviewer.md|cs-security-auditor.md) tier=DeepSeek-V4-Pro ;;
+        cs-architect.md|cs-backend-lead.md|cs-frontend-lead.md|cs-code-reviewer.md|cs-security-auditor.md|cs-review-advisor.md) tier=DeepSeek-V4-Pro ;;
         cs-test-engineer.md|cs-web-perf-auditor.md|cs-knowledge-base-admin.md) tier=DeepSeek-V4-Flash ;;
         *) die "unsupported persona $name" ;;
       esac
       replace_model "$target" "$(platform_model "$platform" "$tier")"
     fi
   done
+  sync_agent_resources "$SRC_AGENTS" "$dst"
 )
 
 build_refs() (
@@ -184,7 +186,9 @@ done
 PLUGIN="$ROOT/plugins/claude"
 mkdir -p "$PLUGIN"
 copy_tree "$ROOT/.claude/skills" "$PLUGIN/skills"
-copy_tree "$ROOT/.claude/agents" "$PLUGIN/agents"
+mkdir -p "$PLUGIN/agents"
+cp "$ROOT/.claude/agents/"*.md "$PLUGIN/agents/"
+sync_agent_resources "$SRC_AGENTS" "$PLUGIN/agents"
 copy_tree "$ROOT/.claude/references" "$PLUGIN/references"
 copy_tree "$ROOT/.claude/commands" "$PLUGIN/commands"
 copy_tree "$ROOT/.claude/rules" "$PLUGIN/rules"

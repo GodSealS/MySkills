@@ -5,3 +5,9 @@ description: "Run a resumable multi-agent review of a code, design, or mixed tar
 This command is an approved manual entry point. Invoke the `cs-team-review` skill with `$ARGUMENTS` as a local path, local git ref/diff, or existing run-id.
 
 The skill is the orchestrator. It writes all handoffs under a unique `tasks/team-review/<run-id>/` directory, validates schema v1 JSON artifacts, and never modifies the reviewed code or design. Use `cs-code-review` for a single-agent review and `cs-shipping` for a release gate.
+
+For DDD projects, follow the skill's DDD context handoff: supply SysDocs inventory evidence, SYSTEM_ROOT and affected module snapshots, and phase-appropriate document verification reports. Record missing context as a coverage blocker; document maintenance happens outside this read-only run. The Team Review JSON validator does not establish SysDocs compliance.
+
+The host validates `cs-review-advisor` classification and assignment proposals. The advisor reviews design targets and gives focused recommendations on code findings; `cs-code-reviewer` retains the independent five-axis code first pass. Relevant experts re-detect advice and itemize fully/partly/not acceptable parts. Rejected advice still considered blocking by the advisor immediately opens user choice and sets pending-human; without a dialog tool ask directly and await the answer. Fact conflicts retain their existing human gate. Consult `cs-architect` only for architecture questions and hard-constraint feasibility evidence.
+
+Advice acceptance or a user choice cannot close a finding. Repairs happen outside the run and require a new linked review of the repaired target with expert verification. Preserve schema v1, source IDs, highest-severity merging and all original gates. Record `review-advisor-v1` and the protocol source in new `team.md` files; completed runs stay unchanged, and active legacy runs keep their original protocol or are preserved while a new run starts.

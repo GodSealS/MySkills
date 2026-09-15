@@ -1,0 +1,67 @@
+# Ponytail Principles - private review method
+
+For `cs-review-advisor` only. Read as a Markdown protocol relative to the installed agent package, not as a public skill or command. This method gives advice and never applies changes or controls delivery gates.
+
+## Source
+
+- Upstream: https://github.com/DietrichGebert/ponytail
+- Version: `4.9.0`; commit: `2ed6c52c9d7e5e56942508591085fd45dea277d3`.
+- Source file: `skills/ponytail/SKILL.md`.
+- Extracted sections: The ladder; root-cause paragraph; selected Rules; When NOT to be lazy.
+- Adjustments: Removed persistence/intensity/runtime and code-first output; adapted implementation commands to read-only advice; softened single-line and shared-function mandates; preserved project testing and explicit requirements; single-implementation abstractions are investigation signals, not automatic deletions.
+- Copyright (c) 2026 DietrichGebert; [MIT license](../../LICENSE), [provenance](../../PROVENANCE.txt).
+
+## Trigger and Inputs
+
+Use when a design or code review needs a necessity, reuse, dependency or simplification judgment. Read requirements, target snapshot, real call flow and constraints first. Do not widen the review into an unsolicited whole-repository audit.
+
+## Process - The ladder
+
+Stop at the first rung that holds:
+
+1. **Does this need to exist at all?** Flag unsupported speculative need and suggest omission. Explicit requirements remain binding. (YAGNI)
+2. **Already in this codebase?** A helper, util, type, or pattern that already lives here → reuse it. Look before you write; re-implementing what's a few files over is the most common slop.
+3. **Stdlib does it?** Use it.
+4. **Native platform feature covers it?** `<input type="date">` over a picker lib, CSS over JS, DB constraint over app code.
+5. **Already-installed dependency solves it?** Use it. Never add a new one for what a few lines can do.
+6. **Can it be expressed directly?** Prefer the smallest readable implementation that preserves correctness and project conventions; line count is not a pass criterion.
+7. **Only then:** the minimum code that works.
+
+The ladder is a reflex, not a research project — but it runs *after* you
+understand the problem, not instead of it. Read the task and the code it
+touches first, trace the real flow end to end, then climb. Two rungs work →
+take the higher one and move on. The first lazy solution that works is the
+right one — once you actually know what the change has to touch.
+
+**Bug fix = root cause, not symptom.** A report names a symptom. Before recommending a fix, inspect every relevant caller and its contract. A shared-function repair is appropriate only when callers share the same invariant and verification supports it. Otherwise recommend the narrowest boundary that owns the correct semantics. Record affected callers and assumptions; a short diff at the wrong boundary can introduce another bug.
+
+## Selected Rules
+
+- No boilerplate, no scaffolding "for later", later can scaffold for itself.
+- Deletion over addition. Boring over clever, clever is what someone decodes at 3am.
+- Two stdlib options, same size? Take the one that's correct on edge cases. Lazy means writing less code, not picking the flimsier algorithm.
+- Single-implementation interfaces, one-product factories and static configuration are signals to inspect actual consumers, external contracts, testing needs and explicit evolution constraints; none alone proves redundancy.
+- Mark deliberate simplifications that cut a real corner with a known ceiling (global lock, O(n^2) scan, naive heuristic) with a `ponytail:` comment naming the ceiling and upgrade path (`# ponytail: global lock, per-account locks if throughput matters`). As an advisor, propose such a marker in the authorized report rather than modifying target code.
+
+## Guardrails
+
+Never simplify away: input validation at trust boundaries, error handling
+that prevents data loss, security measures, accessibility basics, anything
+explicitly requested. If the user insists on the full version, respect that
+scope in the recommendation without re-arguing or implementing it yourself.
+
+Never lazy about understanding the problem. The ladder shortens the
+solution, never the reading. Trace the whole thing first — every file the
+change touches, the actual flow — before picking a rung. Laziness that skips
+comprehension to ship a small diff is the dangerous kind: it dresses up as
+efficiency and ships a confident wrong fix. Read fully, then be lazy.
+
+Hardware is never the ideal on paper: a real clock drifts, a real sensor
+reads off, a PCA9685 runs a few percent fast. Leave the calibration knob, not
+just less code, the physical world needs tuning a minimal model can't see.
+
+Retain the project's required tests, fixtures and validation strategy. A single self-check is not a replacement for behavior, regression, security or concurrency coverage. Do not propose deleting tests as mere scaffolding.
+
+## Output and Verification
+
+Report the rung, located evidence, constraints, smallest compliant alternative, verification case and unverified assumptions. Do not cancel explicit requirements, weaken contracts or equate fewer lines with correctness. Check all affected caller semantics before recommending a shared fix. Do not claim measured savings without a real baseline. This is a complexity method; other review domains require the assigned experts.

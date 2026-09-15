@@ -1,0 +1,42 @@
+# Ponytail Debt - private review method
+
+For `cs-review-advisor` only. Read as a Markdown protocol relative to the installed agent package, not as a public skill or command. This method gives advice and never applies changes or controls delivery gates.
+
+## Source
+
+- Upstream: https://github.com/DietrichGebert/ponytail
+- Version: `4.9.0`; commit: `2ed6c52c9d7e5e56942508591085fd45dea277d3`.
+- Source file: `skills/ponytail-debt/SKILL.md`.
+- Extracted sections: marker purpose; Scan; Output; read-only Boundaries.
+- Adjustments: Use rg and authorized scope; verify real comment markers; missing ceiling/trigger/measurements are unknown; no clean-repository claim; persist only in assigned artifact paths; omit session mode.
+- Copyright (c) 2026 DietrichGebert; [MIT license](../../LICENSE), [provenance](../../PROVENANCE.txt).
+
+## Trigger and Inputs
+
+Use when debt collection is requested or real `ponytail:` deferral comments occur in the authorized scope. Every deliberate ponytail shortcut is marked with a `ponytail:` comment naming its ceiling and upgrade path. This collects them into one ledger so a deferral cannot quietly become permanent.
+
+## Scan
+
+Search the authorized roots with `rg -n 'ponytail:' <authorized-roots>`, respecting project exclusions and skipping `.git`, dependency directories such as `node_modules`, and generated/build outputs. Inspect matches to confirm actual source comments (including stack-specific comment forms); string literals and prose mentioning the convention are not ledger entries. Report exclusions and unreadable areas.
+
+## Output
+
+One row per marker, grouped by file:
+
+`<file>:<line>, <what was simplified>. ceiling: <the limit named>. upgrade: <the trigger to revisit>.`
+
+The convention is `ponytail: <ceiling>, <upgrade path>`, so pull the ceiling
+and the trigger straight from the comment. If ownership is explicitly requested, inspect `git blame -L<line>,<line>`; do not infer a current owner solely from authorship.
+
+Flag the rot risk: any `ponytail:` comment that names no upgrade path or
+trigger gets a `no-trigger` tag, those are the ones that silently rot.
+
+End with `<N> markers, <M> with no trigger.` Nothing found: report zero `ponytail:` markers in the scanned scope; this does not prove zero debt.
+
+Record a missing ceiling or trigger as `unknown`, preserving the original marker text. Trigger status is `unknown` without observed metrics; if measurements exist, cite their snapshot, value and comparison. Do not invent a threshold, owner or reached trigger from intuition. The `no-trigger` tag denotes missing upgrade criteria, not a proven runtime failure.
+
+## Boundaries and Verification
+
+Reads and reports only, changes nothing in the target. Persist a ledger only to an explicitly assigned report path. This is a one-shot scoped collection, not a session mode.
+
+Verify one row per real marker, correct source locations, verbatim ceiling/trigger extraction, `no-trigger` coverage, count accuracy and evidence for any reached threshold. Zero markers is not zero technical debt.

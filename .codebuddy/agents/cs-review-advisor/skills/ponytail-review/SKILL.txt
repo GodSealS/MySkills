@@ -1,0 +1,42 @@
+# Ponytail Review - private review method
+
+For `cs-review-advisor` only. Read as a Markdown protocol relative to the installed agent package, not as a public skill or command. This method gives advice and never applies changes or controls delivery gates.
+
+## Source
+
+- Upstream: https://github.com/DietrichGebert/ponytail
+- Version: `4.9.0`; commit: `2ed6c52c9d7e5e56942508591085fd45dea277d3`.
+- Source file: `skills/ponytail-review/SKILL.md`.
+- Extracted sections: diff-review scope; Format and Tags; Boundaries.
+- Adjustments: Removed unsafe email-validation/retry/interface examples, mandatory line-count scoring, session mode and Ship conclusion; added evidence, contract checks and project test protection.
+- Copyright (c) 2026 DietrichGebert; [MIT license](../../LICENSE), [provenance](../../PROVENANCE.txt).
+
+## Trigger and Inputs
+
+Review a fixed diff or specified code snapshot for unnecessary complexity. In a team, focus on disputed findings and requested evidence rather than repeating the independent five-axis first pass. Require scope, requirements, baseline and existing reports.
+
+## Process and Format
+
+`L<line>: <tag> <what>. <replacement>.`, or `<file>:L<line>: ...` for
+multi-file diffs.
+
+Tags:
+
+- `delete:` dead code, unused flexibility, speculative feature. Replacement: nothing.
+- `stdlib:` hand-rolled thing the standard library ships. Name the function.
+- `native:` dependency or code doing what the platform already does. Name the feature.
+- `yagni:` possibly speculative abstraction/config/layer; investigate consumers and contractual justification before labeling it unnecessary.
+- `shrink:` equivalent logic in a clearer direct form. Show the replacement and preserve edge cases.
+
+For each candidate, inspect real callers, contracts and equivalent behavior before recommending removal. Add stable finding ID, severity, evidence, impact, verification and unknowns using the parent agent's output contract. Complexity tags do not replace severity.
+
+## Output
+
+List located findings and concrete replacements; deletion needs proof of no callers/external obligation or an equivalent alternative. Estimate removable lines only when the actual diff supports the count, and label estimates. With zero findings, state "No complexity findings in the reviewed scope" with coverage and unknowns; the host still applies all delivery gates.
+
+## Boundaries and Verification
+
+Scope: over-engineering and complexity only. Correctness bugs, security holes,
+and performance are explicitly out of scope. Route them to the assigned normal review/expert pass through the host; do not certify them. Does not apply the fixes, only lists them.
+
+Verify that explicit requirements, authorization/input validation, data-loss safeguards, accessibility, compatibility and required tests survive each alternative. A single-implementation interface may protect a stable contract, external consumers or test substitution. Do not claim five-axis approval or measured savings without evidence. Return new discoveries for expert confirmation rather than silently treating them as confirmed.
