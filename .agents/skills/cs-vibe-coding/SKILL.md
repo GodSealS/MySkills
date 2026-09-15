@@ -45,13 +45,17 @@ schema and contain no source contents or unsanitized arguments.
 
 ## Process
 
+### Phase 0 — Read SysDocs Context
+
+After resolving `project_root` and checking the three-state gate, follow `../../references/sysdocs-design-context.md`: read `SysDocs/SYSTEM_ROOT.md` first when available, then the affected module documents and registered pages before deriving the proposal. Map input targets to manifest module IDs and stable section IDs; collect current responsibilities, contracts, dependency direction, and constraints. For PARTIAL-INITIALIZED projects, record missing context and preserve unresolved targets as `awaiting-repair`; retain the existing UNINITIALIZED rejection and write allowlist.
+
 ### Phase 1 — Parse structured input
 
-Extract targets + steps. Write `SysDocs/VibeCoding/<YYYYMMDD-HHMM>-<slug>[ -N].md` from the vibe template (design goals → plan/steps → raw args + review round-trip at the bottom).
+Extract targets + steps. Write `SysDocs/VibeCoding/<YYYYMMDD-HHMM>-<slug>[ -N].md` from the vibe template (design goals → plan/steps → raw args + review round-trip at the bottom). In the plan/steps section, include the context summary and explain how each proposed step reuses or changes the documented system; label assumptions that depend on missing or stale evidence.
 
 ### Phase 2 — Architect review
 
-`Task` fan-out to `cs-architect` (short brief: targets + steps only, never the full `SYSTEM_ROOT.md`). Findings are structured: `id`, `level: target|step`, `severity: blocking|warning`, `target`, `message`, `resolution: pending|accepted|fixed`. All blocking findings must be fixed or explicitly accepted = no unhandled target-level defects.
+`Task` fan-out to `cs-architect` with a short brief: targets + steps, project root, relevant document paths or readable snapshots, constraint summary, and context gaps. Do not paste the full `SYSTEM_ROOT.md` into the brief; the architect reads it when available and the affected module documents/pages before reviewing, and records those references in the review. Assess module responsibility, dependency direction, and contract compatibility against this baseline, keeping conclusions dependent on missing evidence provisional. Findings are structured: `id`, `level: target|step`, `severity: blocking|warning`, `target`, `message`, `resolution: pending|accepted|fixed`. All blocking findings must be fixed or explicitly accepted = no unhandled target-level defects.
 
 ### Phase 3 — Target-change gate (interrupting)
 
@@ -111,6 +115,7 @@ CodeBuddy uses the `user-invocable` skill entry; Codex / Gemini / Claude use the
 ## Verification
 
 - [ ] State was PARTIAL-INITIALIZED or INITIALIZED; UNINITIALIZED rejected
+- [ ] Draft and architect review cite the SysDocs documents actually read, affected modules, constraints, and proposed differences; missing/stale context and awaiting-repair targets remain explicit
 - [ ] Doc written only under `SysDocs/VibeCoding/` via resolved-path allowlist
 - [ ] Slug validated; exclusive-create with `-N`; temp-file + atomic rename
 - [ ] Architect review recorded with structured findings; all blocking target-level defects fixed or accepted

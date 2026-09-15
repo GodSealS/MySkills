@@ -9,6 +9,7 @@ Refines raw ideas into sharp, actionable concepts worth building through structu
 
 ## How It Works
 
+0. **Read SysDocs Context:** Establish the project's current capabilities and constraints before expanding the idea.
 1. **Understand & Expand (Divergent):** Restate the idea, ask sharpening questions, and generate variations.
 2. **Evaluate & Converge:** Cluster ideas, stress-test them, and surface hidden assumptions.
 3. **Sharpen & Ship:** Produce a concrete markdown one-pager moving work forward.
@@ -31,6 +32,10 @@ The final output is a markdown one-pager saved to `docs/ideas/[idea-name].md` (a
 - Say no to 1,000 things. Focus beats breadth.
 - Challenge every assumption. "How it's usually done" is not a reason.
 
+### Phase 0: Read SysDocs Context
+
+Before restating the idea or generating variations, follow `../../references/sysdocs-design-context.md`: read the target project's `SysDocs/SYSTEM_ROOT.md`, affected module documents, and registered pages first, or record the applicable missing-context branch. Carry the context summary into the one-pager.
+
 ### Phase 1: Understand & Expand (Divergent)
 
 1. **Restate the idea** as a crisp "How Might We" problem statement.
@@ -40,7 +45,7 @@ The final output is a markdown one-pager saved to `docs/ideas/[idea-name].md` (a
 ### Phase 2: Evaluate & Converge
 
 1. **Cluster** ideas into 2-3 distinct directions.
-2. **Stress-test** each against: User value (painkiller or vitamin?), Feasibility (hardest part?), Differentiation (would someone switch?).
+2. **Stress-test** each against: User value (painkiller or vitamin?), Feasibility (hardest part?), Differentiation (would someone switch?). Ground feasibility in the SysDocs baseline: identify reusable capabilities, affected modules, and proposed boundary or contract changes. Mark directions that depend on unresolved context as provisional.
 3. **Surface hidden assumptions**: What you're betting is true, what could kill the idea, what you're choosing to ignore.
 
 Be honest, not supportive. Push back on complexity, question real value.
@@ -53,6 +58,8 @@ Be honest, not supportive. Push back on complexity, question real value.
 [One-sentence "How Might We" framing]
 ## Recommended Direction
 [The chosen direction and why — 2-3 paragraphs max]
+## System Context
+[Documents/sections read, affected modules, capabilities to reuse, constraints and proposed departures; missing/not-applicable baseline and unresolved discrepancies]
 ## Key Assumptions to Validate
 - [ ] [Assumption — how to test it]
 ## MVP Scope
@@ -78,6 +85,7 @@ The "Not Doing" list is arguably the most valuable part. Focus is about saying n
 
 ## Verification
 
+- [ ] One-pager cites the SysDocs baseline or its absence; direction comparisons identify reuse, module impact, and unresolved assumptions
 - [ ] A clear "How Might We" problem statement exists
 - [ ] Target user and success criteria defined
 - [ ] Multiple directions were explored

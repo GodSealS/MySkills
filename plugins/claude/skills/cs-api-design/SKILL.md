@@ -19,6 +19,10 @@ Design stable, well-documented interfaces that are hard to misuse. Good interfac
 - Establishing database schema that informs API shape
 - Changing existing public interfaces
 
+## Before Design: Read SysDocs Context
+
+Before drafting a contract or delegating a backend slice, follow `../../references/sysdocs-design-context.md`: read the target project's `SysDocs/SYSTEM_ROOT.md`, affected module documents, and registered pages first, or record the applicable missing-context branch. Identify the existing interface owners, consumers, dependency direction, data flows, and compatibility constraints. Pass that context and its document references to the owning lead.
+
 ## Core Principles
 
 ### Hyrum's Law
@@ -29,7 +33,7 @@ API changes should have exactly one version in production at a time. Multiple AP
 
 ### Contract-First Design
 Define the interface before implementing it. This means:
-1. Write the contract (OpenAPI spec, TypeScript types, GraphQL schema)
+1. Write the contract (OpenAPI spec, TypeScript types, GraphQL schema) from the established baseline. Accompany it with document references and the proposed differences from existing contracts, including owner/consumer impact and any unresolved assumptions.
 2. Get agreement from consumers
 3. Then implement
 
@@ -76,6 +80,7 @@ Validate at every trust boundary:
 
 ## Verification
 
+- [ ] Design cites the SysDocs baseline or its absence, identifies owners/consumers and contract differences, and records unresolved context; delegated owners received and read the relevant documents
 - [ ] API contract is defined before implementation
 - [ ] Error responses use consistent format
 - [ ] All trust boundaries have validation

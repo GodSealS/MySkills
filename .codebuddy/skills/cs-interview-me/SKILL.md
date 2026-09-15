@@ -27,6 +27,10 @@ What people ask for and what they actually want are different things. The cheape
 
 ## The Process
 
+### Step 0: Read SysDocs Context
+
+Before forming the hypothesis or asking questions, follow `../../references/sysdocs-design-context.md`: read the target project's `SysDocs/SYSTEM_ROOT.md`, affected module documents, and registered pages first, or record the applicable missing-context branch. Use documented users, capabilities, and constraints to focus questions on unresolved intent and requested changes.
+
 ### Step 1: Hypothesize with a Confidence Number
 
 Before asking anything, write your best read in one sentence with an honest confidence number (0-100%):
@@ -89,6 +93,7 @@ You're done when you can answer yes to: *Can I predict the user's reaction to th
 
 ## Verification
 
+- [ ] Context summary records SysDocs references and relevant constraints, or the missing/not-applicable baseline; hypotheses distinguish documented facts from requested changes and unknowns
 - [ ] An explicit hypothesis with confidence number was stated
 - [ ] Questions asked one at a time, each with guess attached
 - [ ] At least one "what would you actually want?" probe ran
