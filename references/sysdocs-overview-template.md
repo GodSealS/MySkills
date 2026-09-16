@@ -1,118 +1,90 @@
-# 总文档模板（sysdocs-overview-template）
+﻿# 概览模板（sysdocs-overview-template）
 
-`SYSTEM_ROOT.md` 的生成模板。每一节遵循「≤5 行人读摘要 → 符号表 / Mermaid」双层形状。术语只在本文件 §0 定义一次，模块文档只引用不重定义。
+依据 [共享协议](sysdocs-system.md) 生成 `SysDocs/README.md` 与 `SysDocs/architecture/overview.md`。以下占位值必须替换或删除；实际文档不复制本模板的说明文字。两页各有摘要，不维护重复模块 manifest。
 
-## frontmatter（载入即校验）
+## README 元数据
 
 ```yaml
 ---
-schema: 1
+schema: 2
 doc_type: overview
-status: draft
-generated_from: <git sha or null>
-source_scope: committed | committed+working-tree | unversioned
-updated: <ISO-8601>
-confidence: high | low
-kb: codegraph | understand-anything | graphify | none
-owned_by: agent | mixed
-kb_bootstrap: pending | done
-modules:
-  - id: <module-id>
-    path: modules/<module-id>.md
-    description: <一句话职责，面向人阅读>
-    source_roots: [<src dir>]
-    status: active
-    pages: []
+updated: <ISO 日期>
+source_scope: committed
+generated_from: <可验证提交 SHA>
+source_paths: [<项目根相对源码目录>]
 ---
 ```
 
-`overview` 必须包含 `modules` manifest 和 `kb_bootstrap`。`modules` 是唯一机器事实源；§3 表格仅由它生成。
+无 Git 使用 unversioned，省略 generated_from 并写限制；纳入未提交内容用 committed+working-tree，并添加 `evidence: <项目根相对已有任务或评审证据文件>`。无源码时 source_paths 为 []，不编造实现。
 
-## §0 术语表（定义一次）
+## README 正文形状
 
-| 术语 | 定义 |
+```markdown
+# <项目名>
+
+## 检索摘要
+
+- `<关键类/结构，或实际模块/流程>`：<一句话主要职责>。
+- 关联边界：<关键协作、事务/权限/数据归属或异常边界；什么变化需核查本文>。
+
+## 项目用途与运行边界
+
+<解决什么问题、服务谁、系统负责与不负责的事项；未知背景标明未核实。>
+
+## 阅读路线
+
+1. 系统结构： [架构概览](architecture/overview.md)。
+2. 任务相关模块：<链接 architecture/modules/<id>.md，说明阅读入口>。
+3. 重要业务链路：<按实际内容链接 architecture/flows/>。
+4. 文件定位： [源码导航](files/README.md)。
+5. 需求约束与原因：<链接有效规范、ADR；已有外部权威位置只链接>。
+
+## 术语
+
+| 术语 | 定义或权威定义链接 |
 |---|---|
-| `<term>` | `<唯一权威定义>` |
+| <术语> | <含义> |
 
-约定：本表是术语的唯一定义处。模块文档引用术语时不得重定义。若项目非 TypeScript/JS/Python/C++/C# 之一，在此注明符号引用约定（见体系约定 §7）。
+## 来源与待核实项
 
-## §1 架构风格
-
-【人读摘要 ≤5 行】项目采用的架构风格、分层、依赖方向一句话说明。
-
-```mermaid
-flowchart TD
-    A[<层/模块>] --> B[<层/模块>]
-    B --> C[<层/模块>]
+<范围、版本限制、未覆盖问题；根 README 已解释的安装/运行内容用链接，不复制。>
 ```
 
-- 依赖方向：`A → B`（只允许 `A` 依赖 `B`，禁止反向/成环）
-- ADR 链接：[ADR-NNN](<path>) — <决策>
+## architecture/overview 形状
 
-## §2 端到端主流程
+使用相同来源字段，但 doc_type 为 architecture。摘要同样先于详细正文；相对链接按该页位置计算。
 
-【人读摘要 ≤5 行】主流程一句话。
+```markdown
+# 系统架构
 
-| 步骤 | 发起模块 | 动作 | 输出 | 异常 |
-|---|---|---|---|---|
-| 1 | `<module>` | `<动作>` | `<输出>` | `<异常分支>` |
+## 检索摘要
 
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant A as <Module A>
-    U->>A: <请求>
-    A-->>U: <响应>
-```
+- `<系统入口/关键结构>`：<一句话职责>。
+- 边界：<部署单元、依赖方向、共享数据及异常协作>。
 
-## §3 模块清单（= 模块索引）
+## 系统边界与部署
 
-【人读摘要 ≤5 行】模块清单由 frontmatter `modules` manifest 生成，不得手工维护第二份事实源。
+<当前实现的层次、部署单元、外部服务；无实现时明确状态并链接目标规范。>
 
-| 模块 id | 路径 | 职责 | source_roots | 状态 |
-|---|---|---|---|---|
-| `order-service` | `modules/order-service.md` | 订单创建/流转/持久化 | `src/order` | active |
+## 模块协作
 
-## §4 语言与版本
-
-| 语言 | 版本 | 用途 |
+| 模块说明 | 主要职责 | 协作方向及依据 |
 |---|---|---|
-| `<lang>` | `<ver>` | `<用途>` |
+| <模块相对链接> | <一句话> | <具体接口/消息/数据；源码或已接受决策依据> |
 
-## §5 运行环境
+<图有助于理解时添加 Mermaid，图中关系需核实。>
 
-- OS：`<os>`
-- 运行时：`<runtime> <version>`
-- 外部依赖：`<service>`
-- 环境变量（**只写变量名和用途，禁止写值**）：`VAR_NAME` — 用途
+## 关键流程与入口
 
-## §6 配置文件格式
+<链接独立流程说明，只概述路径，不复制流程全文或文件清单。>
 
-| 配置文件 | 位置 | 格式 | 关键项 | 加载优先级 |
-|---|---|---|---|---|
-| `<file>` | `<path>` | `<format>` | `<key>` | `<优先级>` |
+## 约束与决策来源
 
-## §7 项目目录结构
+<链接适用规范及 ADR；区分当前行为、预期要求和未实施方案。>
 
-【人读摘要 ≤5 行】带职责说明的目录树；记录 workspace 边界（monorepo 时）。
+## 已知限制与核实范围
 
-```text
-project-root/
-├── src/<module>/     # <职责>
-├── ...
+<实际来源、尚未核实内容及风险；不能把知识库候选当已证明关系。>
 ```
 
-> §4–§7 不复制根 `README.md`：已在 README 写过的，这里只写差异 + 链接。禁止第三份会漂的项目概述。
-
----
-
-## 自检清单（8 条规则）
-
-- [ ] 1. 引用唯一可定位：每个符号引用均为 `语言|路径:全限定名`，反查可命中；匿名结构已豁免并注明
-- [ ] 2. 术语唯一：术语只在 §0 定义，正文引用不重定义
-- [ ] 3. 数值具体：阈值/超时/重试均写具体值 + 单位
-- [ ] 4. 枚举穷举：状态/模式/错误码列全部取值
-- [ ] 5. 强度分级：约束用 MUST / MUST NOT / SHOULD / MAY
-- [ ] 6. 流程写清参与者：每步标发起模块 → 动作 → 输出 → 异常
-- [ ] 7. 条件写前提与违反行为
-- [ ] 8. 本清单逐项打勾
+验证：摘要覆盖关键职责与边界；README 导航可到架构、模块和文件索引；来源和工作区证据准确；无重复权威正文；结构检查与源码内容核实分别报告。schema 1 SYSTEM_ROOT 仅由显式迁移按共享协议拆分，不凭模板版本自动移动。

@@ -133,6 +133,6 @@ Every skill includes a verification step. "Seems right" is never sufficient — 
 | Ship | cs-docs-adrs | Document the why |
 | Ship | cs-observability | Structured logs, metrics, traces |
 | Ship | cs-shipping | Pre-launch checklist, rollback plan |
-| SysDocs | cs-sysdocs-init | One-time full SysDocs generation |
-| SysDocs | cs-sysdocs-update | Repair / incremental / rebuild-boundaries |
-| SysDocs | cs-vibe-coding | Fragmentary change pre-design |
+| SysDocs | cs-sysdocs-init | Explicit full overview, architecture, flows and file responsibilities |
+| SysDocs | cs-sysdocs-update | Affected updates / repair / explicit migration, rebuild or full refresh |
+| SysDocs | cs-vibe-coding | Fragmentary pre-design, also before full documentation initialization |

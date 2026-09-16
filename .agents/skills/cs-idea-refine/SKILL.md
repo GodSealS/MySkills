@@ -34,7 +34,7 @@ The final output is a markdown one-pager saved to `docs/ideas/[idea-name].md` (a
 
 ### Phase 0: Read SysDocs Context
 
-Before restating the idea or generating variations, follow `../../references/sysdocs-design-context.md`: read the target project's `SysDocs/SYSTEM_ROOT.md`, affected module documents, and registered pages first, or record the applicable missing-context branch. Carry the context summary into the one-pager.
+Before restating the idea or generating variations, follow `../../references/sysdocs-design-context.md`: read relevant accepted specs/ADRs, use the active layout's navigation and summaries to select affected bodies, and verify key facts with source. Record necessary gaps without forcing full initialization; carry the context summary into the one-pager.
 
 ### Phase 1: Understand & Expand (Divergent)
 

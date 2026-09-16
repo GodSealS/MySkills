@@ -1,150 +1,133 @@
 ---
 name: cs-code-query
-description: "Routes all code-related queries to the project knowledge graph. Supports three backends: CodeGraph (recommended), Understand-Anything, and Graphify. Provides create, query, and update operations for each. / 将所有代码相关查询路由到项目知识图谱，支持三种后端：CodeGraph（推荐）、Understand-Anything、Graphify，每种后端提供创建、查询、更新操作。"
+description: "Answers code questions using an available project knowledge graph and source verification; falls back to source search when no usable index exists. Supports CodeGraph, Understand-Anything, and Graphify. / 使用已有项目知识库定位并核实源码；无可用索引时直接源码检索，支持三种后端及显式创建、更新操作。"
 argument-hint: "[query about code | create | update] [--kb CG|US|GR]  (CG=codegraph, US=understand-anything, GR=graphify; omit to auto-match)"
 allowed-tools: Read, Glob, Grep, Bash, ListDir
 ---
 
-# Code Query via Knowledge Graph
+# Code Query with Source Verification
 
-Route code questions through a knowledge graph — **CodeGraph** (recommended),
-**Understand-Anything**, or **Graphify**. Each backend supports **create**,
-**query**, and **update** via 9 on-demand sub-files:
-`codegraph/`, `understand-anything/`, `graphify/` each with `{create,query,update}.md`.
+Use an existing knowledge graph to locate evidence, then verify implementation claims
+against the target project's source. A graph is neither a specification nor proof that
+SysDocs matches the implementation. Ordinary queries do not require installing,
+creating, refreshing, or repairing a knowledge base.
 
----
+## Phase 1: Recognize Intent and Project
 
-## Phase 1: Recognize Intent
+Resolve the target project root (including the actual worktree), question, and operation.
+General questions default to **query**. Only explicit graph creation or already-authorized
+setup routes to **create**; explicit refresh or an already-authorized maintenance task
+routes to **update**. Selecting a backend alone does not authorize creation/installation.
+A source-editing request alone does not authorize refresh; an owning workflow may
+explicitly include it in the task scope.
 
-Any question about the codebase — how it works, where things live, what calls what.
+Accept `--kb CG|US|GR`, full backend names, or unambiguous standalone selectors:
 
----
+| Selector | Backend | Default project data |
+|---|---|---|
+| CG / codegraph | CodeGraph | `.codegraph/` |
+| US / understand-anything | Understand-Anything | `.understand-anything/knowledge-graph.json` |
+| GR / graphify | Graphify | `graphify-out/graph.json` |
 
-## Phase 2: Detect Knowledge Base Status
+Honor an explicitly configured index location. Some Understand versions also support
+`.ua/`; consult the installed skill before resolving this alternative. Never use a
+different checkout's graph without identifying that source and its coverage gap.
 
-Check which knowledge bases exist in the project by listing these directories:
+## Phase 2: Check Three Independent States
 
-| Knowledge Base       | Project Directory        | Tool CLI        |
-|----------------------|--------------------------|-----------------|
-| CodeGraph            | `.codegraph/`            | `codegraph`     |
-| Understand-Anything  | `.understand-anything/`  | understand-anything (via CodeBuddy skill) |
-| Graphify             | `graphify-out/`          | `graphify`      |
+For each relevant backend, record these independently:
 
-**Action**: Use `ListDir` to check existence of `.codegraph/`, `.understand-anything/`, and `graphify-out/` in the project root. Then use `Bash` to check which CLIs are available:
+1. **Existence:** actual graph/database artifacts at the resolved project location,
+   not merely an empty directory or tool source checkout.
+2. **Queryability:** discover callable MCP tools or the installed CLI/skill and its
+   actual schema/help, then perform a bounded query for a known project symbol/path.
+   Readable supported graph JSON can serve as a direct query interface. Distinguish
+   successful queries with no matching results from failed calls or unreadable data.
+3. **Coverage and freshness:** compare indexed files/symbols and available metadata
+   against this task's source scope, committed differences, staged changes, unstaged
+   changes, and untracked files. A recent directory timestamp, equal HEAD, available
+   CLI, or watcher capability proves none of these by itself. Missing provenance or
+   unsupported languages mean **unknown/partial coverage**, not fresh.
 
-```bash
-# Check CLI availability (Windows)
-where codegraph 2>$null; where graphify 2>$null
+Discover executables with `Get-Command codegraph, graphify -ErrorAction SilentlyContinue`
+in PowerShell, or `command -v` in a POSIX shell. Read installed help and the selected
+backend's `query.md` before invoking version-sensitive commands. MCP availability is
+independent of CLI availability: discover actual tools instead of assuming a bridge
+connected. A health probe must not create a missing index. For strict read-only work,
+check for query side effects; read existing graph data or fall back to source if the
+backend would write logs, update indexes, or start refresh.
 
-# Check CLI availability (Unix)
-which codegraph 2>/dev/null; which graphify 2>/dev/null
-```
+## Phase 3: Select Backend and Route
 
-### Status Matrix
+- **Explicit backend:** use only that backend for graph results. If missing,
+  unqueryable, or incomplete, report the limitation and continue source verification;
+  do not silently switch backends or bootstrap the selected one.
+- **No selector:** prefer an existing queryable index. Among usable indexes, prefer
+  CodeGraph, then Understand-Anything, then Graphify; select only after checking relevant
+  coverage. A stale/partial index can supply labeled candidates, never a completeness
+  guarantee. If another backend is chosen, identify it and why.
+- **No usable knowledge base:** proceed immediately with `rg --files`, `rg`, and
+  targeted source reads (or available equivalents). Do not interrupt an ordinary
+  query to ask which tool to install or demand graph creation.
+- **Explicit multi-backend query:** query each requested available backend, label
+  sources independently, retain single-backend discoveries, and report unavailable
+  backends and disagreements. Do not create missing ones.
+- **Explicit create/update:** load only the selected operation file. For create
+  without a selection, reuse an already-configured backend or default to available
+  CodeGraph; if no creation interface is available, report the concrete prerequisite.
+  For update, require an existing index; do not turn maintenance into creation.
 
-| Directory exists? | CLI available? | Status                                     |
-|-------------------|----------------|--------------------------------------------|
-| YES               | YES            | **READY** — can query immediately          |
-| YES               | NO             | **STALE** — KB exists but CLI missing, can still query via MCP bridge |
-| NO                | YES            | **UNINITIALIZED** — CLI installed, need to create KB |
-| NO                | NO             | **MISSING** — nothing installed            |
+Resolve these paths relative to this installed skill directory, not the caller's cwd:
+`codegraph/`, `understand-anything/`, or `graphify/`, each with
+`create.md`, `query.md`, and `update.md`. Do not substitute `/understand-chat` for
+CodeGraph or Graphify: that skill reads Understand-Anything's own graph.
 
----
+## Phase 4: Verify Source and Document Candidates
 
-## Phase 3: Bootstrap Missing KB
+Treat returned locations/relationships as candidates. Check relevant current source
+and configuration before stating implementation facts. Verify source location and
+snapshot even when a backend includes source excerpts. Distinguish inferred
+relationships from observed ones; empty graph results do not prove no callers or impact.
 
-If NO knowledge base directory exists:
+For SysDocs design or maintenance, follow
+`../../references/sysdocs-design-context.md` and
+`../../references/sysdocs-system.md` for the owning workflow:
 
-1. **Check CLI availability** first using the commands above.
+1. Read applicable specifications and accepted decisions as requirements, separately
+   from current implementation facts.
+2. Form candidates from graph impact results **and** SysDocs retrieval summaries,
+   key class/structure names with one-sentence responsibilities, business terms,
+   source diffs/references, and document inbound links. Take their **union**, never
+   only their intersection. Preserve where each candidate came from.
+3. Investigate unmatched candidates: renamed/new symbols absent from the graph,
+   symbols missing from summaries, documents referring to removed symbols, and
+   prose-only cross-module relations. Read legacy/external documents without a
+   summary through their text or canonical links; do not exclude them.
+4. Reconcile disagreements using source. Matching graph and summary claims may both
+   be stale. For transaction, permission, data ownership, module split or responsibility
+   boundary changes, inspect relevant flow bodies; if scope cannot be narrowed reliably,
+   expand to all flow documents and report remaining gaps.
 
-2. **If at least one CLI is installed**: tell the user which one(s) are available, recommend codegraph, and offer to create the KB:
+A query supplies evidence; it does not authorize rewriting specifications, historical
+ADRs, or documents during a read-only review. Graph refresh never counts as document
+content verification or completion of a SysDocs synchronization gate.
 
-   > 检测到以下知识库工具已安装但尚未为项目创建知识图谱：
-   > - CodeGraph ✓（推荐）
-   > - [其他已安装的工具]
-   >
-   > 是否需要我为项目创建知识图谱？推荐使用 **CodeGraph**（最快、最省资源、100%本地运行）。
-   > 回复 "codegraph" / "understand-anything" / "graphify" 或 "all"。
+## Verification and Verdict
 
-3. **If NO CLI is installed**: ask the user which to install (recommend CodeGraph). Point to the corresponding `create.md` for installation instructions:
+Verify selected backend/project path, successful interface use (or labeled source
+fallback), task-specific coverage, and current source evidence. For create/update,
+perform a real post-operation query and check changed, new, renamed, and removed
+items in scope; directory existence or mtime is insufficient.
 
-   > 项目尚未配置任何知识图谱。推荐安装 **CodeGraph**（最快、最省资源、100%本地运行）。
-   >
-   > 安装命令详见 `.codebuddy/skills/code-query/<kb>/create.md`，或参考 README.md「本地知识库集成」章节。
-   >
-   > 请选择：codegraph / understand-anything / graphify
+- **COMPLETE:** requested operation and evidence checks completed for the stated scope.
+  An ordinary question can be COMPLETE via source fallback; identify that source and
+  do not claim it was answered by a graph.
+- **PARTIAL:** useful evidence exists but requested graph coverage, backend access, or
+  verification remains incomplete. Explicit graph-only/multi-backend requests remain
+  PARTIAL if source fallback cannot fulfill their requested graph operation.
+- **FAILED:** requested operation could not complete; identify the failure and what
+  source work was still possible.
 
-4. **After user selects a KB**, load and execute the corresponding `create.md`:
-   - `Read .codebuddy/skills/code-query/<kb>/create.md`
-   - Follow its instructions to install (if needed) and initialize the KB
-   - **Completion criterion**: Verify the KB directory exists via `ListDir`, then remind: **知识图谱已就绪，可以开始查询了！**
-
----
-
-## Phase 4: Route to Operation
-
-Based on user intent AND available KBs, route to the appropriate sub-file.
-
-### Detect Operation Type
-
-| User says                           | Operation | Sub-file                    |
-|-------------------------------------|-----------|-----------------------------|
-| "查询/搜索/查找/理解/解释 X"        | **query** | `<kb>/query.md`             |
-| "创建/构建/初始化/生成知识图谱"      | **create**| `<kb>/create.md`            |
-| "更新/刷新/重建/同步知识图谱"        | **update**| `<kb>/update.md`            |
-| General code question               | **query** | `<kb>/query.md` (default)   |
-
-### Select Knowledge Base
-
-An optional KB selector lets the user force a specific backend. All of these forms are
-accepted and equivalent: `--kb CG`, `--kb codegraph`, `CG`, `codegraph`.
-
-| Selector | Backend             |
-|----------|---------------------|
-| `CG`     | CodeGraph           |
-| `US`     | Understand-Anything|
-| `GR`     | Graphify            |
-
-**If the selector IS provided**: resolve it to the backend and use it directly — skip
-auto-matching. If the selected KB is MISSING/UNINITIALIZED (Phase 2), go to Phase 3 to
-create it before querying.
-
-**If the selector is OMITTED (no input)**: auto-match —
-- **Prefer an existing KB**: if multiple exist, prefer codegraph > understand-anything > graphify
-- **If none exist**: go back to Phase 3
-
-### Load and Execute
-
-Once KB and operation are determined, read the corresponding sub-file:
-
-```
-Read: .codebuddy/skills/code-query/<kb>/<operation>.md
-```
-
-Then follow its instructions exactly. Load only the sub-file needed for the current operation.
-
----
-
-## Phase 5: Multi-KB Queries
-
-If the user asks to query across multiple KBs (or "query all"):
-
-1. Check which KBs exist (Phase 2)
-2. For each existing KB, load its `query.md` sequentially
-3. Present results from each KB, clearly labeled by source
-4. Note discrepancies between KB results
-
----
-
-## Phase 6: Verdict
-
-After completing any operation, provide a verdict:
-
-- **COMPLETE** — query/create/update finished successfully via knowledge graph
-- **PARTIAL** — operation completed but some KBs were unavailable
-- **FAILED** — operation could not complete (explain why, suggest fallback)
-
-**Fallback**: If the knowledge graph returns no results or is unavailable and cannot be created:
-- Inform the user clearly
-- Fall back to traditional code search (Glob → Grep → Read) as secondary approach
-- Suggest installing a knowledge graph tool
+Report actual backend/interface and index location, source/worktree scope, coverage
+gaps, and relevant source references. Keep routine reports short. Do not claim graph
+freshness, exhaustive impact discovery, or documentation correctness without evidence.

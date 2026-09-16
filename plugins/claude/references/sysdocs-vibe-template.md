@@ -1,70 +1,61 @@
-# vibe 临时方案模板（sysdocs-vibe-template）
+# Vibe 前置方案模板（sysdocs-vibe-template）
 
-`SysDocs/VibeCoding/<YYYYMMDD-HHMM>-<slug>[ -N].md` 的生成模板。这是**前置设计**（改代码之前），非事后补录。
-
-## frontmatter（载入即校验）
+生成 `SysDocs/VibeCoding/<YYYYMMDD-HHMM>-<slug>[-N].md`；不依赖全库初始化，不补写当前架构。slug 采用小写短横线，拒绝空值、路径分隔符、..、控制字符和 Windows 保留名；同名追加序号。依据 [共享协议](sysdocs-system.md)。
 
 ```yaml
 ---
-schema: 1
+schema: 2
 doc_type: vibe
-vibe_id: <stable-id>
+vibe_id: <稳定 ID>
 status: draft
-updated: <ISO-8601>
-targets:
-  - module_id: order-service
-    sections: [execution-flow, constraints]
+updated: <ISO 日期>
+targets: []
 implementation:
-  status: unknown | code-landed | docs-only-confirmed
-  evidence: <git diff | file list | user confirmation>
+  status: unknown
+  evidence: <已有实现证据，未知则明确写未实施>
 merge:
-  status: pending | merged
+  status: pending
 ---
 ```
 
-字段约束：
+- targets 可为空；有正式模块时记录 module_id 和本次目标章节，核对旧 manifest 或新模块页；未初始化/归属不明标待定位，不虚构模块。
+- implementation.status 为 unknown / code-landed / docs-only-confirmed。code-landed 需要可核实源码/差异；用户确认意图不能替代实际实现证据。
+- docs-only-confirmed 仅确认方案或目标规范文档变更，不能因此并入当前架构。merge.status 为 pending / merged；只按实际已吸收范围记录，部分实施保留未实施部分。
+- 纯方案不强制 Git/source_scope；记录所参考的事实来源及缺口即可。新符号必须标“拟议”。
 
-- `vibe_id` 必须是稳定 id。
-- `targets[].module_id` 必须精确匹配 manifest；`sections` 使用模板规定的稳定 section ID（如 `design-structure` / `execution-flow` / `class-refs` / `usage` / `constraints`），不使用标题、行号或自由文本猜测。
-- 部分初始化且模块尚未修复时允许暂存原始目标，但必须标记 `awaiting-repair`。
-- `implementation.status`：`unknown`（未落地）/ `code-landed`（代码已落地）/ `docs-only-confirmed`（用户确认只改文档、代码后补）。
-- `implementation.evidence`：code-landed 必须有 git diff、文件清单或用户确认作为 evidence。
-- `merge.status`：`pending` / `merged`。
+```markdown
+# <方案标题>
 
-## 1. 设计目标
+## 检索摘要
 
-【人读摘要 ≤5 行】当前设计追求的设计目标。
+- `<现有关键类/结构/实际业务流程>`：<一句话职责及本次影响>。
+- 拟议 `<新符号/模块>`：<一句话目标职责，明确尚未实现>。
+- 边界：<预期事务、权限、依赖或异常协作变化>。
 
-## 2. 方案与步骤
+## 设计目标与当前事实
 
-从结构化内容总结整理：完成目标的具体方案和步骤。
+<区分已核实现状、期望变化、约束及非目标；链接权威规范和 ADR。>
 
-## 3. 调用参数原文 + 审查往返
+## 方案与步骤
 
-（放最底，不是整段 chat log）
+<目标结构、执行顺序、影响范围、兼容/恢复和验收；不能把提案写为当前实现。>
 
-- **原始参数**（写盘前已脱敏）：<标题 + 结构化内容>
-- **架构师缺陷清单**：
+## 文档与实现接入
 
-| id | level | severity | target | message | resolution |
-|---|---|---|---|---|---|
-| `F1` | target / step | blocking / warning | `<目标/步骤>` | `<缺陷>` | pending / accepted / fixed |
+<预计涉及的说明、文件索引、规范/决策；未有正式库则记录候选归属。>
 
-- **用户对目标级问题的答复**：<明确答复>
+## 原始输入与评审
 
-> 所有 blocking finding 必须 fixed 或用户明确 accepted，才算无未处理目标级缺陷。原始参数含 token/密码/API key/连接串/私钥时已替换为 `[REDACTED:<类型>]`，不得把秘密复制到本文件、审查往返或日志。
+- 原始参数：<脱敏后的必要原文，不存整段聊天>。
+- 评审来源与状态：<实际完成/不可用；不伪造评审>。
 
----
+| ID | 目标/步骤 | 严重度 | 问题 | 处理及证据 |
+|---|---|---|---|---|
+| F1 | <位置> | blocking/warning | <问题> | <待处理/明确接受/已修复依据> |
 
-## 自检清单（8 条规则）
+## 实施及吸收记录
 
-- [ ] 1. 引用唯一可定位：符号引用反查可命中；匿名结构已豁免
-- [ ] 2. 术语唯一：术语只在 `SYSTEM_ROOT.md` §0 定义
-- [ ] 3. 数值具体：阈值/超时/重试均写具体值 + 单位
-- [ ] 4. 枚举穷举：状态/模式/错误码列全部取值
-- [ ] 5. 强度分级：约束用 MUST / MUST NOT / SHOULD / MAY
-- [ ] 6. 流程写清参与者
-- [ ] 7. 条件写前提与违反行为
-- [ ] 8. 本清单逐项打勾
-- [ ] `targets[].module_id` 精确匹配 manifest；`sections` 用稳定 section ID
-- [ ] 无未处理 blocking 目标级缺陷（fixed 或明确 accepted）
+<已落实部分及证据、吸收目标链接、未实施部分；未知就保持 pending。>
+```
+
+验证：目标和步骤清楚、摘要区分现有与拟议符号；无秘密；未处理 blocking 问题明确保留；目标存在或诚实待定位；方案不改变项目三态、不冒充当前架构。源码已落实且核实后才在 update 中同步已实现事实，历史方案保留。

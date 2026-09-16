@@ -1,5 +1,5 @@
 ---
-description: "Routes all code-related queries to the project knowledge graph. Supports three backends: CodeGraph (recommended), Understand-Anything, and Graphify. Provides create, query, and update operations for each. / 将所有代码相关查询路由到项目知识图谱，支持三种后端：CodeGraph（推荐）、Understand-Anything、Graphify，每种后端提供创建、查询、更新操作。"
+description: "Answers code questions using an available project knowledge graph and source verification; falls back to source search when no usable index exists. Supports CodeGraph, Understand-Anything, and Graphify. / 使用已有项目知识库定位并核实源码；无可用索引时直接源码检索，支持三种后端及显式创建、更新操作。"
 argument-hint: "[args]"
 ---
 

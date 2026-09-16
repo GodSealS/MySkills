@@ -119,18 +119,20 @@ Task arrives
 | Ship | cs-observability | Structured logs, metrics, traces |
 | Ship | cs-shipping | Pre-launch checklist, rollback plan |
 | SysDocs | cs-sysdocs-init | One-time full SysDocs generation |
-| SysDocs | cs-sysdocs-update | Repair / incremental / rebuild-boundaries |
+| SysDocs | cs-sysdocs-update | Affected updates / repair / explicit migration, rebuild or full refresh |
 | SysDocs | cs-vibe-coding | Fragmentary change pre-design |
 
 ## SysDocs — System Project Documentation
 
-`SysDocs/` is a project-documentation system (`SYSTEM_ROOT.md` + per-module docs) with three skills:
+`SysDocs/` contains human-readable `README.md`, `architecture/`, `files/`, applicable `specs/` and `decisions/`, plus proposals in `VibeCoding/`. Generated descriptions have key-symbol retrieval summaries; knowledge-base candidates assist source verification. Legacy `SYSTEM_ROOT.md` layouts remain readable until explicit migration. Three skills own the lifecycle:
 
 - `cs-sysdocs-init` — one-time full generation (UNINITIALIZED only)
-- `cs-sysdocs-update` — the only maintenance entry (repair / incremental / rebuild-boundaries)
-- `cs-vibe-coding` — fragmentary change pre-design, architect-reviewed
+- `cs-sysdocs-update` — the only maintenance entry (affected updates / repair / explicit migration, boundary rebuild or full refresh)
+- `cs-vibe-coding` — fragmentary change pre-design, architect-reviewed; allowed before full SysDocs initialization
 
 Shared templates + validator protocol live in `.codebuddy/references/sysdocs-*.md`. `SysDocs/` deploys on the consuming project's root.
+
+Ordinary changes synchronize only affected descriptions, summaries, indexes, incoming links and approved constraints, with separate structural and content evidence. Missing SysDocs does not force initialization; high-risk boundary changes expand flow reading. Existing task authorization covers necessary reversible synchronization.
 
 ## References
 

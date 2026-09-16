@@ -4,6 +4,8 @@ description: "Implement tasks incrementally — build, test, verify, commit. Add
 
 Invoke `cs-incremental` alongside `cs-tdd`.
 
+For documentation, follow `../references/sysdocs-design-context.md`: read applicable specs/ADRs, select relevant descriptions via summaries and knowledge-base/source candidates, and record semantic impact in the task. Update affected descriptions, summaries, indexes, links and approved requirements before the review snapshot/commit. Structural validation and content/behavior verification are separate; current-change omissions block DONE. Missing SysDocs or unrelated old defects do not force initialization/full repair. High-risk boundary changes expand flow reading. Reuse valid slice evidence at final delivery; only new changes or unresolved gaps require rechecking. Existing task authorization covers necessary reversible synchronization.
+
 ## Modes
 
 - **`/cs-build`** — implement the *next* pending task, then stop (careful, one slice at a time).
@@ -30,7 +32,7 @@ Pick the next pending task from the plan. Then:
 
 Use this once a spec exists and you want to collapse plan + build into one run. It removes the manual stepping between tasks — **not** the verification. Every task still earns a passing test and its own commit.
 
-1. **Require a spec.** Look for `SPEC.md` at repo root, `docs/SPEC.md`, or under `spec/`. If none exists, stop and tell the user to run `/cs-spec` first.
+1. **Require a spec.** Use the user's selected authoritative design/spec path; otherwise inspect `SysDocs/specs/` and existing conventions such as `SPEC.md`, `docs/SPEC.md` or `spec/`. Do not duplicate an existing spec or treat several unrelated specs as one approved target. If none exists, stop and tell the user to run `/cs-spec` first.
 2. **Require a Grill Review decision.** The selected spec must contain `## Grill Review` with either completed `/cs-grill-me` findings and a decision, or an explicit skip plus accepted risks. Otherwise stop and direct the user to complete or formally skip the review.
 3. **Establish a clean baseline.** Run `git status --porcelain`. If there are uncommitted changes outside planning artifacts, stop and ask the user to commit, stash, or confirm.
 4. **Plan if needed.** If no `tasks/plan.md`, invoke `cs-planning` to generate one.

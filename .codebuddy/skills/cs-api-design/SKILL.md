@@ -25,7 +25,7 @@ Design stable, well-documented interfaces that are hard to misuse. Good interfac
 
 ## Before Design: Read SysDocs Context
 
-Before drafting a contract or delegating a backend slice, follow `../../references/sysdocs-design-context.md`: read the target project's `SysDocs/SYSTEM_ROOT.md`, affected module documents, and registered pages first, or record the applicable missing-context branch. Identify the existing interface owners, consumers, dependency direction, data flows, and compatibility constraints. Pass that context and its document references to the owning lead.
+Before drafting a contract or delegating a backend slice, follow `../../references/sysdocs-design-context.md`: read applicable accepted specs/ADRs, use active-layout navigation/summaries and KB/source candidates to select relevant bodies, and verify key facts against source. Identify interface owners, consumers, dependencies, data flows and compatibility constraints; pass that context, evidence and necessary gaps to the owning lead. Missing unrelated documents do not force initialization or full repair.
 
 ## Core Principles
 

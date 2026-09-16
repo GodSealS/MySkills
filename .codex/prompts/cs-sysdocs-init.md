@@ -1,5 +1,5 @@
 ---
-description: "Generates the SysDocs system documentation set (SYSTEM_ROOT.md + one module doc per module) for a target project in one pass. Use only when the three-state inventory says the project is UNINITIALIZED — no SysDocs/ dir, empty, only VibeCoding/, or no valid SYSTEM_ROOT.md/module docs yet. Never runs re-init or repairs; that is cs-sysdocs-update's job. / 一次性全量生成项目 SysDocs 系统文档（SYSTEM_ROOT.md + 每个模块一份模块文档）。仅当三态清单判定项目为「未初始化」时使用——无 SysDocs/ 目录、为空、只有 VibeCoding/、或尚无有效 SYSTEM_ROOT.md/模块文档。绝不执行 re-init 或 repair，那是 cs-sysdocs-update 的职责。"
+description: "Explicitly generates a human-readable SysDocs library for an undocumented project: overview, architecture, important flows, and source-file responsibilities. Uses source evidence with optional knowledge-base assistance. Only for UNINITIALIZED inventory; maintenance and explicit migration belong to cs-sysdocs-update. / 显式为未梳理项目生成面向人的 SysDocs 概览、架构、关键流程和文件职责；知识库可选，源码核实必需。只用于未初始化状态，维护和显式迁移交给 cs-sysdocs-update。"
 argument-hint: "[args]"
 ---
 

@@ -38,6 +38,38 @@ assert_same() {
 
 sh "$ROOT/scripts/build-adapters.sh"
 
+PYTHON=
+for candidate in python3 python; do
+  if command -v "$candidate" >/dev/null 2>&1 && "$candidate" -B -c 'import pathlib' >/dev/null 2>&1; then
+    PYTHON=$candidate
+    break
+  fi
+done
+[ -n "$PYTHON" ] || fail 'Python is required to validate generated Markdown links'
+"$PYTHON" -B - "$ROOT" <<'PY'
+from pathlib import Path
+import re
+import sys
+
+root = Path(sys.argv[1])
+for command_path in ('.codebuddy/commands/cs-build.md', 'commands/cs-build.md',
+                     '.gemini/commands/cs-build.toml', '.claude/commands/cs-build.md',
+                     'plugins/claude/commands/cs-build.md'):
+    command_file = root / command_path
+    command = command_file.read_text(encoding='utf-8-sig')
+    reference = re.search(r'`([^`]+/sysdocs-design-context\.md)`', command)
+    assert reference, (command_path, 'missing design context reference')
+    assert (command_file.parent / reference.group(1)).is_file(), (command_path, 'unresolved design context reference')
+print('Build command design context references: PASS')
+pattern = r'\[[^\]\r\n]+\]\([^\)\r\n]+\)'
+for name in ('cs-sysdocs-init', 'cs-sysdocs-update', 'cs-vibe-coding'):
+    source = (root / '.codebuddy/skills' / name / 'SKILL.md').read_text(encoding='utf-8-sig')
+    for tree in ('skills', '.agents/skills', '.gemini/skills', '.claude/skills', 'plugins/claude/skills'):
+        generated = (root / tree / name / 'SKILL.md').read_text(encoding='utf-8-sig')
+        assert re.findall(pattern, source) == re.findall(pattern, generated), (tree, name, 'Markdown links changed')
+print('Generated SysDocs Markdown links: PASS')
+PY
+
 if command -v python3.11 >/dev/null 2>&1; then
   python3.11 - "$ROOT" <<'PY'
 import pathlib
@@ -74,7 +106,7 @@ for agent in "$ROOT"/.codebuddy/agents/*.md "$ROOT"/.gemini/agents/*.md "$ROOT"/
       ;;
     */cs-knowledge-base-admin.md)
       assert_not_contains "$agent" '## Optional Skill Roster'
-      assert_contains "$agent" 'Use `cs-code-query` only for its existing-backend update protocols.'
+      assert_contains "$agent" 'Use `cs-code-query` only for existing-backend update protocols and their scoped query verification.'
       assert_contains "$agent" 'At least one supported knowledge base must already exist'
       assert_contains "$agent" 'TERMINATED — no supported knowledge base exists'
       assert_not_contains "$agent" 'created, installed, repaired, or deleted'
@@ -103,7 +135,7 @@ for tree in "$ROOT"/skills "$ROOT"/.agents/skills "$ROOT"/.gemini/skills "$ROOT"
   done
 done
 for refs in "$ROOT"/references "$ROOT"/.agents/references "$ROOT"/.gemini/references "$ROOT"/.claude/references "$ROOT"/plugins/claude/references; do
-  for ref in sysdocs-system.md sysdocs-overview-template.md sysdocs-module-template.md sysdocs-vibe-template.md; do
+  for ref in sysdocs-system.md sysdocs-overview-template.md sysdocs-module-template.md sysdocs-vibe-template.md sysdocs-files-template.md sysdocs-flow-template.md; do
     [ -f "$refs/$ref" ] || fail "missing $refs/$ref"
   done
 done
@@ -120,7 +152,7 @@ for command in "$ROOT/.codebuddy/commands/cs-team-review.md" "$ROOT/commands/cs-
 done
 [ -f "$ROOT/.gemini/commands/cs-team-review.toml" ] || fail 'missing Gemini cs-team-review command'
 [ -f "$ROOT/.codex/prompts/cs-team-review.md" ] || fail 'missing Codex cs-team-review prompt'
-for ref in sysdocs-system.md sysdocs-overview-template.md sysdocs-module-template.md sysdocs-vibe-template.md; do
+for ref in sysdocs-system.md sysdocs-overview-template.md sysdocs-module-template.md sysdocs-vibe-template.md sysdocs-files-template.md sysdocs-flow-template.md; do
   [ -f "$ROOT/plugins/claude/references/$ref" ] || fail "missing plugin reference $ref"
 done
 

@@ -1,5 +1,5 @@
 ---
-description: "Captures a fragmentary change as a pre-design VibeCoding doc under SysDocs/VibeCoding/ and routes it through cs-architect design review before any code is written. Requires the project to be PARTIAL-INITIALIZED or INITIALIZED; UNINITIALIZED is rejected. Explicitly invoked only — in CodeBuddy: /cs-vibe-coding <title> \\"<structured content>\\". Never writes SYSTEM_ROOT.md, modules/, or source. / 把碎片需求作为「前置设计」VibeCoding 文档写入 SysDocs/VibeCoding/ 并先经 cs-architect 设计审查，再写代码。要求项目处于「部分初始化」或「已初始化」，未初始化拒绝。仅显式调用——CodeBuddy 语法：/cs-vibe-coding <标题> \\"<结构化内容>\\"。绝不写 SYSTEM_ROOT.md、modules/ 或源码。"
+description: "Explicitly captures a fragmentary change as a reviewed pre-design proposal in SysDocs/VibeCoding/, even when no project library exists. Keeps future design separate from implemented architecture; creates no source code or full documentation baseline. / 显式把碎片需求保存为 SysDocs/VibeCoding/ 前置方案并审查；允许尚无项目文档库，明确区分未来设计与现状，不写源码、不强制全量初始化。"
 argument-hint: "[args]"
 ---
 

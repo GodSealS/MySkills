@@ -1,3 +1,3 @@
 interface:
   display_name: "CS Vibe Coding"
-  short_description: "Captures a fragmentary change as a pre-design VibeCoding doc under SysDocs/VibeCoding/ and routes it through cs-architect design review before any."
+  short_description: "Explicitly captures a fragmentary change as a reviewed pre-design proposal in SysDocs/VibeCoding/, even when no project library exists. Keeps."

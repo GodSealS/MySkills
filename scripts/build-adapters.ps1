@@ -43,8 +43,14 @@ $ExcludeSkills = @()
 # Helpers
 # ---------------------------------------------------------------------------
 function Clear-Dir($path) {
-    if (Test-Path $path) { Remove-Item -Recurse -Force $path }
-    New-Item -ItemType Directory -Force -Path $path | Out-Null
+    $targetPath = [IO.Path]::GetFullPath($path)
+    $workspacePath = [IO.Path]::GetFullPath($Repo.Path).TrimEnd('\', '/')
+    if (-not $targetPath.StartsWith($workspacePath + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Adapter output escapes workspace: $targetPath"
+    }
+    Assert-ResourcePathNoLink $targetPath
+    if (Test-Path -LiteralPath $targetPath) { Remove-Item -LiteralPath $targetPath -Recurse -Force }
+    New-Item -ItemType Directory -Force -Path $targetPath | Out-Null
 }
 
 # Write text as UTF-8 **without** a BOM.
@@ -106,9 +112,9 @@ function Fix-Refs($text, [string[]]$publicRefs) {
     # (e.g. cs-huashu-design/references/brand-asset-protocol.md) are left intact.
     foreach ($name in $publicRefs) {
         $esc = [regex]::Escape($name)
-        # Exclude backticks from the path prefix so a markdown-inline
-        # `references/<file>` keeps its opening backtick after rewriting.
-        $refPattern = '(?i)[^\s`]*references/' + $esc
+        # Restrict the prefix to path text; preserve Markdown link labels,
+        # target parentheses, angle brackets and inline-code delimiters.
+        $refPattern = '(?i)[^\s`\[\]()<>]*references/' + $esc
         $text = $text -replace $refPattern, "../../references/$name"
     }
     # cs-code-query references its own sub-files via an absolute .codebuddy path.

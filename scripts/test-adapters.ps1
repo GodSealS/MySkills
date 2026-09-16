@@ -32,6 +32,15 @@ try {
     & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Temp 'scripts\build-adapters.ps1')
     if ($LASTEXITCODE -ne 0) { throw "builder exited with $LASTEXITCODE" }
 
+    foreach ($commandPath in @('.codebuddy\commands\cs-build.md', 'commands\cs-build.md', '.gemini\commands\cs-build.toml', '.claude\commands\cs-build.md', 'plugins\claude\commands\cs-build.md')) {
+        $commandFile = Join-Path $Temp $commandPath
+        $commandRaw = Get-Content -Raw -LiteralPath $commandFile
+        $reference = [regex]::Match($commandRaw, '`([^`]+/sysdocs-design-context\.md)`')
+        Assert "$commandPath declares the design context reference" $reference.Success
+        $target = Join-Path (Split-Path -Parent $commandFile) $reference.Groups[1].Value
+        Assert "$commandPath resolves the design context reference" (Test-Path -LiteralPath $target -PathType Leaf)
+    }
+
     $newSkills = @('cs-sysdocs-init', 'cs-sysdocs-update', 'cs-vibe-coding', 'cs-team-review')
     foreach ($tree in @('skills', '.agents\skills', '.gemini\skills', '.claude\skills', 'plugins\claude\skills')) {
         foreach ($skill in $newSkills) {
@@ -41,6 +50,11 @@ try {
             Assert "$tree/$skill has no model field" (-not ($raw -match '(?m)^model\s*:'))
             if ($skill -like 'cs-sysdocs-*' -or $skill -eq 'cs-vibe-coding') {
                 Assert "$tree/$skill has resolvable reference path" ($raw -match '\.\./\.\./references/sysdocs-system\.md')
+                $sourceRaw = Get-Content -Raw (Join-Path $Temp ".codebuddy\skills\$skill\SKILL.md")
+                $linkPattern = '\[[^\]\r\n]+\]\([^\)\r\n]+\)'
+                $sourceLinks = @([regex]::Matches($sourceRaw, $linkPattern) | ForEach-Object { $_.Value })
+                $generatedLinks = @([regex]::Matches($raw, $linkPattern) | ForEach-Object { $_.Value })
+                Assert "$tree/$skill preserves Markdown link labels and targets" (($sourceLinks -join "`n") -ceq ($generatedLinks -join "`n"))
             }
         }
     }
@@ -83,7 +97,7 @@ try {
     Assert 'advisor allows only the two external auxiliaries' ($advisor -match 'Only the following external auxiliaries' -and $advisor -match '\| `cs-code-query` \|' -and $advisor -match '\| `cs-docs-adrs` \|')
     $teamBuild = Get-Content -Raw (Join-Path $Temp '.agents\skills\cs-team-build\SKILL.md')
     Assert 'team-build skips nested knowledge-base refreshes during task implementation' ($teamBuild -match 'Skip the final knowledge-base-administrator step; Team Build owns its single invocation in Phase 5')
-    foreach ($ref in @('sysdocs-system.md', 'sysdocs-overview-template.md', 'sysdocs-module-template.md', 'sysdocs-vibe-template.md')) {
+    foreach ($ref in @('sysdocs-system.md', 'sysdocs-overview-template.md', 'sysdocs-module-template.md', 'sysdocs-vibe-template.md', 'sysdocs-files-template.md', 'sysdocs-flow-template.md')) {
         foreach ($tree in @('references', '.agents\references', '.gemini\references', '.claude\references', 'plugins\claude\references')) {
             Assert "generated $tree/$ref" (Test-Path (Join-Path $Temp "$tree\$ref"))
         }
@@ -97,5 +111,12 @@ try {
     Write-Host 'test-adapters.ps1: passed'
 }
 finally {
-    if (Test-Path $Temp) { Remove-Item -LiteralPath $Temp -Recurse -Force }
+    if (Test-Path $Temp) {
+        $cleanupPath = (Resolve-Path -LiteralPath $Temp).Path
+        $tempParent = [IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd('\', '/')
+        if ((Split-Path -Parent $cleanupPath) -ne $tempParent -or (Split-Path -Leaf $cleanupPath) -notlike 'agent-skills-adapter-test-*') {
+            throw "Refusing adapter test cleanup outside its temporary directory: $cleanupPath"
+        }
+        Remove-Item -LiteralPath $cleanupPath -Recurse -Force
+    }
 }

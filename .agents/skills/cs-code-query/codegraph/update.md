@@ -1,58 +1,33 @@
-# CodeGraph: Update Knowledge Graph
+# CodeGraph: Update Existing Index
 
-Update/sync the project's CodeGraph knowledge graph.
+Require an existing index and explicit refresh or already-authorized maintenance.
+If no index exists, report the prerequisite and continue independent source work;
+do not initialize one. Query failures alone do not authorize mutation.
 
----
+## Select the Actual Refresh Interface
 
-## Auto-Sync (Default)
+Discover the installed CLI/MCP and help/schema first. In supported CLI versions:
 
-CodeGraph runs a file watcher after `codegraph init`. It automatically detects
-file changes via OS native events and re-indexes affected files. **No manual
-action is needed under normal usage.**
-
----
-
-## Manual Rebuild
-
-If the graph is stale, corrupted, or you want to force a full re-index:
-
-```bash
-# From project root
-codegraph init
+```text
+codegraph sync "<project-root>"
 ```
 
-This re-scans the entire project and rebuilds the graph. The existing `.codegraph/`
-data will be updated in-place.
+performs incremental synchronization. Use `codegraph index "<project-root>"` only
+when the task calls for a full rebuild or incremental refresh cannot repair the
+relevant index. Confirm replacement scope first. `codegraph init` can return
+immediately for an existing index and is not a refresh substitute.
 
----
+A watcher may already handle changes. Check indexed evidence before deciding refresh
+is needed; watcher capability and directory mtime do not prove freshness. Do not
+install or reconfigure the tool as an implicit repair.
 
-## When to Rebuild
+## Verification
 
-- After a `git pull` or branch switch that changed many files
-- After a major refactor (file renames, directory restructuring)
-- If queries return outdated or incorrect results
-- After adding/removing large numbers of files
+Record target root, operation, indexed scope, and failures/skips. Follow `query.md`
+to query a changed/new symbol, confirm renamed/deleted items no longer mislead, and
+compare affected relationships with source. Include staged, unstaged, and untracked
+task changes rather than treating HEAD as the entire snapshot.
 
----
-
-## Verify Update
-
-After rebuilding:
-
-1. Run a test query via `/understand-chat` to confirm results are current
-2. Check `.codegraph/` modification time is recent
-
----
-
-## Troubleshooting
-
-If `codegraph init` fails:
-
-1. Ensure `codegraph` CLI is installed: `codegraph --version`
-2. Ensure you're in the project root directory
-3. Check disk space (CodeGraph uses SQLite, typically < 100MB)
-4. Try re-installing: `npm install -g @colbymchenry/codegraph`
-
----
-
-**Verdict**: COMPLETE — CodeGraph knowledge graph updated.
+Report COMPLETE/PARTIAL/FAILED according to these results. Unknown coverage stays
+unknown. Index refresh is not document validation; SysDocs checks remain with the
+owning development/document workflow.

@@ -4,7 +4,7 @@ description: "Break work into small verifiable tasks with acceptance criteria an
 
 Invoke the `cs-planning` skill.
 
-Read the existing spec (`SPEC.md` or equivalent) and the relevant codebase sections.
+Read the selected authoritative spec (`SysDocs/specs/<topic>.md`, an existing `SPEC.md`, or the user's supplied design path) and relevant source. Follow the shared task-context protocol; do not copy the spec or initialize a full documentation library merely to plan work.
 
 Before planning, require a `## Grill Review` section in the spec. It must either summarize the completed `/cs-grill-me` findings and decision, or explicitly state that the review was skipped and the risks were accepted. If it is absent, stop and direct the user to run `/cs-grill-me <spec-path>` or record an explicit skip decision.
 

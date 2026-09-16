@@ -1,60 +1,32 @@
-# Graphify: Update Knowledge Graph
+# Graphify: Update Existing Graph
 
-Update/rebuild the project's Graphify knowledge graph.
+Require an existing graph and explicit refresh or already-authorized maintenance.
+Resolve actual graph and scan root; missing data does not authorize creation. Read
+installed interface help/skill before choosing a refresh method.
 
----
+## Match Refresh to Coverage
 
-## Rebuild
+- In supported versions, `graphify update "<project-root>"` re-extracts **code**.
+  It does not certify freshness of document, paper, or image-derived relationships.
+- Mixed corpus refresh uses the installed skill's supported update flow (such as
+  `/graphify --update`) or CLI extraction with the configured provider supported by
+  that version. Some versions support manifest-based incremental extraction; do not
+  describe every refresh as a full rebuild.
+- Use force/full rebuild only when required by the requested repair and supported
+  by the actual interface. Check replacement scope and preserve unrelated data;
+  do not delete output directories as a troubleshooting shortcut.
+- If the interface/provider for affected prose is unavailable, refresh authorized
+  supported scope if useful and report the gap. Do not present code-only success
+  as full mixed-corpus completion or silently reinstall.
 
-Graphify requires manual rebuild after code changes. To update the graph,
-re-run from the project root:
+## Verification
 
-```bash
-graphify
-```
+Inspect output for skipped/failed extraction and confirm graph path. Use `query.md`
+to query changed/new nodes, check renamed/removed items, and compare locations and
+important relationships with source or canonical prose. Verify scope against available
+manifests/provenance and working-tree changes. Recent mtime and exit success alone
+are insufficient; unknown coverage stays unknown. An unchanged graph may mean no
+changes or a refused rebuild; check output.
 
-This re-scans the entire project and regenerates all graph data in `graphify-out/`.
-
----
-
-## When to Rebuild
-
-- After significant code changes (new files, refactors, restructures)
-- After a `git pull` or branch switch
-- When queries return outdated information
-- After adding/removing modules or directories
-
----
-
-## Incremental vs Full Rebuild
-
-Graphify always performs a **full rebuild** — re-scanning all files, re-running
-entity extraction, relationship detection, community detection, and god node
-identification. The `graphify-out/` directory is replaced with fresh output.
-
----
-
-## Verify Update
-
-After rebuilding:
-
-1. Confirm `graphify-out/` modification time is recent
-2. Run a test query via `/understand-chat` to verify current results
-
----
-
-## Troubleshooting
-
-If `graphify` fails:
-
-1. Ensure graphify is installed: `graphify --version`
-2. Ensure Python 3.10+ is available: `python --version`
-3. Reinstall if needed:
-   ```bash
-   uv tool install "graphifyy @ git+https://github.com/safishamsi/graphify@v8"
-   ```
-4. Check internet connectivity (git+https install requires network)
-
----
-
-**Verdict**: COMPLETE — Graphify knowledge graph updated.
+Report actual refreshed/unverified scope with COMPLETE/PARTIAL/FAILED. Refresh does
+not verify SysDocs; the owning workflow performs content checks separately.

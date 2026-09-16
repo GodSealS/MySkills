@@ -68,8 +68,8 @@ Identify the development phase of the incoming task, then apply the matching ski
 
 **SysDocs / project documentation**
 - `cs-sysdocs-init` — one-time full generation of the SysDocs library (UNINITIALIZED only)
-- `cs-sysdocs-update` — the only maintenance entry: repair / incremental / rebuild-boundaries
-- `cs-vibe-coding` — fragmentary change pre-design, architect-reviewed (explicit call)
+- `cs-sysdocs-update` — the only maintenance entry: affected updates / repair / explicit migration, boundary rebuild or full refresh
+- `cs-vibe-coding` — fragmentary change pre-design, architect-reviewed (explicit call); allowed without full SysDocs initialization
 
 ## Personas (agents/)
 

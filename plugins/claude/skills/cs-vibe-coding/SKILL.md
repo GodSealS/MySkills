@@ -1,136 +1,93 @@
 ---
 name: cs-vibe-coding
-description: "Captures a fragmentary change as a pre-design VibeCoding doc under SysDocs/VibeCoding/ and routes it through cs-architect design review before any code is written. Requires the project to be PARTIAL-INITIALIZED or INITIALIZED; UNINITIALIZED is rejected. Explicitly invoked only — in CodeBuddy: /cs-vibe-coding <title> \"<structured content>\". Never writes SYSTEM_ROOT.md, modules/, or source. / 把碎片需求作为「前置设计」VibeCoding 文档写入 SysDocs/VibeCoding/ 并先经 cs-architect 设计审查，再写代码。要求项目处于「部分初始化」或「已初始化」，未初始化拒绝。仅显式调用——CodeBuddy 语法：/cs-vibe-coding <标题> \"<结构化内容>\"。绝不写 SYSTEM_ROOT.md、modules/ 或源码。"
+description: "Explicitly captures a fragmentary change as a reviewed pre-design proposal in SysDocs/VibeCoding/, even when no project library exists. Keeps future design separate from implemented architecture; creates no source code or full documentation baseline. / 显式把碎片需求保存为 SysDocs/VibeCoding/ 前置方案并审查；允许尚无项目文档库，明确区分未来设计与现状，不写源码、不强制全量初始化。"
 ---
 
 # Vibe Coding — Fragmentary Change, Pre-Design
 
 ## Overview
 
-Capture a fragmentary adjustment as a **pre-design** document under `SysDocs/VibeCoding/` and route it through `cs-architect` design review **before** any code is written. This is forward design, not after-the-fact recording. The doc is marked `draft` and later merged by `cs-sysdocs-update` under the four conditions.
+Capture and review a proposal before implementation, preserving the user's goals and a traceable distinction between current facts and future design. Invoke only when the user explicitly requests this skill. Read [the shared protocol](../../references/sysdocs-system.md), [design context](../../references/sysdocs-design-context.md), and [vibe template](../../references/sysdocs-vibe-template.md).
 
-Read the shared convention first: `../../references/sysdocs-system.md`, plus `sysdocs-vibe-template.md`.
+A project can be **UNINITIALIZED**, **PARTIAL-INITIALIZED**, or **INITIALIZED**. No formal SysDocs library is required. Creating only `SysDocs/VibeCoding/` and reports leaves project documentation **UNINITIALIZED**; it does not lock out later init or silently satisfy a full documentation request.
 
-## When to Use
+## Invocation and Inputs
 
-- Project is **PARTIAL-INITIALIZED** or **INITIALIZED**, and the user explicitly invokes this skill for a fragmentary change.
+CodeBuddy: `/cs-vibe-coding <title> "<structured content>"`; other hosts use their equivalent skill entry. A title and natural-language content are sufficient. `#` may identify multiple targets and subheadings/lists their proposed steps; do not invent missing user intent to fit a parser.
 
-**When NOT to use:**
+Normalize `operation`, `project_root`, `mode`, `source_scope`, `yes`, title and targets. Record only sanitized input. Reuse the existing request's authorization to create a reversible proposal. `--yes` is optional for automation, not a new gate when the user already authorized writing. Neither absent interactivity nor unavailable subagents prevents a supported proposal draft.
 
-- **UNINITIALIZED** → **stop**, require `cs-sysdocs-init` first. This skill must never create `SysDocs/` on an uninitialized project (it would lock init).
-- Implicit/inferred fragmentary edits without an explicit call.
+## Write Authorization
 
-## Invocation (explicit only)
+Only create/modify `SysDocs/VibeCoding/**` and, when needed, audit reports under `SysDocs/.meta/reports/**` in the resolved project root. Never write current `README.md`, `SYSTEM_ROOT.md`, architecture/modules/files pages, external requirements, KB indexes or business source. Unknown future schema remains read-only under the shared gate; do not mutate a library whose schema cannot be safely understood.
 
-CodeBuddy: `/cs-vibe-coding <title> "<structured content>"`. This is a skill-invocation syntax, **not** a new command file. One title = one doc. `#` = targets (multiple allowed), `##` / `###` / `1.` / `2.` = sub-steps / reference notes.
-
-## Inputs (normalize first)
-
-Normalize into `operation`, `project_root`, `mode`, `source_scope`, `yes`; output `status`, `run_id`, `written`, `skipped`, `issues`. Record normalized inputs + confirm/reject results into the run report.
-
-## Write Authorization (allowlist)
-
-Only create/modify `SysDocs/VibeCoding/**` and the mandatory audit reports under
-`SysDocs/.meta/reports/**` within the current project root. Never write
-`SYSTEM_ROOT.md`, `modules/**`, source code, or paths outside the project root.
-Architect fan-out briefs must not ask the subagent to modify business code.
-
-- `<title>` → lowercase-hyphen slug, only `[a-z0-9-]`, length 1–80; reject empty, `..`, path separators, control chars, Windows reserved names.
-- Resolved path must stay under `SysDocs/VibeCoding/`; no symlink/absolute/Bash escape outside.
-- Filename collision → exclusive-create / lock-retry assign `-2`, `-3`; never overwrite. Temp file + atomic rename; failure cleans the temp file and keeps the old file.
-- Raw call arguments may be recorded, but sanitize tokens/passwords/API keys/connection strings/private keys/PII before writing, and mark "原始参数已脱敏" in the doc. Never copy secrets into frontmatter, review round-trips, or logs.
-
-The `.meta/reports/**` exception is report-only: report files must use the shared
-schema and contain no source contents or unsanitized arguments.
+- Validate the slug: lowercase letters, digits and hyphens, 1–80 characters; reject separators, `..`, control characters and Windows reserved names. Derive a meaningful safe slug from non-Latin titles while preserving the readable title in the document.
+- Resolve paths and symlinks to stay within the allowlist; reject escapes. Use exclusive-create with `-2`, `-3` on filename collision; never overwrite a different proposal. Temp files stay in the allowlist and land by atomic rename.
+- Sanitize tokens, passwords, keys, connection strings and personal data before writing input/review text; use redaction markers and identify redacted input. Reports contain no source dumps or unsanitized arguments.
 
 ## Process
 
-### Phase 0 — Read SysDocs Context
+### 1. Read task-relevant context
 
-After resolving `project_root` and checking the three-state gate, follow `../../references/sysdocs-design-context.md`: read `SysDocs/SYSTEM_ROOT.md` first when available, then the affected module documents and registered pages before deriving the proposal. Map input targets to manifest module IDs and stable section IDs; collect current responsibilities, contracts, dependency direction, and constraints. For PARTIAL-INITIALIZED projects, record missing context and preserve unresolved targets as `awaiting-repair`; retain the existing UNINITIALIZED rejection and write allowlist.
+Apply shared dual-layout inventory without an init prerequisite. Read the existing entry/navigation if present, then relevant accepted requirements and decisions. Extract summaries to select candidate bodies, including key symbol responsibilities and important boundaries. Combine document candidates with actual available KB/source candidates; inspect discrepancies and verify current facts in source. Legacy or external documents without summaries require body/link fallback.
 
-### Phase 1 — Parse structured input
+For responsibility, module, transaction, permission, ownership, recovery or dependency changes, inspect related flow explanations even without direct matches; expand to all flows if the relevant set cannot be determined. Source inspection can establish enough evidence without a KB. Record actual index coverage/freshness and remaining gaps; never install/bootstrap a KB.
 
-Extract targets + steps. Write `SysDocs/VibeCoding/<YYYYMMDD-HHMM>-<slug>[ -N].md` from the vibe template (design goals → plan/steps → raw args + review round-trip at the bottom). In the plan/steps section, include the context summary and explain how each proposed step reuses or changes the documented system; label assumptions that depend on missing or stale evidence.
+If no library exists, derive the proposal from source and available authoritative requirements. If evidence is missing, identify assumptions precisely. Use stable module IDs when existing targets resolve; otherwise keep descriptive proposed targets with an explicit unresolved/planned mapping, rather than inventing a manifest or forcing whole-library repair. Unrelated missing documents do not block this draft.
 
-### Phase 2 — Architect review
+### 2. Write the proposal draft
 
-`Task` fan-out to `cs-architect` with a short brief: targets + steps, project root, relevant document paths or readable snapshots, constraint summary, and context gaps. Do not paste the full `SYSTEM_ROOT.md` into the brief; the architect reads it when available and the affected module documents/pages before reviewing, and records those references in the review. Assess module responsibility, dependency direction, and contract compatibility against this baseline, keeping conclusions dependent on missing evidence provisional. Findings are structured: `id`, `level: target|step`, `severity: blocking|warning`, `target`, `message`, `resolution: pending|accepted|fixed`. All blocking findings must be fixed or explicitly accepted = no unhandled target-level defects.
+Create `SysDocs/VibeCoding/<YYYYMMDD-HHMM>-<slug>[-N].md` using the current vibe template. Include current-state evidence, design goals, proposed changes, verification criteria, context gaps and the sanitized review exchange.
 
-### Phase 3 — Target-change gate (interrupting)
+Place `## 检索摘要` before the detailed body. Name key existing classes/structures with one-sentence responsibilities where applicable; use real functions/modules/processes otherwise. Mark proposed symbols and future boundaries as **拟议／未实施**. Include cross-module effects and relevant transaction/permission/ownership/recovery boundaries without listing every internal symbol.
 
-If a **target-level** defect hits a target-change condition, the main skill **stops to ask the user**, accepting only an explicit answer. No answer / timeout → keep doc `draft`, execute no code, merge nothing. Step-level findings are self-adjusted by the architect, no interruption.
+Maintain `status: draft` and implementation evidence as prescribed by the shared template. A reviewed design is not implemented architecture or an accepted requirement by default.
 
-Target-change conditions (any one triggers asking):
+### 3. Review the design
 
-1. Multiple targets' solutions logically conflict.
-2. A single target is infeasible.
-3. A single target needs downgrade / phasing.
-4. A target violates hard constraints (MUST / module responsibility boundary).
+When running as the host with delegation available, give `cs-architect` a short read-only brief: goals, targets, relevant document/source paths, applicable constraints, candidate differences and evidence gaps. The reviewer reads the relevant material rather than receiving a pasted full library. A persona already running this skill performs the assigned review locally and must not invoke another persona.
 
-### Phase 4 — Fix and record
+Assess responsibility, dependency direction, constraint compatibility, necessary interfaces and proposed verification. Record structured findings: `id`, `level: target|step`, `severity: blocking|warning`, `target`, `message`, `resolution: pending|accepted|fixed`. Evidence-dependent conclusions remain provisional until verified. If separate review is unavailable, record the actual local review method and limit; do not fabricate a reviewer or declare an unchecked design reviewed. A draft can still be delivered.
 
-Revise per the review; record "审查结论 + 修复点" at the top of the doc.
+### 4. Resolve target-level choices
 
-### Phase 5 — Mark for merge
+Request a user decision only when the review exposes a material **unresolved** target change:
 
-`status: draft`; later merged by `cs-sysdocs-update` under the four conditions.
+1. The proposed targets conflict.
+2. A target is infeasible.
+3. A target needs reduced scope or phasing.
+4. A target conflicts with applicable hard requirements or responsibilities.
 
-## Invocation examples
+Reuse an existing explicit decision that already resolves the same issue; do not ask again. Present concrete alternatives and their effects. No answer means the disputed target stays pending in the draft; do not implement or merge it. Step-level repairs within the accepted target are made directly and documented. Accepting a risk cannot silently override an authoritative hard constraint; identify the required authorized constraint change.
 
-```text
-/cs-vibe-coding "fix-order-timeout" "# order-service\n## Reduce timeout to 2 seconds\n1. Update the service constraint"
-cs-vibe-coding --project-root . --yes "fix-order-timeout" "# order-service ..."
-cs-vibe-coding --project-root . --source-scope committed --yes "fix-order-timeout" "# order-service ..."
-```
+### 5. Verify and hand off
 
-`--yes` is required for non-interactive hosts. `project_root` defaults to the
-current workspace root; `source_scope` is recorded when supplied. When `Task` or
-interactive confirmation is unavailable, keep the document `draft`, record
-`architect_review: unavailable` or the rejected confirmation in the report, and
-do not merge it.
+Record review conclusions and repairs near the top **after** the fixed retrieval summary. Verify links, permitted targets, metadata, summary-body consistency and the distinction between existing facts and proposed design. Run shared structural validation for the proposal scope only; it must not demand a complete project library. Separately record source/content evidence and unresolved findings.
 
-## Cross-Platform Equivalence
+Deliver the draft with sanitized scoped verification evidence, distinguishing draft completion from design readiness and implementation. Prefer the proposal's own review section or existing task evidence; no separate report is required. If the enclosing task evidence is outside this skill's write allowlist, return the results to its host instead of editing that file. A draft may be complete as a capture artifact while necessary design questions remain explicitly pending; never label unresolved design as implementation-ready.
 
-CodeBuddy uses the `user-invocable` skill entry; Codex / Gemini / Claude use the builder-generated equivalent. All four must pass the same title + structured content + reject/write result through the same flow; a platform lacking slash syntax cannot bypass preconditions or safety checks. Behavior is what's guaranteed, not the tool name: parse → project-root/state check → preview → confirm → authorized read/write → validate → verdict. When `Task` is unavailable → main skill does the check and records `architect_review: unavailable`; vibe stays `draft`, never merged. No LSP → KB or Grep. No interactive confirm → without `--yes`, refuse to write.
-
-## Common Rationalizations
-
-| Rationalization | Reality |
-|---|---|
-| "I'll record it after coding" | This is pre-design, before code; after-the-fact is not the same thing. |
-| "No docs yet, I'll create SysDocs here" | UNINITIALIZED is rejected — never create SysDocs/ here, it locks init. |
-| "The architect found issues, I'll fix silently" | Target-level findings must be asked; step-level the architect self-adjusts. |
-| "I'll merge it right into the module doc" | Only writes VibeCoding/; merge is cs-sysdocs-update's job, under four conditions. |
-| "The raw args can go in verbatim" | Sanitize secrets before writing; mark "原始参数已脱敏". |
-
-## Red Flags
-
-- Creating `SysDocs/` or writing `SYSTEM_ROOT.md` / `modules/**`
-- Writing source code from this skill
-- Overwriting an existing vibe file instead of exclusive-create `-N`
-- Skipping the interrupting target-change gate on a target-level defect
-- Recording secrets verbatim into frontmatter / review round-trips / logs
+Later integration uses `cs-sysdocs-update` when appropriate destinations exist. Verified implementation can update current descriptions; an authorized docs-only proposal can update intended specifications/decisions or links while remaining unimplemented. Do not merge future design into current architecture or create a library merely to obtain a merge target.
 
 ## Verification
 
-- [ ] State was PARTIAL-INITIALIZED or INITIALIZED; UNINITIALIZED rejected
-- [ ] Draft and architect review cite the SysDocs documents actually read, affected modules, constraints, and proposed differences; missing/stale context and awaiting-repair targets remain explicit
-- [ ] Doc written only under `SysDocs/VibeCoding/` via resolved-path allowlist
-- [ ] Slug validated; exclusive-create with `-N`; temp-file + atomic rename
-- [ ] Architect review recorded with structured findings; all blocking target-level defects fixed or accepted
-- [ ] Target-change gate interrupted for target-level findings; no answer → `draft`
-- [ ] Raw args sanitized + marked; no secrets in frontmatter/logs
-- [ ] Doc marked `draft`, not `active`, not merged
-- [ ] Sanitized `.meta/reports/<run-id>.json` written; verdict recorded
+- [ ] Explicit invocation established; all inventory states permitted and proposal-only remains UNINITIALIZED.
+- [ ] Relevant current facts, accepted requirements, KB/source evidence and gaps recorded without full-library prerequisites.
+- [ ] Summary contains key real symbols/responsibilities and boundaries; proposed symbols clearly marked.
+- [ ] Paths/slugs/collisions validated; writes restricted to proposals and any needed sanitized reports.
+- [ ] Review method and structured findings are truthful; missing delegation does not fabricate review evidence.
+- [ ] New unresolved target changes receive a user decision; existing authorization and decisions are reused.
+- [ ] Draft, readiness and implementation states remain distinct; unresolved targets are preserved.
+- [ ] Structure checks and content checks are separate; no architecture/source/KB writes occurred.
 
 ## Interaction with Other Skills
 
-- `cs-sysdocs-init` / `cs-sysdocs-update`: upstream/downstream — this skill requires init/update to have reached PARTIAL-INITIALIZED or INITIALIZED; update later merges the vibe.
-- `cs-architect` (agent): design review fan-out (short, read-only brief).
-- `cs-code-query`: symbol/KB query fallback when needed.
+- `cs-sysdocs-init`: can initialize a formal library later; proposal creation neither invokes nor blocks it.
+- `cs-sysdocs-update`: integrates eligible proposals into appropriate existing destinations without losing their history.
+- `cs-code-query`: optional actual index evidence and source fallback.
+- `cs-architect`: read-only review at the host's direction; no persona-to-persona invocation.
 
 ## See Also
 
-- `../../references/sysdocs-system.md` — shared convention (inventory, frontmatter, validator, report)
-- `../../references/sysdocs-vibe-template.md` — vibe doc shape
+- [Shared protocol](../../references/sysdocs-system.md)
+- [Design context](../../references/sysdocs-design-context.md)
+- [Vibe template](../../references/sysdocs-vibe-template.md)

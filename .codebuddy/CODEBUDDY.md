@@ -49,7 +49,7 @@ Skills encode the workflows, quality gates, and best practices that senior engin
 │   ├── cs-observability/Ship
 │   ├── cs-shipping/     Ship
 │   ├── cs-sysdocs-init/   SysDocs: one-time full doc generation
-│   ├── cs-sysdocs-update/ SysDocs: repair / incremental / rebuild-boundaries
+│   ├── cs-sysdocs-update/ SysDocs: affected updates / repair / explicit migration or rebuild
 │   └── cs-vibe-coding/  SysDocs: fragmentary change pre-design
 ├── commands/                 → 10 slash commands (orchestration layer)
 │   ├── cs-spec.md
@@ -77,6 +77,8 @@ Skills encode the workflows, quality gates, and best practices that senior engin
 │   ├── sysdocs-system.md
 │   ├── sysdocs-overview-template.md
 │   ├── sysdocs-module-template.md
+│   ├── sysdocs-files-template.md
+│   ├── sysdocs-flow-template.md
 │   └── sysdocs-vibe-template.md
 ├── AGENTS.md                 → Skill discovery router and intent mapping
 ├── settings.json             → Hook registration and permissions
@@ -160,8 +162,12 @@ Personas follow the composition rule: **only the user (or AGENTS.md intent mappi
 
 The pack ships a project-documentation system (`SysDocs/`) plus three skills:
 `cs-sysdocs-init` (one-time full generation), `cs-sysdocs-update` (the only
-maintenance entry: repair / incremental / rebuild-boundaries), and
-`cs-vibe-coding` (fragmentary change pre-design, architect-reviewed). The shared
+maintenance entry: affected updates / repair / explicit migration or rebuild), and
+`cs-vibe-coding` (fragmentary pre-design, also without an initialized library). Schema 2
+uses README, architecture, files, applicable specs/decisions and proposal directories.
+Header summaries list key classes/structures with one-sentence responsibilities;
+KB and documentation candidates are combined and verified against source. Legacy
+layouts remain readable until explicit migration. The shared
 templates and validator protocol live in `references/sysdocs-*.md`. `SysDocs/`
 deploys on the consuming project's root, not this skill-pack repo.
 

@@ -88,7 +88,7 @@ fix_refs() (
     [ -f "$ref" ] || continue
     name=$(basename "$ref")
     tmp="$target_file.tmp.$$"
-    sed "s#[^[:space:]$bt]*references/$name#../../references/$name#g; s#\.codebuddy/skills/code-query/##g" "$target_file" > "$tmp"
+    sed "s#[^][()<>[:space:]$bt]*references/$name#../../references/$name#g; s#\.codebuddy/skills/code-query/##g" "$target_file" > "$tmp"
     mv "$tmp" "$target_file"
   done
 )

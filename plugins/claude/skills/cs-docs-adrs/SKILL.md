@@ -22,8 +22,20 @@ Document decisions, not just code. The most valuable documentation captures the 
 ## Architecture Decision Records (ADRs)
 
 ### ADR Template
+
+For a newly created ADR under `SysDocs/decisions/`, include schema 2 metadata and an applicable retrieval summary as below. Existing external ADRs and historical formats remain authoritative; do not rewrite them merely to adopt this template or mark a decision Accepted without acceptance evidence.
+
 ```markdown
+---
+schema: 2
+doc_type: decision
+updated: <ISO date or timestamp>
+---
+
 # ADR-[NNN]: [Title]
+
+## 检索摘要
+[Key classes/structures or actual modules/processes, their one-sentence responsibilities, and the decision boundary; label future symbols as proposed.]
 
 ## Status
 [Proposed | Accepted | Deprecated | Superseded by ADR-XXX]
@@ -53,12 +65,16 @@ Document decisions, not just code. The most valuable documentation captures the 
 
 | Situation | Document | Location |
 |-----------|----------|----------|
-| Architecture decision | ADR | `docs/adr/ADR-NNN.md` |
+| Architecture decision | ADR | Existing authoritative ADR location; new projects default to `SysDocs/decisions/ADR-NNN.md` |
 | API reference | API docs | Inline JSDoc + generated docs |
-| How to use a module | Module doc | `SysDocs/modules/<slug>.md` (see `cs-sysdocs-update`) |
+| How to use a module | Module doc | `SysDocs/architecture/modules/<slug>.md`; full file responsibilities in `SysDocs/files/<slug>.md` (see `cs-sysdocs-update`) |
 | Project setup | README | Root `README.md` |
 | Design rationale | Design doc | `docs/design/[feature].md` |
 | Changelog entries | CHANGELOG | `CHANGELOG.md` |
+
+Keep existing accepted specs/ADRs in their authoritative locations and link them from SysDocs. New requirements default to `SysDocs/specs/`; creating a spec or ADR does not initialize an entire documentation library. Legacy SysDocs layouts remain locally maintainable until an explicit migration through `cs-sysdocs-update`.
+
+Preserve accepted ADR bodies. A changed decision uses a new ADR and supersession link; only locator/status corrections belong in an old record. Implementation facts cannot automatically become MUST requirements. Follow [the shared context protocol](../../references/sysdocs-design-context.md) for source-backed descriptions, header summaries and affected synchronization; proposed changes must remain visibly unimplemented.
 
 ## Documentation Standards
 
@@ -83,7 +99,7 @@ Document decisions, not just code. The most valuable documentation captures the 
 
 ## Interaction with Other Skills
 
-- `cs-sysdocs-init` / `cs-sysdocs-update`: SysDocs = what/how, ADR = why. Module docs link ADRs; this skill's "How to use a module" points to `SysDocs/modules/<slug>.md`, not `src/module/README.md` (avoid double-writing).
+- `cs-sysdocs-init` / `cs-sysdocs-update`: SysDocs separates current architecture/files, expected requirements and historical decisions. Link each authoritative source once and synchronize affected content within the authorized task.
 
 ## Verification
 

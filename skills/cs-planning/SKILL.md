@@ -127,7 +127,7 @@ Arrange tasks so dependencies are satisfied and verification checkpoints occur e
 - `cs-incremental`: downstream — execute tasks in thin vertical slices, routed by owner
 - `cs-frontend-lead` / `cs-backend-lead` (agents): downstream — implement primary-owner tasks and consult on listed collaborator boundaries
 - `cs-tdd`: downstream — test-driven implementation of individual tasks
-- `cs-sysdocs-update` / `SysDocs/`: when a `SysDocs/` library exists, derive task boundaries from its module manifest + dependency direction instead of re-guessing from source
+- `cs-sysdocs-update` / `SysDocs/`: use the shared [task-context protocol](../../references/sysdocs-design-context.md). Read relevant accepted specs/ADRs, then schema 2 navigation/summaries (or the legacy manifest), and verify boundaries against source. Each task records documentation impact or a specific no-impact reason. Missing unrelated documentation does not require full initialization or repair before planning.
 
 ## See Also
 

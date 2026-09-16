@@ -1,66 +1,42 @@
-# CodeGraph: Query Knowledge Graph
+# CodeGraph: Query Existing Index
 
-Query the project's CodeGraph knowledge graph to answer code-related questions.
+Apply the main skill's separate existence, queryability, and coverage checks. Resolve
+the target project and its `.codegraph/` index; if absent or unusable, report the
+condition and search source directly. Do not initialize or refresh during a query.
 
----
+## Interface Discovery
 
-## Prerequisites
+Discover the host's actual CodeGraph MCP tools and input schemas. A known interface
+is `codegraph_explore` with `query` and `projectPath`; narrower tools such as
+`codegraph_search`, `codegraph_node`, and `codegraph_impact` may not be exposed.
+Only invoke tools actually available; pass the verified target project path.
 
-- `.codegraph/` directory must exist in the project root
-- CodeGraph must be registered to CodeSquad (MCP bridge auto-connects)
+If MCP is unavailable, discover the CLI and inspect `codegraph --help` and relevant
+subcommand help. Supported versions provide these examples:
 
-If `.codegraph/` does not exist, go back to Phase 3 of the main SKILL.md
-or load `codegraph/create.md` to create it first.
-
----
-
-## Query Flow
-
-### 1. Use `/understand-chat` (CodeBuddy)
-
-CodeGraph integrates with CodeSquad via MCP bridge, making its tools available
-through the standard understand-chat flow. The most reliable approach is:
-
-```
-/understand-chat [user's question rephrased for graph query]
+```text
+codegraph status "<project-root>" --json
+codegraph query "<symbol>" --path "<project-root>" --json
+codegraph explore "<question or symbols>" --path "<project-root>"
+codegraph callers "<symbol>" --path "<project-root>" --json
+codegraph impact "<symbol>" --path "<project-root>" --json
 ```
 
-**Rephrasing examples**:
+Replace placeholders with safely quoted arguments; confirm flags against the installed
+version. Do not invent an MCP-to-skill bridge or use `/understand-chat`. For strict
+read-only constraints, inspect backend database/watcher side effects first and use
+source fallback when the available interface cannot honor those constraints.
 
-| User asks                              | Route as                                    |
-|----------------------------------------|---------------------------------------------|
-| "How does the chat system work?"       | `/understand-chat chat system architecture and flow` |
-| "Where is session handling defined?"   | `/understand-chat session handling location and dependencies` |
-| "What calls the agent runner?"         | `/understand-chat agent-runner callers and dependents` |
-| "Find all API routes"                  | `/understand-chat API route definitions and structure` |
+## Query and Verification
 
-### 2. Interpret Results
+1. Probe a known symbol/path and verify the reported project/index location.
+2. Query the needed symbols, call paths, or impact candidates. Inspect status metadata
+   and omissions; a running watcher does not guarantee coverage or freshness.
+3. Cross-check relevant current source, including renamed/new files and uncommitted
+   work missing from the index. A returned source excerpt still needs its location
+   and snapshot checked. Empty results trigger source search, not automatic rebuild.
+4. For document work, union graph candidates with SysDocs summary/business-term and
+   source candidates under the main skill. Report discrepancies and provenance.
 
-After `/understand-chat` returns:
-
-1. **Summarize** findings in plain language
-2. **If answer is complete**: present it directly with file paths and line references
-3. **If deeper investigation is needed**: use results as a map, then `Read` the specific files identified
-
-### 3. CodeGraph-Specific Strengths
-
-CodeGraph provides:
-- **Semantic code graph**: relationships between functions, classes, modules
-- **Call chains**: who calls what, dependency chains
-- **Symbol resolution**: find definitions, references, implementations
-- **20+ language support**: TypeScript, Python, C#, C++, GDScript, etc.
-- **Auto-sync**: file watcher keeps the graph up-to-date (no manual refresh needed)
-
----
-
-## Fallback
-
-If `/understand-chat` returns no results:
-
-1. Check that CodeGraph is running (MCP connection active)
-2. Try re-initializing: load `codegraph/update.md`
-3. If still failing, fall back to traditional search (Glob → Grep → Read)
-
----
-
-**Verdict**: COMPLETE — query answered via CodeGraph knowledge graph.
+Follow the main verdict contract: identify CodeGraph vs source fallback and unknown
+coverage. Query completion does not certify SysDocs contents.

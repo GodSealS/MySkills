@@ -91,4 +91,4 @@ npx tsc --noEmit
 
 ## Interaction with Other Skills
 
-- `cs-sysdocs-update`: when a `SysDocs/` library exists, add one reminder before commit/PR — does the change drift the docs? Do not auto-refresh the whole library.
+- `cs-sysdocs-update`: include the authorized change's documentation impact and necessary synchronization in the same commit/PR (or workspace delivery when not committing). Follow [the task-context protocol](../../references/sysdocs-design-context.md); verify the affected scope before review, reuse valid evidence, and report unrelated old gaps separately. Do not turn each update into a repeated permission prompt or unconditional full-library refresh.

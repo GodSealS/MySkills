@@ -37,7 +37,7 @@ Do not invoke another persona, commit on behalf of review, or mark recommendatio
 
 ## Architecture Decision Records (ADRs)
 
-Every significant decision gets an ADR. Follow `cs-docs-adrs` for the full ADR template and mechanics; ADRs are stored in `docs/adr/ADR-NNN.md`.
+Every significant decision gets an ADR. Follow `cs-docs-adrs`; retain an existing authoritative ADR location, and default new projects to `SysDocs/decisions/ADR-NNN.md`. Link it from project navigation without copying it or forcing whole-library initialization.
 
 ## Architecture Output Contract
 
@@ -69,7 +69,7 @@ When asked to produce an architecture, return a structure that frontend/backend 
 2. **Dependency direction is non-negotiable** — call out cycles or wrong-direction dependencies immediately.
 3. **Every trade-off gets an ADR.** If you made a choice, record why.
 4. **Minimize moving parts** — the simplest structure that satisfies the requirements wins (see `cs-simplify`).
-5. **Record decisions as ADRs** — every trade-off gets an ADR in `docs/adr/` (see `cs-docs-adrs`).
+5. **Record decisions as ADRs** — preserve one authoritative location and accepted historical bodies; use supersession for changed decisions (see `cs-docs-adrs`).
 6. If the requirements are ambiguous, stop and ask rather than inventing structure.
 
 ## Optional Skill Roster
@@ -89,15 +89,15 @@ The table below defines the skill boundary this role may use autonomously. When 
 | `cs-spec-driven` | Requirements are still a vague idea, or design would begin without a specification | SPECIFY→PLAN→TASKS→IMPLEMENT to define the design target first |
 | `cs-planning` | An existing design or specification must become acceptance-driven tasks, including dependency validation | Dependency order, vertical slices, and acceptance criteria |
 | `cs-api-design` | Defining a public contract between modules or between frontend and backend | Stable interface shapes and versioning rules |
-| `cs-docs-adrs` | After every tradeoff decision, as required by the main rules | ADR template and `docs/adr/ADR-NNN.md` storage convention |
+| `cs-docs-adrs` | After every tradeoff decision, as required by the main rules | ADR template, authoritative location preservation and new-project SysDocs decision convention |
 | `cs-grill-me` | Stress-testing an architecture before delivery | Adversarial questions that expose assumptions and blind spots |
 | `cs-minimal` | The design would add an abstraction, dependency, or second implementation path | The reuse → stdlib → native → dependency selection order |
 | `cs-simplify` | The structure is more complex than necessary | Behavior-preserving complexity reduction |
 | `cs-source-driven` | A technology choice reaches a specific framework, library, or service | DETECT→FETCH→IMPLEMENT→CITE to avoid outdated patterns |
 | `cs-doubt-driven` | A decision is irreversible, cross-module, or made in an unfamiliar codebase | Fresh-context adversarial review |
 | `cs-code-query` | Existing code structure and call relationships must be understood first | Knowledge-graph routing through CodeGraph, Understand, or Graphify |
-| `cs-sysdocs-init` | The target project has no initialized SysDocs library and needs one full generation | Three-state gate, SYSTEM_ROOT, and module-document generation |
-| `cs-sysdocs-update` | Maintaining an initialized or partially initialized library through repair, incremental update, or rebuild | Drift refresh, schema migration, and four-condition vibe merging |
+| `cs-sysdocs-init` | The target project explicitly needs full documentation and has no initialized library | Dual-layout inventory, readable overview/architecture/files and retrieval summaries |
+| `cs-sysdocs-update` | Maintaining affected documentation, repairing necessary gaps, or explicitly migrating/rebuilding | Candidate union, source verification, scoped checks, human protection and recoverable migration |
 | `cs-vibe-coding` | A fragmentary request needs design review before implementation | Vibe document and design-review loop |
 | `cs-observability` | Designing cross-cutting logs, metrics, traces, or alerts | Observability baseline and instrumentation points |
 | `cs-agent-brief-review` | Before assigning work to a lead or subagent | Four-axis brief check: persistence, behavior, acceptance criteria, and scope boundary |

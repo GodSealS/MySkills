@@ -57,12 +57,23 @@ ASSUMPTIONS I'M MAKING:
 5. **Testing Strategy** — Framework, location, coverage expectations
 6. **Boundaries** — Always/Ask First/Never rules
 
-**Architecture Fan-Out:** After the human approves the objective, **FAN-OUT to `cs-architect`** (via `Task`) to produce the architecture: module boundaries, dependency direction, tech stack, and an ADR for each significant decision (written via `cs-docs-adrs` to `docs/adr/`). The architect's output is a required input for the spec's Project Structure section.
+**Architecture Fan-Out:** After the human approves the objective, **FAN-OUT to `cs-architect`** (via `Task`) to produce module boundaries, dependency direction, tech stack and significant ADRs via `cs-docs-adrs`. Preserve an existing authoritative ADR location; new projects default to `SysDocs/decisions/`. The architect's output is required input for the spec's Project Structure section.
 
 **Spec template:**
 
+Keep an existing authoritative spec location; otherwise use `SysDocs/specs/<topic>.md`. For a newly created SysDocs specification, include the schema 2 metadata below and an applicable retrieval summary. Preserve existing external/historical formats; do not create a second authority or initialize the whole library.
+
 ```markdown
+---
+schema: 2
+doc_type: spec
+updated: <ISO date or timestamp>
+---
+
 # Spec: [Project/Feature Name]
+
+## 检索摘要
+[Key existing or proposed classes/structures with one-sentence responsibilities and relevant constraints; label proposed symbols as unimplemented. Use real modules/processes when classes do not apply.]
 
 ## Objective
 [What we're building and why. User stories or acceptance criteria.]
@@ -95,7 +106,7 @@ ASSUMPTIONS I'M MAKING:
 
 ## Grill Review
 - Status: pending
-- Findings: [Run `/cs-grill-me SPEC.md` and summarize the vulnerabilities, or explicitly record a skip decision.]
+- Findings: [Run `/cs-grill-me <actual-spec-path>` and summarize the vulnerabilities, or explicitly record a skip decision.]
 - Decision: [Address now / proceed with accepted risks / skipped with accepted risks]
 ```
 
@@ -143,9 +154,9 @@ Before invoking `cs-planning`, run `/cs-grill-me <spec-path>` and replace the `p
 - `cs-interview-me`: upstream — extracts what the user actually wants before specifying
 - `cs-idea-refine`: upstream — generates and refines options before writing a spec
 - `grill-me`: required gate before planning — stress-test the spec, then record the findings and decision in `## Grill Review`
-- `cs-architect` (agent): fan-out after the objective is approved — produces module boundaries, dependency direction, tech stack, and ADRs (via `cs-docs-adrs`, stored in `docs/adr/`)
+- `cs-architect` (agent): fan-out after the objective is approved — produces module boundaries, dependency direction, tech stack and ADRs via `cs-docs-adrs`, retaining the authoritative location or defaulting new projects to `SysDocs/decisions/`
 - `cs-planning`: downstream — break the spec into verifiable tasks
-- `cs-sysdocs-init` / `cs-sysdocs-update`: downstream — after the spec lands, initialize/refresh the SysDocs library (no code → skeleton; with code → full or update)
+- `cs-sysdocs-init` / `cs-sysdocs-update`: use the shared [task-context protocol](../../references/sysdocs-design-context.md). Preserve existing authoritative specs; new projects default to `SysDocs/specs/`. A specification alone does not trigger full initialization. Describe target behavior separately from implemented architecture, and synchronize only documentation affected by the authorized change.
 
 ## Verification
 

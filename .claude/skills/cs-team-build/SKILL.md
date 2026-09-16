@@ -79,7 +79,7 @@ tasks/team-build/<run-id>/
 1. Resolve the design doc from `$ARGUMENTS`. If missing or unreadable, **stop** and ask for the path.
 2. Confirm a clean baseline: `git status --porcelain`. If there are uncommitted changes outside the selected `<run-dir>/`, stop and ask the user to commit, stash, or confirm.
 3. Create a fresh `tasks/team-build/<run-id>/reviews/` directory (for example, a timestamp plus short random suffix). If the selected run directory already exists, stop and choose a new run id; never overwrite prior handoffs.
-4. Establish the SysDocs baseline using the three-state inventory in `../../references/sysdocs-system.md`. The host arranges `cs-sysdocs-init` for UNINITIALIZED (use `--type spec` when only a specification exists), `cs-sysdocs-update --mode repair` for PARTIAL-INITIALIZED, or incremental refresh for INITIALIZED. Complete required maintenance before decomposition; capture the resulting Git/document baseline and retain the existing approval rules for any maintenance changes. Read `SysDocs/SYSTEM_ROOT.md` and manifest-selected module documents, and record state, module IDs, document snapshot identities and report paths in `<run-dir>/team.md`. Unavailable or failed prerequisite evidence blocks implementation; directory existence alone is insufficient.
+4. Establish task-specific context using `../../references/sysdocs-design-context.md` and the dual-layout inventory in `../../references/sysdocs-system.md`. Read relevant accepted specs/ADRs, then schema 2 navigation/summaries or the legacy manifest and necessary bodies; verify key facts with source and available KB candidates. Record state, affected modules, source/document evidence and gaps in `<run-dir>/team.md`. Missing SysDocs or unrelated old defects do not force init, full repair or refresh before decomposition. Required task constraints/evidence must be available; explicitly requested full documentation remains an acceptance condition.
 
 ### Phase 1 — Architect decomposes (FAN-OUT → `cs-architect`)
 
@@ -90,7 +90,7 @@ Fan-out to `cs-architect` with the design doc path and the preflight SysDocs con
 3. **Invokes the `cs-planning` skill** to break the doc into executable tasks. Vertical slices, not horizontal layers. Every task needs: id, title, description, **primary owner** (`arch` / `frontend` / `backend`), acceptance criteria, verification steps, dependencies, files likely touched.
 4. Writes `<run-dir>/plan.md` (full breakdown) and `<run-dir>/todo.md` (tracking checklist with a `Rounds` column).
 5. Constraint: `arch` tasks are limited to public contracts, module skeletons, and cross-cutting config. Business features go to a domain lead.
-6. Each task references affected SysDocs module IDs and boundaries, maps requirements to acceptance criteria, and names expected document updates or explains why none are needed. Proposed new boundaries require architect decisions and corresponding manifest updates, not invented module IDs treated as established facts.
+6. Each task references affected modules and verified boundaries, maps requirements to acceptance criteria, and records semantic/documentation impact or a specific no-impact reason. Proposed boundaries require architect decisions and corresponding navigation/index updates in the active layout; absent documentation does not justify invented established module IDs.
 
 **Plan review:** the host fans out `cs-review-advisor` with the plan, constraints, preflight SysDocs context, allowed context and `<run-dir>/reviews/00-plan-review.md`. The advisor checks executability, module traceability and acceptance gaps. The host sends its recommendations to relevant experts under the Advice and verification protocol below; architecture questions return to `cs-architect`. Record how each plan finding was addressed or explicitly accepted as risk before presenting the plan. The host records `review-advisor-v1`, this skill path and its source version in `team.md`.
 
@@ -106,11 +106,11 @@ For each task `T<NN>` in dependency order, run at most **3 rounds**. A round has
 - `frontend` → `cs-frontend-lead`
 - `arch` → `cs-architect`
 
-Supply SYSTEM_ROOT and the task's affected module context to the lead. Instruct the lead to reuse only `/cs-build`'s implementation cycle (`cs-incremental` + `cs-tdd`) for exactly this task: read acceptance criteria → RED → GREEN → regression suite → build → **stage only this task's files and stop before committing**. Skip the final knowledge-base-administrator step; Team Build owns its single invocation in Phase 5. Team Build also owns the single task commit after review approval.
+Supply applicable specs/ADRs, affected descriptions and source evidence to the lead using the shared task-context protocol. Instruct the lead to reuse only `/cs-build`'s implementation cycle (`cs-incremental` + `cs-tdd`) for exactly this task: read acceptance criteria → RED → GREEN → regression suite → build → **stage only this task's files and stop before committing**. Skip the final knowledge-base-administrator step; Team Build owns its single invocation in Phase 5. Team Build also owns the single task commit after review approval.
 
 For round 1 the input is `<run-dir>/plan.md#T<NN>`. For rounds 2-3 the input is `<run-dir>/reviews/T<NN>-r<k>-fixes.md` — the lead implements the directive, stages only this task's files, and does nothing else. Scope discipline applies: no drive-by refactors, no "while I'm here" changes.
 
-Before fixing the review snapshot in each round, the host arranges `cs-sysdocs-update` for the slice's documentation impact and obtains validator evidence. Stage the affected module/manifest updates with the task; preserve update reports in `SysDocs/.meta/reports/` and link the checked snapshot, result and unresolved drift in that round's handoff. Record a reason when no document edit is needed. If synchronization changes reviewed files later, invalidate affected reviews and verify the new snapshot before approval.
+Before fixing each review snapshot, synchronize the slice's affected descriptions, summaries, file indexes, incoming links and approved requirements/decisions; use `cs-sysdocs-update` when maintaining a library. Existing authorization covers necessary reversible synchronization. Combine KB and summary candidates, verify source, and expand high-risk flow reading as the shared protocol requires. Stage corresponding document changes with the task and record scoped structural checks separately from content/behavior verification in the round's existing handoff. Reuse valid evidence; a specific no-impact explanation needs no empty update report. Current-change omissions block DONE; unrelated inherited defects are recorded separately. Later related changes invalidate affected reviews and require new verification.
 
 **Step 2 — REVIEW.** FAN-OUT to `cs-code-reviewer` (`cs-code-review`). Review the task's staged diff (`git diff --cached`), not the whole branch; the handoff must include the base commit and the exact staged file list. Review across all five axes and write the result to `<run-dir>/reviews/T<NN>-r<k>-code-review.md` using the reviewer's standard output template, ending with a verdict:
 
@@ -189,14 +189,14 @@ Fan-out to `cs-test-engineer` with `<run-dir>/plan.md` and `<run-dir>/todo.md`. 
 
 ### Phase 4 — Advisor synthesis (FAN-OUT → `cs-review-advisor`)
 
-Before synthesis, the host arranges the final `cs-sysdocs-update` and validator check. Any resulting target changes return through the affected review and verification gates; prior evidence cannot certify a changed snapshot. Fan-out to `cs-review-advisor` with all still-open findings, their verification history, `<run-dir>/test-report.md`, and the final SysDocs context/update/validator evidence. It writes a draft in `<run-dir>/final-report.md` without replacing actual test evidence. The host obtains relevant expert verification of its recommendations, consults `cs-architect` only for architecture consequences, then records the final verdict in the same artifact:
+Before synthesis, aggregate still-valid slice documentation evidence and check only new impacts or unresolved required gaps; do not unconditionally refresh or validate the entire library again. Any resulting target changes return through affected review and verification gates. Fan-out to `cs-review-advisor` with open findings, verification history, `<run-dir>/test-report.md`, and the scoped document/source evidence. It writes a draft in `<run-dir>/final-report.md` without replacing actual test evidence. The host obtains relevant expert verification, consults `cs-architect` only for architecture consequences, then records the final verdict:
 
 1. **Verdict:** `SHIP` | `FIX FIRST`
 2. **Fix priorities** — proposed from the test report and open findings, with relevant expert evidence; architectural consequences require architect consultation. A flaky integration test on a core flow outranks a missing unit test on a utility.
 3. **Fix approach per item** — for each P0/P1: which owner should take it, which files, the suggested technique, and the risk if it's done wrong. This is the part the test report does not provide.
 4. **Deferred items** — what is being accepted, with the rationale.
 5. **Residual risk** — what the human should know before shipping.
-6. **Documentation verification** — affected module IDs and document changes (or a reasoned no-change result), update report paths, validator method/result, checked snapshot and remaining drift. Missing/failed required evidence or unresolved drift requires `FIX FIRST`; knowledge-base refresh cannot replace SysDocs validation.
+6. **Documentation verification** — affected modules and document changes (or a concrete no-impact result), existing evidence locations, structural method/result, separate content/behavior checks, source scope and unresolved necessary gaps. Required missing/failed evidence or current-change omissions require `FIX FIRST`; unrelated old defects are separate. A KB refresh or structural PASS cannot replace content verification.
 
 If the verdict is `FIX FIRST`, do **not** auto-start the fixes. Present the prioritized list and get approval — then each fix re-enters Phase 2 as a new task with a fresh 3-round budget.
 
@@ -213,7 +213,7 @@ The advisor only recommends. For every recommendation, the host assigns a releva
 
 Every advisor brief includes the installed agent file and private resource directory as absolute paths, target/baseline snapshot, purpose, constraints, permitted context and exact output paths. Private resources resolve from that installed location, never the target cwd. Missing resources mean an incomplete installation, not permission to substitute public review skills. The host collects isolated drafts into approved handoffs; experts and advisors never overwrite one another's evidence.
 
-Mark the assignment as DDD and include the advisor's Documentation-driven review inputs in every brief: project root, inventory evidence, SYSTEM_ROOT and affected module snapshots, relevant spec/ADRs, and the update/validator evidence available for that phase. Include these documents in the permitted read context; their inclusion grants no advisor write access. The host owns maintenance and records coverage gaps in the existing plan review, round handoff or final report.
+Include the advisor's task-specific Documentation-driven review inputs in each relevant brief: project root, inventory evidence, applicable specs/ADRs, affected document/source snapshots and phase-appropriate structural/content evidence. Use the active layout; record absent or unnecessary documentation honestly without forcing initialization. Permitted read context grants no advisor writes. The host owns authorized maintenance and records gaps in existing plan, round or final artifacts.
 
 Return the expert's rejected parts and evidence to the advisor, unless its recorded position already explicitly covers that rejection and supporting evidence. Allow at most one focused position confirmation to establish whether the rejected part remains blocking; do not infer its stance or start a debate loop. Missing confirmation blocks dependent approval; a confirmed blocking disagreement triggers the next paragraph immediately.
 
@@ -273,8 +273,8 @@ Every handoff document is self-contained — the receiving agent must be able to
 ## Verification
 
 - [ ] `<run-dir>/team.md` lists ≥4 members, including `cs-architect`, `cs-review-advisor`, and `cs-code-reviewer`, with a reason for each
-- [ ] Preflight records a usable SysDocs inventory and document baseline; plans reference module boundaries, and every advisor brief carries the corresponding permitted document context.
-- [ ] Each slice and final synthesis has snapshot-matched SysDocs update/validator evidence; documentation-impacting repairs were independently verified, and missing evidence or unresolved drift prevented DONE/SHIP.
+- [ ] Preflight records task-specific inventory, authoritative constraints, relevant document/source evidence and gaps without forcing unrelated initialization or repair.
+- [ ] Each slice synchronizes its affected scope and separates structure/content evidence; final synthesis reuses valid checks. Current-change omissions or required gaps prevent DONE/SHIP, while unrelated old defects remain separate.
 - [ ] `<run-dir>/plan.md` exists; every task has acceptance criteria, verification, and a primary owner
 - [ ] The human approved the roster + plan before implementation started
 - [ ] Every task ran ≤3 rounds; any task that hit the cap was escalated, not silently continued
@@ -302,7 +302,7 @@ Every handoff document is self-contained — the receiving agent must be able to
 - `cs-debugging` — the escape hatch when a test can't be made to pass
 - `cs-doubt-driven` — for high-risk or irreversible tasks before implementing
 - `cs-shipping` — downstream, once the final report says SHIP
-- `cs-sysdocs-init` / `cs-sysdocs-update` / `SysDocs/` — the host establishes the three-state baseline before decomposition and synchronizes/validates each slice and final delivery; the architect and advisor read SYSTEM_ROOT + relevant module docs
+- `cs-sysdocs-init` / `cs-sysdocs-update` / `SysDocs/` — the host follows the shared task-context protocol, synchronizes affected slice documents, and reuses valid evidence at delivery. Full initialization/refresh occurs only when requested; legacy and schema 2 layouts are both readable.
 - `cs-knowledge-base-admin` — final subagent refreshes existing knowledge bases only; it never bootstraps one
 
 ## See Also

@@ -1,141 +1,112 @@
 ---
 name: cs-sysdocs-init
-description: "Generates the SysDocs system documentation set (SYSTEM_ROOT.md + one module doc per module) for a target project in one pass. Use only when the three-state inventory says the project is UNINITIALIZED — no SysDocs/ dir, empty, only VibeCoding/, or no valid SYSTEM_ROOT.md/module docs yet. Never runs re-init or repairs; that is cs-sysdocs-update's job. / 一次性全量生成项目 SysDocs 系统文档（SYSTEM_ROOT.md + 每个模块一份模块文档）。仅当三态清单判定项目为「未初始化」时使用——无 SysDocs/ 目录、为空、只有 VibeCoding/、或尚无有效 SYSTEM_ROOT.md/模块文档。绝不执行 re-init 或 repair，那是 cs-sysdocs-update 的职责。"
+description: "Explicitly generates a human-readable SysDocs library for an undocumented project: overview, architecture, important flows, and source-file responsibilities. Uses source evidence with optional knowledge-base assistance. Only for UNINITIALIZED inventory; maintenance and explicit migration belong to cs-sysdocs-update. / 显式为未梳理项目生成面向人的 SysDocs 概览、架构、关键流程和文件职责；知识库可选，源码核实必需。只用于未初始化状态，维护和显式迁移交给 cs-sysdocs-update。"
 argument-hint: "[project_root] [--type code|spec] [--source-roots <dirs>] [--kb <backend>] [--source-scope committed|committed+working-tree|unversioned] [--yes]"
 user-invocable: true
 allowed-tools: Read, Glob, Grep, Write, Edit, Bash, Task, ListDir
 agent: cs-architect
 ---
 
-# SysDocs Init — One-Pass Full Generation
+# SysDocs Init — Human-Readable Project Documentation
 
 ## Overview
 
-Generate the **SysDocs** system documentation set — `SYSTEM_ROOT.md` (the single overview entry point) plus one module doc per identified module — for a target project. This is the **one-time, full-generation** entry point. It runs **only** when the three-state inventory (§2 of the shared convention) says the project is **UNINITIALIZED**. Re-init and boundary rebuild live in `cs-sysdocs-update`, never here.
+Generate a navigable explanation of what the project does, its runtime boundaries, module responsibilities, important flows, and where to read the implementation. This is an explicitly requested full documentation deliverable, not a prerequisite for ordinary development or a small design proposal.
 
-Read the shared convention first: `../../references/sysdocs-system.md`, then the three templates `sysdocs-overview-template.md`, `sysdocs-module-template.md`, `sysdocs-vibe-template.md`.
+Read [the shared protocol](../../references/sysdocs-system.md) first. It owns the schema, inventory, summaries, evidence, protection and validation rules. Use its overview, module, file-index and flow templates; do not reproduce a second schema here.
 
 ## When to Use
 
-- Inventory state = **UNINITIALIZED** (no `SysDocs/`, empty, only `VibeCoding/`, or no valid `SYSTEM_ROOT.md` / module docs).
-- A code project that has never been documented, OR a spec-only project (just landed from `cs-spec-driven`) that needs the skeleton.
+- The user requests project documentation and inventory is **UNINITIALIZED**: no formal library, including a project with only `VibeCoding/` and reports.
+- Code or accepted design evidence identifies the requested project scope.
+- **PARTIAL-INITIALIZED** → use `cs-sysdocs-update` repair; **INITIALIZED** → update within the requested scope. Never reinitialize, silently migrate, or overwrite an existing library.
+- Ordinary work without SysDocs continues with task evidence. A proposal alone uses `cs-vibe-coding` and does not trigger full initialization.
 
-**When NOT to use:**
+## Inputs and Authorization
 
-- **PARTIAL-INITIALIZED** → stop; hand to `cs-sysdocs-update` mode=`repair`.
-- **INITIALIZED** → stop; hand to `cs-sysdocs-update` incremental.
-- Boundary rebuild / re-init → `cs-sysdocs-update` mode=`rebuild-boundaries`, never init.
+Normalize `operation`, `project_root`, `mode`, `source_scope`, `--type`, `--source-roots`, `--kb`, and `yes`. Resolve the explicitly named project root, defaulting to the current workspace; do not discover a different parent or child root silently.
 
-## Inputs (normalize first)
+- `--type code|spec` only overrides project classification; it does not override exclusions or evidence requirements.
+- `--source-roots` declares the business-source scope. Record exclusions with reasons.
+- `--kb` selects the actual requested backend; `none` disables KB use. Selection, availability, coverage and freshness follow `cs-code-query`.
+- `source_scope` is `committed`, `committed+working-tree`, or `unversioned`. Use task authorization to select the scope; explicitly include intended working changes rather than silently ignoring them.
+- Reuse existing authorization for this documentation deliverable. Present the intended scope and proceed when already authorized; `--yes` is an automation convenience, not a requirement to reapprove the same work. Ask only if a material scope or constraint choice remains unresolved.
 
-Normalize all arguments into one object before doing anything: `operation`, `project_root`, `mode`, `source_scope`, `yes`, plus `--type`, `--source-roots`, `--kb`, and the file list when no git. Record the normalized inputs and every confirm/reject result into the run report — do not rely on natural-language dialogue alone.
+## Write Authorization
 
-- `project_root`: explicit workspace-relative dir; default = current workspace root. Never search up to a parent or down into a child automatically.
-- `--type code|spec`: override project-type detection only. Cannot override project_root, the exclusion table, path allowlist, or sensitive-data rules.
-- `--source-roots <dirs>`: explicit source dirs/packages.
-- `--kb <backend>`: force codegraph / understand-anything / graphify.
-- `--source-scope committed|committed+working-tree|unversioned`: default `committed`.
-- `--yes`: non-interactive confirmation. **Without `--yes`, do not auto-continue** past the module-list preview.
+Only write `SysDocs/**` beneath the resolved project root, including temporary files and reports. Resolve real paths and symlinks before writes; reject escape paths. Do not modify source, external authoritative specs/ADRs, installed skills, or knowledge-base indexes; do not install or create a KB. Link existing authoritative material in its original location.
 
-## Invocation examples
+Architect boundary reviews, when available, use short read-only briefs. A persona already running this workflow performs its own assigned checks and does not invoke another persona. Missing delegation alone is not evidence of incorrect documentation or an automatic `PARTIAL` result.
 
-```text
-cs-sysdocs-init --project-root . --type code --source-roots src --kb none --yes
-cs-sysdocs-init --project-root ../demo --type spec --source-scope unversioned --yes
-```
-
-On hosts without `Task`, continue boundary identification with source tools but
-record `architect_review: unavailable`, use `confidence: low`/`PARTIAL`, and never
-claim high-confidence module boundaries. Hosts without interactive confirmation
-must require `--yes`; otherwise stop before writing.
-
-## Write Authorization (allowlist)
-
-Tool declaration ≠ write authorization. This skill may only create/modify `SysDocs/**` under the current project root:
-
-- Never write source code, KB directories, the skill pack, or paths outside project root.
-- Before every `Write`/`Edit`/`Bash` write, resolve the real path (including symlinks) and confirm it stays inside the allowlist; a path check failure is an immediate reject — no fallback path.
-- `Bash` is only for non-destructive probing, temp files, and atomic rename; never recursive delete, overwrite outside the allowlist, source-mutation commands, or installing dependencies.
-- `Task` fan-out briefs to `cs-architect` are **read-only**; the subagent must not write the target project. All fan-out output is sanitized and validated by this skill before this skill lands it.
+Verification evidence should reuse the enclosing task artifact. If that artifact is outside this skill's write allowlist, return the results to the host for authorized recording; do not widen the allowlist or create a duplicate report merely for routing.
 
 ## Process
 
-### Phase 1 — Survey the project
+### 1. Inventory and source baseline
 
-Identify language / runtime / config format / directory structure (feeds SYSTEM_ROOT §4–§7). Apply the exclusion table (§9 of the convention): `node_modules/`, `vendor/`, `dist/`, `build/`, `.git/`, `generated/`, `*.g.cs`, protobuf/openapi generated dirs, wide frontend buckets (`src/components/`, `src/assets/`, `src/styles/`), pure test/resource dirs, and sensitive sources (`.env*`, keys/certs, credential dirs, logs, dumps).
+Apply the shared dual-layout inventory: legacy `SYSTEM_ROOT.md` / `modules/` and schema 2 `README.md` / `architecture/` / `files/`. A mixed interrupted migration is repair work, not a new init. Unknown future schema is read-only `FAILED`; preserve everything.
 
-Classify project type using the **evidence matrix**, never a single extension:
+Identify runtime, entry points, packages and existing authoritative requirements. Record the inspected revision and declared source paths. Committed scope uses the actual commit contents; working-tree scope records the base SHA plus included staged, unstaged and untracked files in existing task evidence; its required `evidence` metadata points to that project-relative file, optionally with an anchor. Without Git, use explicit source paths and `unversioned`; do not invent a SHA. Recheck relevant source state before publishing; changes invalidate affected evidence.
 
-- **Code evidence**: ≥1 source file/package not filtered by the exclusion table, with an identifiable language and entry point / export symbols / parseable syntax. README, config, test data, resources, and generated artifacts alone are NOT code evidence.
-- **Spec evidence**: `SPEC.md`, `spec/`, `design/`, or an explicitly user-specified spec file whose content is readable.
-- Code only → full init. Spec only (no code) → skeleton (`SYSTEM_ROOT.md` §0–§3 + empty module manifest, empty `modules/`; module bodies later via update repair). Neither → **stop**, ask for project type or `source_roots`. Both → treat as code project and list both evidence kinds in the preview.
-- Record evidence, exclusions, overrides, and the final choice into the init report for later repair/audit.
+Exclude dependency caches, generated/build output and sensitive material. Business code in `components/` remains eligible. Tests, configuration and assets may have separate reading guidance or directory-level explanations; exclusions must not hide business source.
 
-### Phase 2 — Probe knowledge base (never install)
+For a spec-only project, document the project purpose, existing requirements and the fact that no implementation exists. Use empty source scope and no invented modules; prospective designs remain proposals/specs. The required architecture overview states that implementation does not yet exist and links its authoritative requirements; do not invent module pages or create other empty directories.
 
-Run only `cs-code-query` Phase 2 (directory/CLI status probe). Do **not** load its Phase 3 bootstrap/create wizard. Select a READY backend by the capability matrix (§5.2.1 of the plan). No usable backend → say **one line** "no KB, low-confidence degraded generation this round", write `kb: none`, `confidence: low`, `kb_bootstrap: pending`, and fall back to Glob/Grep/Read.
+### 2. Query evidence, with source fallback
 
-### Phase 3 — Identify module boundaries (strategy C + exclusion table)
+Use `cs-code-query` to check the actual backend, project/index identity, queryability, file coverage and source revision. Directory or CLI existence is not proof of usable evidence. Prefer existing usable indexes; never bootstrap here. A requested backend that fails is reported; do not silently substitute another.
 
-Directory/package as skeleton; AI + KB add business semantics, split/merge wide buckets, and write the rationale. May fan-out `cs-architect` to validate the **module list table** (short brief: slug / dir / one-line responsibility / split-merge rationale — never module bodies).
+Use KB results as candidates, then read the source/configuration supporting important facts. Without a usable KB, source reads and reference searches may fully support the deliverable. Record KB limitations separately; only unresolved necessary facts reduce the result to `PARTIAL`.
 
-### Phase 4 — Module list preview (confirmation gate)
+### 3. Establish reading structure
 
-Present the module list (id / path / description / source_roots / split-merge rationale) for confirmation. Interactive mode: only an explicit `yes`/`approve` continues to write; reject, timeout, or no reply → stop, landed checkpoints stay `draft`. Non-interactive: must pass `--yes`; record input source, assumptions, and risk into the result.
+Derive modules from responsibilities and actual dependency direction, using packages/directories as evidence rather than treating every directory as a module. Identify the key flows and exception paths readers need. Preview modules, source scope, exclusions and evidence gaps as a progress update. Existing authorization permits reversible generation to continue.
 
-### Phase 5 — Generate SYSTEM_ROOT.md
+Where helpful and the host supports it, request a read-only `cs-architect` review of the short boundary table. Do not send entire module bodies. Resolve material boundary ambiguity using evidence; if a needed user choice is absent, retain it as unresolved rather than inventing a business decision.
 
-Write `SYSTEM_ROOT.md` from the overview template: frontmatter (with `modules` manifest + `kb_bootstrap`), `generated_from` = current HEAD (or omit + note in body when no git), §0–§7.
+### 4. Generate schema 2 pages
 
-### Phase 6 — Generate each module doc (checkpointed)
+- `SysDocs/README.md`: purpose, terminology, running boundaries and a short reading route.
+- `architecture/overview.md`: implemented system and deployment boundaries; for a spec-only project, explain that no implementation exists and link the design requirements.
+- `architecture/modules/<module-id>.md`: responsibilities, collaborators, key entry points and important limitations.
+- `architecture/flows/<flow-id>.md`: important cross-module normal and exceptional paths when independently useful.
+- `files/README.md`: declared source scope, directory navigation and exclusions with reasons.
+- `files/<module-id>.md`: the complete file-responsibility table for the declared module scope, paired with its module page; a shared file has one detailed owner.
+- Link accepted specs/ADRs at their authoritative locations. Create `specs/` or `decisions/` content only when warranted and authorized; do not invent accepted requirements or design reasons.
 
-Write each module doc from the module template; land each one and update SYSTEM_ROOT §3 after each. Interrupt is allowed — after an interrupt the inventory is PARTIAL-INITIALIZED and `cs-sysdocs-update` repair resumes. Verify class references exist via the reverse-lookup order (§7.1 of the convention).
+Use schema 2 metadata from the shared protocol. Source-derived pages record `source_scope`, `source_paths`, and a verified base `generated_from` when Git-based. Navigation replaces the old duplicated editable module manifest.
 
-### Phase 7 — Ambiguity self-check + verdict
+Each generated overview, architecture and file page starts with `## 检索摘要` after metadata (an H1 may precede it). List only key entry or responsibility-bearing classes/structures, each with a one-sentence responsibility; use real functions, modules, configuration or processes where no class exists. Include important cross-module and transaction, permission, ownership or recovery boundaries. Do not build an exhaustive symbol list or a duplicate summary index.
 
-Run the **shared validator** (convention §11) before any `active` status or atomic replace. Write the sanitized `.meta/reports/<run-id>.json` (convention §12). Verdict: `COMPLETE` / `PARTIAL` / `FAILED`. Only set `active` after all required docs + self-check pass; an interrupt leaves `draft`.
+Write files through temporary files and atomic rename. Preserve existing proposals, unknown fields and human material. Record interrupted progress so update repair can resume without replacing completed pages.
 
-## Common Rationalizations
+### 5. Verify structure and content separately
 
-| Rationalization | Reality |
-|---|---|
-| "The dir exists, so it's initialized" | The gate is the three-state inventory, not dir existence. A dir with only VibeCoding/ is UNINITIALIZED. |
-| "I can just re-run init to fix gaps" | init is one-time. Gaps = PARTIAL-INITIALIZED = update repair. |
-| "No KB, so I'll install one" | Never install/bootstrap here. Degrade with Glob/Grep/Read and `kb_bootstrap: pending`. |
-| "I'll auto-proceed without asking" | The module-list preview is a hard gate. No `--yes` → stop. |
-| "I'll document every class" | Class references are tiered; hard cap ~400 lines / 15 detailed classes. |
+Run the shared validator for the **whole requested library**: metadata, summaries, paths, navigation, file coverage and unique ownership. Separately verify source-backed responsibilities, important dependencies/flows, summary-body agreement and constraints against evidence. Record actual methods and missing parser capabilities; formatting checks cannot prove symbol semantics or Mermaid correctness.
 
-## Red Flags
-
-- Writing anywhere outside `SysDocs/**` under project root
-- Loading `cs-code-query` Phase 3 bootstrap/create, or calling `findReferences`/`workspaceSymbol` as if the KB skill provides them
-- Marking docs `active` before the validator passes
-- Continuing past the module-list preview without explicit confirmation / `--yes`
-- Guessing project type instead of applying the evidence matrix
-- Leaving a half-written file instead of temp-file + atomic replace
+Record sanitized results with declared scope, checked items, failures and uncovered items in existing task/review evidence. Use a `.meta/reports/` file only when a separate durable artifact is needed; do not require a duplicate report. `COMPLETE` requires full requested coverage and necessary content evidence, not simply a successful validator exit. Only mark applicable pages `active` after both kinds of checks. Missing KB or an unavailable subagent is not by itself a failure.
 
 ## Verification
 
-- [ ] Inventory state was UNINITIALIZED before starting
-- [ ] Project type decided by evidence matrix; evidence/exclusions/overrides recorded in the report
-- [ ] KB probed, not installed; `kb` / `confidence` / `kb_bootstrap` set per the capability matrix
-- [ ] Module list previewed and explicitly confirmed (or `--yes` recorded with source/assumptions/risk)
-- [ ] `SYSTEM_ROOT.md` has full frontmatter + `modules` manifest + §0–§7
-- [ ] Every module doc follows the module template, with tiered class references and self-check
-- [ ] All Write/Edit/Bash ops stayed inside the resolved-path allowlist
-- [ ] Shared validator ran; sanitized `.meta/reports/<run-id>.json` written
-- [ ] Verdict COMPLETE/PARTIAL/FAILED recorded; `active` only after all checks pass
+- [ ] Explicit full-documentation request and UNINITIALIZED inventory established; proposals alone do not count as initialization.
+- [ ] Source scope, actual baseline, exclusions and accepted source locations are recorded; no sensitive material copied.
+- [ ] KB queried only when usable; limitations and source verification are distinguished.
+- [ ] README, architecture and file navigation explain the project; every declared business file has one detailed responsibility owner.
+- [ ] Summaries use key real symbols plus one-sentence responsibilities and significant boundaries; no duplicated index.
+- [ ] Future designs remain identified as unimplemented; requirements/ADRs retain one authoritative location.
+- [ ] All writes stay in the allowlist; existing human text and proposals survive.
+- [ ] Full structure checks and separate content checks support the scoped verdict; existing task evidence or any needed report is sanitized.
 
 ## Interaction with Other Skills
 
-- `cs-code-query`: KB probe / query base — Phase 2 detection only, never Phase 3 bootstrap.
-- `cs-architect` (agent): boundary list validation fan-out (short, read-only brief).
-- `cs-sysdocs-update`: downstream — repair (partial) / incremental (initialized) / rebuild-boundaries.
-- `cs-vibe-coding`: downstream — requires PARTIAL-INITIALIZED or INITIALIZED first.
-- `cs-spec-driven`: upstream — spec-only project lands here to produce the skeleton.
+- `cs-sysdocs-update`: sole repair, affected maintenance, explicit refresh or migration entry.
+- `cs-vibe-coding`: may create a proposal before any library exists.
+- `cs-code-query`: actual index/query evidence and source fallback, without automatic creation.
+- `cs-spec-driven`: specifications do not automatically require full initialization.
 
 ## See Also
 
-- `../../references/sysdocs-system.md` — shared convention (inventory, frontmatter, rules, validator, report schema)
-- `../../references/sysdocs-overview-template.md` — SYSTEM_ROOT.md shape
-- `../../references/sysdocs-module-template.md` — module doc shape
+- [Shared protocol](../../references/sysdocs-system.md)
+- [Overview template](../../references/sysdocs-overview-template.md)
+- [Module template](../../references/sysdocs-module-template.md)
+- [Design context](../../references/sysdocs-design-context.md)

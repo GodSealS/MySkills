@@ -148,11 +148,31 @@ Ship: cs-git-workflow, cs-cicd, cs-deprecation, cs-docs-adrs, cs-observability, 
 Meta: cs-using, cs-code-query, cs-agent-brief-review, cs-skill-review
 SysDocs: cs-sysdocs-init, cs-sysdocs-update, cs-vibe-coding
 
+### SysDocs：面向人的项目说明
+
+新梳理使用 schema 2：`SysDocs/README.md` 提供阅读入口，`architecture/` 解释模块与流程，`files/` 保存完整文件职责，`specs/` 和 `decisions/` 按需保存规范与决策。既有权威资料保留原位置并链接接入。
+
+生成类文档的头部检索摘要列出关键类／结构及一句话职责，并保留重要业务边界。开发时合并摘要与可用知识库候选，用源码核实；高风险边界变化扩大流程正文检查。普通任务按影响同步，不因没有 SysDocs 或知识库而强制初始化。旧 `SYSTEM_ROOT.md` 布局可继续读取和局部维护；目录迁移通过 `cs-sysdocs-update --mode migrate` 显式执行，并保护人工内容。
+
+从技能包目录检查目标项目（参数是该项目的 **SysDocs 目录**）：
+
+```powershell
+python scripts/validate-sysdocs.py E:/Project/SysDocs --json
+python scripts/validate-sysdocs.py E:/Project/SysDocs --summaries
+python scripts/validate-sysdocs.py E:/Project/SysDocs --files SysDocs/architecture/modules/order.md
+```
+
+`--files` 是相对目标项目根的文档路径，附带检查相关入链；完整初始化、迁移和全量刷新使用默认全库检查。输出区分检查范围与未验证项：结构 `COMPLETE` 不证明内容语义、完整符号解析、Mermaid 解析或工作区证据新鲜度。语义影响、摘要正文一致性和规范符合性仍需源码、行为测试或评审证据。校验器是技能包工具；安装位置未提供脚本时报告缺口并执行可用的等效检查，不能编造脚本运行结果。
+
+回归入口：`scripts/test-sysdocs.ps1` / `scripts/test-sysdocs.sh`；样例和行为测试覆盖新旧布局、摘要提取、局部范围、源码覆盖及异常输入。跨平台文件由 `.codebuddy/` 经 `scripts/build-adapters.ps1` 或 `.sh` 生成。
+
 ---
 
 ## 🧠 本地知识库集成
 
 CodeSquad 支持集成本地知识图谱，为代理提供项目架构的深度上下文理解。
+
+普通代码查询优先使用已有可查询索引，无可用知识库时直接核实源码。安装、创建和刷新是独立操作，只有明确任务授权才执行；工具安装成功不代表项目索引、MCP 接口或当前变更覆盖已经就绪。每次按安装版本的实际帮助和项目索引来源选择接口。
 
 ### Graphify — 代码知识图谱
 
@@ -166,26 +186,18 @@ uv tool install "graphifyy @ git+https://github.com/safishamsi/graphify@v8"
 pipx install "graphifyy @ git+https://github.com/safishamsi/graphify@v8"
 ```
 
-安装后在项目目录运行 `graphify` 即可生成知识图谱。
+显式创建前先检查 `graphify --help`；支持对应接口的版本可用 `graphify extract "<project-root>" --code-only` 生成代码图谱。代码模式不覆盖文档资料。已有库的 `update` 与混合资料刷新按 [Graphify 更新协议](.codebuddy/skills/cs-code-query/graphify/update.md) 区分，不能把裸命令或成功退出当作内容已同步。
 
 
 ### Understand-Anything — 架构可视化
 
-一键安装并自动分析项目架构：
-
-```powershell
-# PowerShell（Windows）
-iwr -useb https://raw.githubusercontent.com/GodSealS/Understand-Anything/main/install.ps1 | iex
-. .\install.ps1 codesquad
-```
-
-安装后运行 `/understand` 即可生成交互式架构图，支持图层分析、导览游览和社区检测。
+按 [Understand-Anything 创建协议](.codebuddy/skills/cs-code-query/understand-anything/create.md) 检查已安装技能及宿主入口；只有明确要求创建时才运行其 `understand` 流程。`understand-chat` 读取该后端自己的图谱，不能代替 CodeGraph 或 Graphify 查询。实际图谱路径、工作区和版本覆盖需要分别核实。
 
 ---
 
 ### CodeGraph — 语义代码知识图谱
 
-为 AI 代理预构建项目的语义代码知识图谱，100% 本地运行（SQLite + Rust 解析引擎），支持 20+ 编程语言。安装后 CodeSquad 代理可自动获得项目架构的深度语义理解，大幅减少工具调用次数。
+为 AI 代理提供代码定位、调用与影响候选。结果仍需核实源码；实际语言支持、接口能力和检索收益取决于安装版本、索引覆盖与任务，不能从安装成功推断。
 
 **方式 A：一键安装脚本（推荐，无需 Node.js）**
 
@@ -205,3 +217,5 @@ npm install -g @colbymchenry/codegraph
 ```bash
 npx @colbymchenry/codegraph
 ```
+
+显式创建使用安装版本支持的 `init`；已有库日常刷新使用 `sync`，`init` 不等于刷新。查询走 CodeGraph 自身 MCP/CLI，参见 [查询协议](.codebuddy/skills/cs-code-query/codegraph/query.md)。索引刷新不能代替 SysDocs 内容核实。

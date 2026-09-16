@@ -1,3 +1,3 @@
 interface:
   display_name: "CS Code Query"
-  short_description: "Routes all code-related queries to the project knowledge graph."
+  short_description: "Answers code questions using an available project knowledge graph and source verification; falls back to source search when no usable index."

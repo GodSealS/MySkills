@@ -25,7 +25,7 @@ What people ask for and what they actually want are different things. The cheape
 
 ### Step 0: Read SysDocs Context
 
-Before forming the hypothesis or asking questions, follow `../../references/sysdocs-design-context.md`: read the target project's `SysDocs/SYSTEM_ROOT.md`, affected module documents, and registered pages first, or record the applicable missing-context branch. Use documented users, capabilities, and constraints to focus questions on unresolved intent and requested changes.
+Before forming the hypothesis or asking questions, follow `../../references/sysdocs-design-context.md`: read relevant accepted specs/ADRs, then active-layout navigation/summaries and necessary bodies; verify key facts with source and record necessary gaps. Use documented users, capabilities and constraints to focus questions on unresolved intent and requested changes, without forcing whole-library initialization.
 
 ### Step 1: Hypothesize with a Confidence Number
 
