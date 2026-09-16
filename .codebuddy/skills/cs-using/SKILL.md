@@ -24,7 +24,7 @@ Task arrives
     ├── Have a rough concept, need variants? → cs-idea-refine
     ├── New project/feature/change? ──→ cs-spec-driven
     ├── Have a spec, need tasks? ──────→ cs-planning
-    ├── Team build/review requested? ──→ do not auto-select; require an explicit skill or command invocation
+    ├── Team build/review/refactor requested? → do not auto-select; require an explicit skill or command invocation
     ├── Implementing code? ────────────→ cs-incremental
     │   ├── Choosing minimal solution? → cs-minimal
     │   ├── UI work? ─────────────────→ cs-frontend-ui
@@ -117,6 +117,7 @@ Every skill includes a verification step. "Seems right" is never sufficient — 
 | Plan | cs-planning | Decompose into verifiable tasks |
 | Manual only | cs-team-build | Explicit skill/command invocation: agent team implements a design doc |
 | Manual only | cs-team-review | Explicit skill/command invocation: multi-agent review |
+| Manual only | cs-team-refactor | Explicit skill/command invocation: team diagnosis and staged refactor/performance plan |
 | Build | cs-incremental | Thin vertical slices |
 | Build | cs-minimal | Minimal solution before writing code |
 | Build | cs-source-driven | Verify against official docs |

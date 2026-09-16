@@ -303,6 +303,9 @@ interface:
   display_name: "$displayName"
   short_description: "$shortDesc"
 "@
+    if ($raw -match '(?m)^disable-model-invocation:\s*true\s*$') {
+        $yaml += "`npolicy:`n  allow_implicit_invocation: false"
+    }
     Write-TextFile (Join-Path $agentDir 'openai.yaml') $yaml
     $codexMetaCount++
 }

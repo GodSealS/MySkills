@@ -143,7 +143,7 @@ Plan: cs-planning
 Build: cs-incremental, cs-minimal, cs-tdd, cs-context-eng, cs-source-driven, cs-doubt-driven, cs-frontend-ui, cs-api-design
 Verify: cs-browser-test, cs-debugging
 Review: cs-code-review, cs-simplify, cs-security, cs-perf-opt
-Manual only: cs-team-build (explicit skill or `/cs-team-coding`), cs-team-review (explicit skill or `/cs-team-review`)
+Manual only: cs-team-build (explicit skill or `/cs-team-coding`), cs-team-review (explicit skill or `/cs-team-review`), cs-team-refactor (explicit skill or `/cs-team-refactor`; evidence-based diagnosis and staged refactor/performance plan)
 Ship: cs-git-workflow, cs-cicd, cs-deprecation, cs-docs-adrs, cs-observability, cs-shipping
 Meta: cs-using, cs-code-query, cs-agent-brief-review, cs-skill-review
 SysDocs: cs-sysdocs-init, cs-sysdocs-update, cs-vibe-coding

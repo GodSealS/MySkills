@@ -1,3 +1,5 @@
 interface:
   display_name: "CS Team Build"
   short_description: "Manually runs a design document through a coordinated agent team — the architect decomposes, leads implement, a reviewer audits, an advisor."
+policy:
+  allow_implicit_invocation: false

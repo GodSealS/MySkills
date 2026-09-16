@@ -1,0 +1,7 @@
+---
+description: "Plan evidence-based refactoring and performance work with an agent team / 组织专家形成有证据的重构与性能优化方案"
+---
+
+This is an approved manual entry point. Invoke the `cs-team-refactor` skill with the **unchanged** `$ARGUMENTS`: `<project-or-module-path> [--focus refactor|performance|both]` or `--resume <run-id>`. With no path, use the current workspace. A natural-language request for only one focus overrides the default `both`.
+
+The host orchestrates independent architect, reviewer, test, advisor and relevant domain assignments. Follow the skill's snapshot, isolation, evidence, SysDocs, review and resume rules. Write only the run's `tasks/team-refactor/<run-id>/` evidence and `Idea/team-refactor/<run-id>/` proposal. Keep diagnosis separate from implementation: do not edit target code/docs, run Team Build/Review, create or refresh a knowledge base, or claim measured gains without a real comparable result. Return the computed `READY | RESEARCH REQUIRED | NO CHANGE | BLOCKED` verdict with the proposal, implementation plan and unresolved evidence.

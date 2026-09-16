@@ -41,7 +41,7 @@ try {
         Assert "$commandPath resolves the design context reference" (Test-Path -LiteralPath $target -PathType Leaf)
     }
 
-    $newSkills = @('cs-sysdocs-init', 'cs-sysdocs-update', 'cs-vibe-coding', 'cs-team-review')
+    $newSkills = @('cs-sysdocs-init', 'cs-sysdocs-update', 'cs-vibe-coding', 'cs-team-review', 'cs-team-refactor')
     foreach ($tree in @('skills', '.agents\skills', '.gemini\skills', '.claude\skills', 'plugins\claude\skills')) {
         foreach ($skill in $newSkills) {
             $file = Join-Path $Temp "$tree\$skill\SKILL.md"
@@ -56,11 +56,27 @@ try {
                 $generatedLinks = @([regex]::Matches($raw, $linkPattern) | ForEach-Object { $_.Value })
                 Assert "$tree/$skill preserves Markdown link labels and targets" (($sourceLinks -join "`n") -ceq ($generatedLinks -join "`n"))
             }
+            if ($skill -eq 'cs-team-refactor') {
+                foreach ($ref in @('artifact-contract.md', 'evidence-and-measurement.md')) {
+                    Assert "$tree/$skill includes $ref" (Test-Path (Join-Path $Temp "$tree\$skill\references\$ref"))
+                }
+                foreach ($ref in @('sysdocs-design-context.md', 'sysdocs-system.md')) {
+                    Assert "$tree/$skill resolves shared $ref" (Test-Path (Join-Path $Temp "$tree\$skill\..\..\references\$ref"))
+                }
+                Assert "$tree/$skill retains manual invocation policy" ($raw -match '(?m)^disable-model-invocation:\s*true\s*$')
+                $codexMeta = Join-Path $Temp '.agents\skills\cs-team-refactor\agents\openai.yaml'
+                Assert 'Codex cs-team-refactor disables implicit invocation' ((Get-Content -Raw $codexMeta) -match 'allow_implicit_invocation:\s*false')
+            }
         }
     }
     foreach ($tree in @('commands', '.gemini\commands', '.claude\commands', '.codex\prompts')) {
         $suffix = if ($tree -eq '.gemini\commands') { '.toml' } elseif ($tree -eq '.codex\prompts') { '.md' } else { '.md' }
         Assert "generated $tree/cs-team-review" (Test-Path (Join-Path $Temp "$tree\cs-team-review$suffix"))
+        Assert "generated $tree/cs-team-refactor" (Test-Path (Join-Path $Temp "$tree\cs-team-refactor$suffix"))
+    }
+    foreach ($commandPath in @('.codebuddy\commands\cs-team-refactor.md', 'commands\cs-team-refactor.md', '.gemini\commands\cs-team-refactor.toml', '.claude\commands\cs-team-refactor.md')) {
+        $raw = Get-Content -Raw -LiteralPath (Join-Path $Temp $commandPath)
+        Assert "$commandPath forwards the user's arguments" ($raw -match '\$ARGUMENTS')
     }
     $knowledgeBaseAdminModels = [ordered]@{
         'agents' = 'DeepSeek-V4-Flash'

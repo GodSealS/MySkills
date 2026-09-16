@@ -1,3 +1,5 @@
 interface:
   display_name: "CS Team Review"
   short_description: "Manually runs a multi-agent team review of code, design, or mixed targets with deterministic findings, domain confirmation, and resumable file."
+policy:
+  allow_implicit_invocation: false

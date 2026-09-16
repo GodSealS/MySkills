@@ -29,6 +29,7 @@ Identify the development phase of the incoming task, then apply the matching ski
 
 **Plan**
 - `cs-planning` — break work into ordered, verifiable tasks
+- `cs-team-refactor` — manual-only: team diagnosis and staged refactoring/performance plan
 
 **Build**
 - `cs-incremental` — deliver changes in small, working vertical slices
@@ -85,7 +86,7 @@ Identify the development phase of the incoming task, then apply the matching ski
 | cs-web-perf-auditor | Web Perf Engineer | Core Web Vitals audit | cs-perf-opt, cs-shipping; manual-only team workflows |
 | cs-knowledge-base-admin | Knowledge Base Administrator | refresh existing project knowledge bases only | final subagent step of `/cs-build` and `cs-team-build` |
 
-Personas may invoke skills, but do not invoke other personas — only the user (or this router) orchestrates. `cs-team-build` and `cs-team-review` sequence multiple personas only after explicit invocation of the skill or its approved command (`/cs-team-coding`, `/cs-team-review`); intent routing must never auto-start either workflow.
+Personas may invoke skills, but do not invoke other personas — only the user (or this router) orchestrates. `cs-team-build`, `cs-team-review` and `cs-team-refactor` sequence multiple personas only after explicit invocation of the skill or its approved command (`/cs-team-coding`, `/cs-team-review`, `/cs-team-refactor`); intent routing must never auto-start these workflows.
 
 `cs-review-advisor` loads its bundled Ponytail protocols only for assigned reviews. They are private role resources, not public skills or commands. Its external skill allowlist is limited to `cs-code-query` and `cs-docs-adrs`, loaded only as needed. The host supplies the installed persona and resource paths; experts verify its suggestions, and the host immediately asks the user when rejected advice remains a blocking dispute. Only verified repairs can close findings.
 

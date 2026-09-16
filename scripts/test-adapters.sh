@@ -6,7 +6,7 @@ SOURCE_ROOT=$ROOT
 TMP_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/agent-skills-adapter-test.XXXXXX")
 trap 'rm -rf "$TMP_ROOT"' EXIT HUP INT TERM
 mkdir -p "$TMP_ROOT/.codebuddy/skills" "$TMP_ROOT/.codebuddy/agents" "$TMP_ROOT/.codebuddy/references" "$TMP_ROOT/.codebuddy/commands" "$TMP_ROOT/.claude/rules" "$TMP_ROOT/scripts"
-for skill in cs-sysdocs-init cs-sysdocs-update cs-vibe-coding cs-team-review cs-team-build cs-incremental cs-agent-brief-review cs-skill-review; do
+for skill in cs-sysdocs-init cs-sysdocs-update cs-vibe-coding cs-team-review cs-team-refactor cs-team-build cs-incremental cs-agent-brief-review cs-skill-review; do
   cp -R "$SOURCE_ROOT/.codebuddy/skills/$skill" "$TMP_ROOT/.codebuddy/skills/"
 done
 cp -R "$SOURCE_ROOT/.codebuddy/agents/." "$TMP_ROOT/.codebuddy/agents/"
@@ -146,12 +146,26 @@ done
 for tree in "$ROOT"/skills "$ROOT"/.agents/skills "$ROOT"/.gemini/skills "$ROOT"/.claude/skills "$ROOT"/plugins/claude/skills; do
   [ -f "$tree/cs-team-review/SKILL.md" ] || fail "missing $tree/cs-team-review/SKILL.md"
   assert_not_contains "$tree/cs-team-review/SKILL.md" 'DESIGN.md'
+  [ -f "$tree/cs-team-refactor/SKILL.md" ] || fail "missing $tree/cs-team-refactor/SKILL.md"
+  for ref in artifact-contract.md evidence-and-measurement.md; do
+    [ -f "$tree/cs-team-refactor/references/$ref" ] || fail "missing $tree/cs-team-refactor/references/$ref"
+  done
+  for ref in sysdocs-design-context.md sysdocs-system.md; do
+    [ -f "$tree/cs-team-refactor/../../references/$ref" ] || fail "unresolved $tree/cs-team-refactor shared $ref"
+  done
+  assert_contains "$tree/cs-team-refactor/SKILL.md" 'disable-model-invocation: true'
 done
+assert_contains "$ROOT/.agents/skills/cs-team-refactor/agents/openai.yaml" 'allow_implicit_invocation: false'
 for command in "$ROOT/.codebuddy/commands/cs-team-review.md" "$ROOT/commands/cs-team-review.md" "$ROOT/.claude/commands/cs-team-review.md"; do
   [ -f "$command" ] || fail "missing $command"
 done
 [ -f "$ROOT/.gemini/commands/cs-team-review.toml" ] || fail 'missing Gemini cs-team-review command'
 [ -f "$ROOT/.codex/prompts/cs-team-review.md" ] || fail 'missing Codex cs-team-review prompt'
+for command in "$ROOT/.codebuddy/commands/cs-team-refactor.md" "$ROOT/commands/cs-team-refactor.md" "$ROOT/.gemini/commands/cs-team-refactor.toml" "$ROOT/.claude/commands/cs-team-refactor.md"; do
+  [ -f "$command" ] || fail "missing $command"
+  assert_contains "$command" '$ARGUMENTS'
+done
+[ -f "$ROOT/.codex/prompts/cs-team-refactor.md" ] || fail 'missing Codex cs-team-refactor prompt'
 for ref in sysdocs-system.md sysdocs-overview-template.md sysdocs-module-template.md sysdocs-vibe-template.md sysdocs-files-template.md sysdocs-flow-template.md; do
   [ -f "$ROOT/plugins/claude/references/$ref" ] || fail "missing plugin reference $ref"
 done

@@ -28,6 +28,7 @@ Load these proactively as standing context:
 - `/cs-webperf` — web performance audit
 - `/cs-code-simplify` — simplify code
 - `/cs-ship` — shipping and launch checklist
+- `/cs-team-refactor` — manually run team diagnosis and write a staged refactor/performance plan
 
 ## Conventions
 

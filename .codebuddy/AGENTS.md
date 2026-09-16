@@ -14,7 +14,7 @@ Task arrives
     ├── Design ready, need stress-test? ─────→ grill-me
     ├── New project/feature/change? ─────────→ cs-spec-driven
     ├── Have a spec, need tasks? ────────────→ cs-planning
-    ├── Team build/review requested? ─────────→ do not auto-select; require explicit skill or command invocation
+    ├── Team build/review/refactor requested? ─→ do not auto-select; require explicit skill or command invocation
     ├── Implementing code? ──────────────────→ cs-incremental
     │   ├── Choosing minimal solution? ───────→ cs-minimal
     │   ├── UI work? ────────────────────────→ cs-frontend-ui
@@ -65,7 +65,7 @@ Task arrives
 | Web Perf Auditor | `.codebuddy/agents/cs-web-perf-auditor.md` | Core Web Vitals audit | `cs-perf-opt`, `cs-shipping`; manual-only team workflows |
 | Knowledge Base Administrator | `.codebuddy/agents/cs-knowledge-base-admin.md` | Refresh existing project knowledge bases only | final subagent step of `/cs-build` and `cs-team-build` |
 
-**Orchestration model:** Agents are invoked **by skills** (fan-out), not by user commands. `cs-team-build` and `cs-team-review` sequence multiple personas only after an explicit skill invocation or their approved commands (`/cs-team-coding`, `/cs-team-review`); intent routing must never auto-start either workflow.
+**Orchestration model:** Agents are invoked **by skills** (fan-out), not by user commands. `cs-team-build`, `cs-team-review`, and `cs-team-refactor` sequence multiple personas only after an explicit skill invocation or their approved commands (`/cs-team-coding`, `/cs-team-review`, `/cs-team-refactor`); intent routing must never auto-start these workflows. Team Refactor produces a proposal under `Idea/`, with evidence under `tasks/`; it does not implement business changes or launch Build.
 
 `cs-review-advisor` reads its bundled Ponytail protocols as private role resources, never public skills or commands. The host supplies the installed persona/resource paths. Only `cs-code-query` and `cs-docs-adrs` are available as optional external skills; no minimum load count applies. Experts recheck the advice, blocking disagreements immediately go to the user, and findings remain open until repairs are independently verified.
 
@@ -98,6 +98,7 @@ Task arrives
 | Plan | cs-planning | Decompose into verifiable tasks |
 | Manual only | cs-team-build | Explicit skill/command invocation: agent team implements a design doc |
 | Manual only | cs-team-review | Explicit skill/command invocation: multi-agent review |
+| Manual only | cs-team-refactor | Explicit skill/command invocation: team diagnosis and staged refactor/performance plan |
 | Build | cs-incremental | Thin vertical slices |
 | Build | cs-minimal | Minimal solution before writing code |
 | Build | cs-tdd | Failing test first, then make it pass |

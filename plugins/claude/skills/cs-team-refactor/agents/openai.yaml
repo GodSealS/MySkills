@@ -1,0 +1,5 @@
+interface:
+  display_name: "CS Team Refactor"
+  short_description: "Coordinate an agent team to plan evidence-based refactoring and performance work."
+policy:
+  allow_implicit_invocation: false
