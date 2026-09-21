@@ -5,7 +5,7 @@ description: 审查 Agent Brief 的质量——按持久性、行为驱动、验
 
 # Agent Brief Review
 
-Read the target agent brief (GitHub issue body, PR description, or task spec meant for an AFK agent), then run this review. Every finding traces to the principles in [AGENT-BRIEF.md](F:\Tools\skills\skills\engineering\triage\AGENT-BRIEF.md).
+Read the target agent brief (GitHub issue body, PR description, or task spec meant for an AFK agent), then run this review. Every finding traces to the principles in [cs-agent-brief.md](../../references/cs-agent-brief.md).
 
 An agent brief is the authoritative specification an AFK agent works from. The original discussion is context — the brief is the contract. A good brief answers one question completely: **can an agent with no prior context read this and produce the right change?**
 

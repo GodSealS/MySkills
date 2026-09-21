@@ -5,7 +5,7 @@ description: 审查一个 skill 的可预测性——按调用、信息层级、
 
 # Skill Review
 
-Read the target skill's `SKILL.md` and any disclosed reference files, then run this review. Every finding traces to a principle in [`writing-great-skills`](F:\Tools\skills\skills\productivity\writing-great-skills\SKILL.md); when in doubt, consult it.
+Read the target skill's `SKILL.md` and any disclosed reference files, then run this review. Every finding traces to a principle in [`cs-writing-great-skills.md`](../../references/cs-writing-great-skills.md); when in doubt, consult it (its bold terms are defined in `../../references/cs-writing-great-skills-glossary.md`).
 
 ## Step 1 — Invocation Axis
 
