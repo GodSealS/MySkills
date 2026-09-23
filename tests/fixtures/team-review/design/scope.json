@@ -4,13 +4,13 @@
   "review_type": "design",
   "isolation": "isolated",
   "fixture_mode": "portable",
-  "manifest_sha256": "f742ffbb7f9587510aa8f34184610b996dc6bb0b0ffd8074bc56687023c8655f",
+  "manifest_sha256": "10890f03d715698bd791e431be2bb05dc00619809a648e62045e7fd666104adc",
   "manifest": [
     {
       "path": "design/review-plan.md",
-      "size": 50,
+      "size": 47,
       "mtime": 0,
-      "sha256": "505cd0e035c0949c7641781a3fb312ab62b8e443301f62ee9c21df475d0f9c12"
+      "sha256": "9bca0fd8ffc8a47d0dc8a1a379bc455faf1cefed367be007048dd3f6020fa245"
     }
   ]
 }

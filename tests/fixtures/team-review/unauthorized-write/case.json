@@ -3,5 +3,6 @@
   "case": "unauthorized-write",
   "expected_valid": false,
   "expected_status": "blocked",
-  "expected_error": "allowlist violation"
+  "expected_error": "allowlist violation",
+  "fixture_mode": "portable"
 }

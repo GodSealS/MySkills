@@ -4,13 +4,13 @@
   "review_type": "code",
   "isolation": "isolated",
   "fixture_mode": "portable",
-  "manifest_sha256": "7e90b9a49d25b74ed868048a847073163eff2ee99e99c5c8458a0e3636cf1e08",
+  "manifest_sha256": "d98e95ef9aabebcfb4725b8bb45690eb5f875ee822d804b5cae7116df5dc0c1b",
   "manifest": [
     {
       "path": "src/complete.py",
-      "size": 43,
+      "size": 41,
       "mtime": 0,
-      "sha256": "d4135caa42452ff8598df8286c303ab8cefd69d9ca40824a4463a5030e12ac76"
+      "sha256": "3e672b25574f5d292dbacd64af3e78baa960ddb11cd4db11db5f51131ed56348"
     }
   ],
   "phase0": {

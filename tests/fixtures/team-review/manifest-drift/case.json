@@ -3,5 +3,6 @@
   "case": "manifest-drift",
   "expected_valid": false,
   "expected_status": "blocked",
-  "expected_error": "sha256 does not match file"
+  "expected_error": "sha256 does not match file",
+  "fixture_mode": "portable"
 }

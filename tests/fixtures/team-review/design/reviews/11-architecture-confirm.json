@@ -3,7 +3,7 @@
   "domain": "architecture",
   "agent": "fixture-agent",
   "run": "tasks/team-review/example/",
-  "target_manifest_sha256": "f742ffbb7f9587510aa8f34184610b996dc6bb0b0ffd8074bc56687023c8655f",
+  "target_manifest_sha256": "10890f03d715698bd791e431be2bb05dc00619809a648e62045e7fd666104adc",
   "responses": [
     {
       "finding_id": "design-F01",

@@ -13,9 +13,12 @@ sync_agent_resources() (
   [ -d "$resource_source" ] || return 0
   mkdir -p "$resource_destination"
   resource_manifest="$resource_destination/.agent-resources-manifest"
+  # Only the destination tree is owned here. Ancestors may legitimately be links
+  # (for example macOS TMPDIR resolves through /var), so stop at the destination.
   resource_cursor="$resource_manifest"
-  while [ "$resource_cursor" != / ] && [ "$resource_cursor" != . ]; do
+  while :; do
     [ ! -L "$resource_cursor" ] || { printf 'Resource ownership path contains a link: %s\n' "$resource_cursor" >&2; exit 1; }
+    [ "$resource_cursor" != "$resource_destination" ] || break
     resource_parent=${resource_cursor%/*}
     [ "$resource_parent" != "$resource_cursor" ] || break
     [ -n "$resource_parent" ] || resource_parent=/

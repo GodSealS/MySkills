@@ -3,7 +3,7 @@
   "domain": "backend",
   "agent": "fixture-agent",
   "run": "tasks/team-review/example/",
-  "target_manifest_sha256": "7e90b9a49d25b74ed868048a847073163eff2ee99e99c5c8458a0e3636cf1e08",
+  "target_manifest_sha256": "d98e95ef9aabebcfb4725b8bb45690eb5f875ee822d804b5cae7116df5dc0c1b",
   "responses": [
     {
       "finding_id": "code-F01",

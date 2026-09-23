@@ -1,9 +1,13 @@
 # Private agent bundles are byte-for-byte resources, never persona/skill adapters.
-function Assert-ResourcePathNoLink([string]$Path) {
+function Assert-ResourcePathNoLink([string]$Path, [string]$StopAt) {
+    $trim = [char[]]@('\', '/')
     $cursor = [IO.Path]::GetFullPath($Path)
+    $stop = if ($StopAt) { [IO.Path]::GetFullPath($StopAt).TrimEnd($trim) } else { '' }
     while ($cursor) {
         $item = Get-Item -LiteralPath $cursor -Force -ErrorAction SilentlyContinue
         if ($item -and ($item.Attributes -band [IO.FileAttributes]::ReparsePoint)) { throw "Resource ownership path contains a link: $cursor" }
+        # Only the destination tree is owned here; ancestors may be links.
+        if ($stop -and [string]::Compare($cursor.TrimEnd($trim), $stop, [StringComparison]::OrdinalIgnoreCase) -eq 0) { break }
         $cursor = Split-Path -Parent $cursor
     }
 }
@@ -12,7 +16,7 @@ function Sync-AgentResources([string]$Source, [string]$Destination) {
     if (-not (Test-Path -LiteralPath $Source)) { return }
     $root = [IO.Path]::GetFullPath($Destination).TrimEnd('\', '/')
     $manifestPath = Join-Path $root '.agent-resources-manifest'
-    Assert-ResourcePathNoLink $manifestPath
+    Assert-ResourcePathNoLink -Path $manifestPath -StopAt $root
     New-Item -ItemType Directory -Force -Path $Destination | Out-Null
     $known = @{}
     if (Test-Path -LiteralPath $manifestPath) {

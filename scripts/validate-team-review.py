@@ -509,7 +509,6 @@ def validate(root: Path) -> None:
     scope_preview = load_json(root / "scope.json")
     portable = bool(
         case
-        and case.get("expected_valid") is True
         and case.get("fixture_mode") == "portable"
         and scope_preview.get("fixture_mode") == "portable"
     )

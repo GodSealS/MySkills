@@ -4,19 +4,19 @@
   "review_type": "mixed",
   "isolation": "isolated",
   "fixture_mode": "portable",
-  "manifest_sha256": "82a3a86f8dd66268bbcbf097ccb35bd56f52a0b9fe97c5543e38993b3270d334",
+  "manifest_sha256": "2722a5a12c8c88bb8bcd67f0cb7ddd0cb428d533d8369f6dea85c421a7b7eafc",
   "manifest": [
     {
       "path": "src/component.py",
-      "size": 44,
+      "size": 42,
       "mtime": 0,
-      "sha256": "db909390fc6f4a52a936998862e1621f219589af57382a42cf85e2db4706ddb6"
+      "sha256": "6a226c8a4a229716c9a9dbc0009d827a7dfc4d5dc5498e0515095f26ee5f70f2"
     },
     {
       "path": "design/component.md",
-      "size": 59,
+      "size": 56,
       "mtime": 0,
-      "sha256": "dc65f5b9938ade08a0bc3eb951cca85a9698fea84f9fb900132b2f1b7c0c4255"
+      "sha256": "a238b95e66bd87ad8089ec2509fcf1addaf896eda5415d1f954bca68868a8575"
     }
   ],
   "phase0": {

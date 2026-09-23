@@ -3,13 +3,13 @@
   "run": "tasks/team-review/example/",
   "review_type": "code",
   "isolation": "isolated",
-  "manifest_sha256": "f252caa4286923f97b584f50d8d38949a77c1e26bccaae5a82c4ea9b789f43e2",
+  "manifest_sha256": "d98e95ef9aabebcfb4725b8bb45690eb5f875ee822d804b5cae7116df5dc0c1b",
   "manifest": [
     {
       "path": "src/complete.py",
-      "size": 43,
-      "mtime": 1789272738594879400,
-      "sha256": "d4135caa42452ff8598df8286c303ab8cefd69d9ca40824a4463a5030e12ac76"
+      "size": 41,
+      "mtime": 0,
+      "sha256": "3e672b25574f5d292dbacd64af3e78baa960ddb11cd4db11db5f51131ed56348"
     }
   ],
   "phase0": {
@@ -18,5 +18,6 @@
     "patch_files": 1,
     "patch_lines": 1,
     "size": "small"
-  }
+  },
+  "fixture_mode": "portable"
 }
