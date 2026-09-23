@@ -1,4 +1,4 @@
-# 概览模板（sysdocs-overview-template）
+﻿# 概览模板（sysdocs-overview-template）
 
 依据 [共享协议](sysdocs-system.md) 生成 `SysDocs/README.md` 与 `SysDocs/architecture/overview.md`。以下占位值必须替换或删除；实际文档不复制本模板的说明文字。两页各有摘要，不维护重复模块 manifest。
 

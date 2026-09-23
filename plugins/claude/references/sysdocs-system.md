@@ -1,4 +1,4 @@
-# SysDocs 体系约定（sysdocs-system）
+﻿# SysDocs 体系约定（sysdocs-system）
 
 本协议集中定义 schema 2、内容归属、双布局读取、影响范围和迁移。生成/维护技能、开发接入方和 validator 共用此契约。文档解释事实；知识库提供检索候选；规范和决策保存意图，彼此不代行批准。
 

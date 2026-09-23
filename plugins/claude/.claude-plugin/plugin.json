@@ -1,6 +1,6 @@
 {
   "name": "agent-skills-cs",
   "version": "1.0.0",
-  "description": "Production-grade engineering workflow skills (cs-*) for Claude Code, sourced from .codebuddy/.",
+  "description": "Production-grade engineering workflow skills for Claude Code.",
   "author": { "name": "agent-skills" }
 }

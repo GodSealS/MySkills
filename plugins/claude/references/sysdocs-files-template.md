@@ -1,4 +1,4 @@
-# 文件索引模板（sysdocs-files-template）
+﻿# 文件索引模板（sysdocs-files-template）
 
 依据 [共享协议](sysdocs-system.md) 生成 files/README 与模块索引。每个文件只有一个详细职责归属，其他页面通过链接引用，不另建代码—文档映射表。
 

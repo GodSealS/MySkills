@@ -1,6 +1,7 @@
 description = "Implement tasks incrementally — build, test, verify, commit. Add \\\"auto\\\" to run the whole plan in one approved pass. / 增量实现任务——构建、测试、验证、提交。添加\\\"auto\\\"一次性执行完整计划。"
 
-prompt = '''Invoke `cs-incremental` alongside `cs-tdd`.
+prompt = '''
+Invoke `cs-incremental` alongside `cs-tdd`.
 
 For documentation, follow `../references/sysdocs-design-context.md`: read applicable specs/ADRs, select relevant descriptions via summaries and knowledge-base/source candidates, and record semantic impact in the task. Update affected descriptions, summaries, indexes, links and approved requirements before the review snapshot/commit. Structural validation and content/behavior verification are separate; current-change omissions block DONE. Missing SysDocs or unrelated old defects do not force initialization/full repair. High-risk boundary changes expand flow reading. Reuse valid slice evidence at final delivery; only new changes or unresolved gaps require rechecking. Existing task authorization covers necessary reversible synchronization.
 
@@ -43,5 +44,4 @@ Use this once a spec exists and you want to collapse plan + build into one run. 
 8. **Final execution step — FAN-OUT to `cs-knowledge-base-admin`.** Pass the current project root. If none of `.codegraph/`, `.understand-anything/`, or `graphify-out/` exists, it terminates with a prerequisite message and creates nothing. Otherwise it refreshes every existing supported knowledge base independently.
 9. **Summarize the build:** tasks completed, tests added, commits made, anything skipped, and the administrator's update/skip/failure results.
 
-If any step fails, follow `cs-debugging`.
-'''
+If any step fails, follow `cs-debugging`.'''
