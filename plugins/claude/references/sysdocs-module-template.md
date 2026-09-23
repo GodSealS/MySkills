@@ -1,4 +1,4 @@
-﻿# 模块模板（sysdocs-module-template）
+# 模块模板（sysdocs-module-template）
 
 生成 `SysDocs/architecture/modules/<module-id>.md`；完整文件职责由对应 files 页维护。遵循 [共享协议](sysdocs-system.md)，不再把全部内部类、方法或约束复制到模块页。
 

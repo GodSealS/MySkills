@@ -1,4 +1,4 @@
-﻿# Vibe 前置方案模板（sysdocs-vibe-template）
+# Vibe 前置方案模板（sysdocs-vibe-template）
 
 生成 `SysDocs/VibeCoding/<YYYYMMDD-HHMM>-<slug>[-N].md`；不依赖全库初始化，不补写当前架构。slug 采用小写短横线，拒绝空值、路径分隔符、..、控制字符和 Windows 保留名；同名追加序号。依据 [共享协议](sysdocs-system.md)。
 

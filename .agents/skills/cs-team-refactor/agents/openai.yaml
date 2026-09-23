@@ -1,5 +1,5 @@
 interface:
   display_name: "CS Team Refactor"
-  short_description: "Coordinate an agent team to plan evidence-based refactoring and performance work."
+  short_description: "Manually coordinates an agent team to plan refactoring or performance work in an existing project."
 policy:
   allow_implicit_invocation: false

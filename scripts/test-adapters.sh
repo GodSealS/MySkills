@@ -6,7 +6,7 @@ SOURCE_ROOT=$ROOT
 TMP_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/agent-skills-adapter-test.XXXXXX")
 trap 'rm -rf "$TMP_ROOT"' EXIT HUP INT TERM
 mkdir -p "$TMP_ROOT/.codebuddy/skills" "$TMP_ROOT/.codebuddy/agents" "$TMP_ROOT/.codebuddy/references" "$TMP_ROOT/.codebuddy/commands" "$TMP_ROOT/.claude/rules" "$TMP_ROOT/scripts"
-for skill in cs-sysdocs-init cs-sysdocs-update cs-vibe-coding cs-team-review cs-team-refactor cs-team-build cs-incremental cs-agent-brief-review cs-skill-review; do
+for skill in cs-sysdocs-init cs-sysdocs-update cs-vibe-coding cs-team-review cs-team-refactor cs-team-build cs-incremental cs-agent-brief-review cs-skill-review cs-grill-me; do
   cp -R "$SOURCE_ROOT/.codebuddy/skills/$skill" "$TMP_ROOT/.codebuddy/skills/"
 done
 cp -R "$SOURCE_ROOT/.codebuddy/agents/." "$TMP_ROOT/.codebuddy/agents/"
@@ -37,6 +37,15 @@ assert_same() {
 }
 
 sh "$ROOT/scripts/build-adapters.sh"
+
+[ -f "$ROOT/.agents/skills/cs-team-refactor/agents/openai.yaml" ] || fail 'missing Codex skill UI metadata'
+assert_contains "$ROOT/.agents/skills/cs-team-refactor/agents/openai.yaml" 'allow_implicit_invocation: false'
+[ -f "$ROOT/.claude/rules/skills-contributing.md" ] || fail 'missing Claude project rule'
+[ -f "$ROOT/plugins/claude/rules/skills-contributing.md" ] || fail 'missing Claude plugin rule'
+[ -f "$ROOT/CLAUDE.md" ] || fail 'missing Claude project context'
+assert_not_contains "$ROOT/.claude/commands/cs-build.md" 'allowed-tools:'
+[ -f "$ROOT/.claude/commands/cs-grill-me.md" ] || fail 'missing Claude wrapper for referenced skill command'
+assert_contains "$ROOT/plugins/claude/.claude-plugin/plugin.json" 'sourced from .codebuddy/'
 
 PYTHON=
 for candidate in python3 python; do
@@ -176,7 +185,7 @@ done
 
 for command in cs-build cs-plan cs-spec; do
   assert_same "$ROOT/.codebuddy/commands/$command.md" "$ROOT/commands/$command.md"
-  assert_same "$ROOT/.codebuddy/commands/$command.md" "$ROOT/.claude/commands/$command.md"
+  assert_not_contains "$ROOT/.claude/commands/$command.md" 'allowed-tools:'
 done
 assert_contains "$ROOT/.gemini/commands/cs-build.toml" 'routed by primary owner'
 assert_contains "$ROOT/.gemini/commands/cs-plan.toml" 'primary owner'

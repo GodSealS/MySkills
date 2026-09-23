@@ -1,7 +1,6 @@
 description = "Conduct a five-axis code review — correctness, readability, architecture, security, performance / 进行五轴代码审查——正确性、可读性、架构、安全性、性能"
 
-prompt = '''
-Invoke the `cs-code-review` skill.
+prompt = '''Invoke the `cs-code-review` skill.
 
 Review the current changes (staged or recent commits) across all five axes:
 
@@ -12,4 +11,5 @@ Review the current changes (staged or recent commits) across all five axes:
 5. **Performance** — No N+1 queries? No unbounded ops? (Use `cs-perf-opt`)
 
 Categorize findings as Critical, Important, or Suggestion.
-Output a structured review with specific file:line references and fix recommendations.'''
+Output a structured review with specific file:line references and fix recommendations.
+'''

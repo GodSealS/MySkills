@@ -1,5 +1,7 @@
 {
   "name": "agent-skills-cs",
   "owner": { "name": "agent-skills" },
-  "plugins": [{ "source": "./plugins/claude" }]
+  "plugins": [
+    { "source": "./plugins/claude" }
+  ]
 }

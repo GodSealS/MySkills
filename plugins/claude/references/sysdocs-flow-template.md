@@ -1,4 +1,4 @@
-﻿# 跨模块流程模板（sysdocs-flow-template）
+# 跨模块流程模板（sysdocs-flow-template）
 
 按需要生成 `SysDocs/architecture/flows/<flow-id>.md`，遵循 [共享协议](sysdocs-system.md)。不要求每模块一个流程文件；流程也可能存在于既有权威资料，导航链接即可。
 

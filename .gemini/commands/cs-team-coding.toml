@@ -1,7 +1,6 @@
 description = "Implement a design doc with an agent team — architect decomposes, leads build, reviewer audits, advisor recommends, experts verify. / 用 Agent 团队实现设计文档——架构师拆解、领域负责人实现、审查员首审、顾问建议、专家复验。"
 
-prompt = '''
-This command is an approved manual entry point. Invoke the `cs-team-build` skill with `$ARGUMENTS` as the path to the design document.
+prompt = '''This command is an approved manual entry point. Invoke the `cs-team-build` skill with `$ARGUMENTS` as the path to the design document.
 
 The host executes the skill as orchestrator. It writes every handoff to a unique `tasks/team-build/<run-id>/` directory; it never overwrites a prior run:
 
@@ -16,4 +15,5 @@ Follow the skill's `review-advisor-v1` run protocol and legacy-run compatibility
 
 Before each review snapshot, the host synchronizes affected descriptions, summaries, indexes, links and applicable requirements, with separate structure/content verification. Reuse existing authorization and valid evidence; no empty update report or unconditional whole-library refresh. Combine KB/summary/source candidates and expand high-risk flow reading per the shared context protocol. Later related changes invalidate affected reviews; required documentation gaps block DONE or committing.
 
-Do not implement code yourself. Fan out, and let the files carry the handoffs.'''
+Do not implement code yourself. Fan out, and let the files carry the handoffs.
+'''
