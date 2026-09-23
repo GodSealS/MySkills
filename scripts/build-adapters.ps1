@@ -565,7 +565,7 @@ Skills are discovered from `.claude/skills/<name>/SKILL.md` (project) and `~/.cl
 ## Conventions
 
 - One `cs-<name>` per lifecycle phase; do not duplicate phases across skills.
-- Every skill follows the same anatomy — frontmatter (`name`, `description`) + body (`Overview`, `When to Use`, `Process`, `Common Rationalizations`, `Red Flags`, `Verification`).
+- Skills contain concise triggers, actionable steps and verification. Examples and troubleshooting sections are optional and included only when useful.
 - Cross-reference other skills instead of paraphrasing their content.
 '@
     Write-TextFile $dstClaudeMd $claudeMdBody

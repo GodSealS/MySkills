@@ -103,7 +103,7 @@ try {
     Assert 'knowledge-base admin does not prohibit refresh-time deletion' ($knowledgeBaseAdmin -notmatch 'created, installed, repaired, or deleted')
     foreach ($agent in @('cs-architect', 'cs-backend-lead', 'cs-frontend-lead', 'cs-code-reviewer', 'cs-security-auditor', 'cs-test-engineer', 'cs-web-perf-auditor')) {
         $raw = Get-Content -Raw (Join-Path $Temp ".codex\agents\$agent.md")
-        Assert ".codex/agents/$agent limits autonomous skill loading to its own roster" ($raw -match 'may autonomously load 2–3 skills when their triggers match; it must not load skills outside this roster')
+        Assert ".codex/agents/$agent limits autonomous skill loading to its own roster" ($raw -match 'may autonomously load 0–3 skills when their triggers match; there is no minimum skill count, and it must not load skills outside this roster')
         $roster = [regex]::Match($raw, '(?ms)^## Optional Skill Roster\s*(.*?)(?=^## |\z)').Groups[1].Value
         Assert ".codex/agents/$agent has an Optional Skill Roster" ($roster.Length -gt 0)
         Assert ".codex/agents/$agent Optional Skill Roster is English-only" ($roster -notmatch '[\u3400-\u9fff]')

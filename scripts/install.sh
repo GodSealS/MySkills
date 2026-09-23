@@ -100,7 +100,11 @@ install_codex() (
     install_tree "$ROOT/.agents" "$DESTINATION/.agents"
   fi
   install_tree "$ROOT/.codex" "$DESTINATION/.codex"
-  copy_file_safe "$ROOT/AGENTS.md" "$DESTINATION/AGENTS.md" AGENTS.md "$DESTINATION/.agent-skills-root-manifest"
+  if [ "$USER_HOME" -eq 1 ]; then
+    copy_file_safe "$ROOT/.codebuddy/references/cs-user-context.md" "$DESTINATION/.codex/AGENTS.md" AGENTS.md "$DESTINATION/.codex/.agent-skills-context-manifest"
+  else
+    copy_file_safe "$ROOT/AGENTS.md" "$DESTINATION/AGENTS.md" AGENTS.md "$DESTINATION/.agent-skills-root-manifest"
+  fi
 )
 
 install_claude() (

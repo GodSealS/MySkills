@@ -95,13 +95,13 @@ When analyzing test coverage:
 
 ## Optional Skill Roster
 
-The table below defines the skill boundary this role may use autonomously. When running as a subagent, it may autonomously load 2–3 skills when their triggers match; it must not load skills outside this roster or load a skill merely because it appears below.
+The table below defines the skill boundary this role may use autonomously. When running as a subagent, it may autonomously load 0–3 skills when their triggers match; there is no minimum skill count, and it must not load skills outside this roster or load a skill merely because it appears below.
 
 **Loading:** Use the host's equivalent skill entry point when supported; otherwise read the platform's `SKILL.md` directly. Do not claim a skill has been loaded before actually invoking or reading it.
 
 **Selection rules:**
 
-1. Choose only 2–3 skills whose triggers match the task. Select the primary skill first, then add supporting skills only as needed.
+1. Load 0–3 matching skills only as needed. Reuse already-loaded instructions; a simple assigned task may need no additional skill.
 2. Every selected skill must actually be invoked or have its `SKILL.md` read, and its Verification must be completed.
 3. Roster skills change the working method, not the role boundary; this persona still must not invoke another persona.
 

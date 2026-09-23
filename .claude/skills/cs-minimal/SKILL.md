@@ -65,14 +65,6 @@ Minimalism must not cut any of the following:
 | `cs-code-review` | Remains the only code-review entry point; its Lean pass is the formatted second-axis check. |
 | `cs-security` | Still owns threat modeling and guardrails; minimalism never lowers its bar. |
 
-## Common Rationalizations
-
-| Rationalization | Reality |
-|---|---|
-| "It's just a small helper, might as well add it now" | Speculative code that no caller needs is dead weight from day one. |
-| "A few more lines make it future-proof" | You cannot future-proof against a future you cannot see; the abstraction pays interest now. |
-| "One more dependency saves me an hour" | The dependency costs an hour every review, upgrade, and security audit from now on. |
-| "One line is always simpler" | A dense one-liner that needs decoding is more complex than three readable lines. |
 
 ## Red Flags
 

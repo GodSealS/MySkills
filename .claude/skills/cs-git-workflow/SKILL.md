@@ -68,13 +68,6 @@ npm run lint
 npx tsc --noEmit
 ```
 
-## Common Rationalizations
-
-| Rationalization | Reality |
-|---|---|
-| "I'll commit when the feature is done" | One giant commit is impossible to review, debug, or revert. |
-| "The message doesn't matter" | Messages are documentation for future you and future agents. |
-| "I'll squash it all later" | Squashing destroys the development narrative. |
 
 ## Verification
 

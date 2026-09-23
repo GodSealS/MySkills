@@ -23,7 +23,9 @@ Write a failing test before writing the code that makes it pass. For bug fixes, 
 - Adding edge case handling
 - Any change that could break existing behavior
 
-**Owner Routing:** Tests stay with the slice they prove. For a backend-owned slice, FAN-OUT to `cs-backend-lead`; for a frontend-owned slice, FAN-OUT to `cs-frontend-lead`. `cs-test-engineer` remains the independent test-coverage reviewer and does not own feature implementation.
+**Owner Routing:** Tests stay with the slice owner. The host handles ordinary work; delegate to a domain lead only for a concrete independent task or an explicit team workflow. Independent test-coverage review remains separate from implementation.
+
+Documentation-only and low-impact configuration edits use relevant validators and inspection; do not create tests that merely mirror instruction wording.
 
 ## The TDD Cycle
 
@@ -49,7 +51,7 @@ When a bug is reported, do NOT start by trying to fix it. Start by writing a tes
 2. Confirm the test fails
 3. Implement the fix
 4. Test PASSES (proving the fix works)
-5. Run full test suite (no regressions)
+5. Run affected regression tests; use the shared Definition of Done for integration/final checks.
 
 ## The Test Pyramid
 
@@ -101,18 +103,11 @@ it('marks overdue tasks when deadline has passed', () => {
 | Snapshot abuse | Nobody reviews | Use sparingly |
 | Mocking everything | Production breaks | Prefer real implementations |
 
-## Common Rationalizations
-
-| Rationalization | Reality |
-|---|---|
-| "I'll write tests after the code works" | You won't. Tests written after test implementation, not behavior. |
-| "This is too simple to test" | Simple code gets complicated. Tests document expected behavior. |
-| "Tests slow me down" | They slow you now, speed you up every time you change code later. |
 
 ## Verification
 
 - [ ] Every new behavior has a test
-- [ ] All tests pass
+- [ ] Affected tests pass; required integration/final checks follow the shared Definition of Done
 - [ ] Bug fixes include a reproduction test
 - [ ] Test names describe the behavior
 - [ ] No tests were skipped or disabled
@@ -120,4 +115,4 @@ it('marks overdue tasks when deadline has passed', () => {
 
 ## See Also
 
-See `.codebuddy/references/cs-testing-patterns.md` for detailed patterns and framework-specific examples.
+See [Definition of Done](../../references/cs-definition-of-done.md) for check frequency and `.codebuddy/references/cs-testing-patterns.md` for detailed patterns and framework-specific examples.

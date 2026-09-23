@@ -25,7 +25,7 @@ class AdvisorAdapters(unittest.TestCase):
                 if skill.name != 'cs-minimal':
                     shutil.rmtree(skill)
             for reference in list((repo / '.codebuddy/references').iterdir())[1:]:
-                if reference.is_file():
+                if reference.is_file() and reference.name != 'cs-user-context.md':
                     reference.unlink()
             for command in (repo / '.codebuddy/commands').glob('*.md'):
                 command.unlink()
@@ -61,6 +61,11 @@ class AdvisorAdapters(unittest.TestCase):
                 if global_install:
                     args += ["-UserHome", "-UserHomePath", str(dest)] if shell == "ps1" else ["--user-home", "--user-home-path", str(dest)]
                 run("install", *args)
+                context = dest / ('.codex/AGENTS.md' if global_install else 'AGENTS.md')
+                expected_context = repo / ('.codebuddy/references/cs-user-context.md' if global_install else 'AGENTS.md')
+                self.assertEqual(context.read_text(encoding='utf-8-sig'), expected_context.read_text(encoding='utf-8-sig'))
+                if global_install:
+                    self.assertFalse((dest / 'AGENTS.md').exists())
                 installs.append((dest, args))
                 for platform in (".codebuddy", ".gemini", ".codex", ".claude"):
                     installed = dest / platform / "agents/cs-review-advisor"

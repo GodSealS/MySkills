@@ -75,10 +75,10 @@ Ask if the user wants to address the vulnerabilities now or proceed with awarene
 
 - `cs-interview-me`: upstream — clarifies what the user actually wants before a plan exists
 - `cs-idea-refine`: upstream — generates variations before grilling a specific option
-- `cs-spec-driven`: upstream — produces the spec that should be grilled before planning
+- `cs-spec-driven`: supplies a spec for an explicitly requested stress-test or major unresolved design assumptions; ordinary planning does not require this review
 - `cs-planning`: downstream — break the grilled-and-hardened design into tasks
 - `cs-doubt-driven`: post-decision artifact review (grill the code/spec, not the plan)
-- `/cs-plan` and `/cs-build`: workflow gates that require the resulting `## Grill Review` decision before planning or autonomous implementation
+- `/cs-plan` and `/cs-build`: reuse findings when a review occurred; neither requires a `Grill Review` section or formal skip record for ordinary work
 
 ## Verification
 

@@ -1,27 +1,21 @@
 # Definition of Done
 
-> Ported from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) (MIT)
+> Adapted from [addyosmani/agent-skills](https://github.com/addyosmani/agent-skills) (MIT).
 
-The project-wide standing bar that every change must clear, regardless of which skill is active.
+## Per Slice
 
-## Required for Every Change
+- Acceptance criteria have observable evidence.
+- Behavior changes and bug fixes have appropriate tests; affected checks pass.
+- Relevant documentation is synchronized; secrets and unrelated user changes are protected.
+- Documentation-only edits use content, link and format verification rather than unrelated application tests.
 
-- [ ] Code compiles and builds without errors
-- [ ] All existing tests pass (no regressions)
-- [ ] New behavior has corresponding tests (unit, integration, or E2E as appropriate)
-- [ ] Linting and type checking pass
-- [ ] No secrets, credentials, or sensitive data in code or logs
-- [ ] Code review completed and approved
-- [ ] Behavior verified at runtime (manual test, browser check, or automated E2E)
+## Integration and Final Delivery
 
-## Per-Task Acceptance Criteria
-
-In addition to the project-wide Definition of Done, each task has its own acceptance criteria defined during planning (via `cs-planning`). These answer "did we build the right thing?" while the Definition of Done answers "did we build it right?"
-
-## Verification Evidence
-
-"Seems right" is never sufficient. Evidence includes:
-- Passing test output
-- Successful build logs
-- Runtime screenshots or terminal output
-- Before/after comparisons for performance/visual changes
+- Run project-required regression, build, lint and type checks for executable changes.
+  Run them earlier for shared infrastructure changes or uncertain impact.
+- Verify changed runtime behavior through suitable tests, browser checks or manual runs.
+- Complete review required by the project or owning workflow before merging.
+- Reuse passing evidence for unchanged inputs; rerun affected checks after changes or
+  failures. A different phase name alone does not require rerunning the same checks.
+- Report checks, failures and concrete limitations in the existing task or delivery report.
+  Create another checklist artifact only when the workflow actually needs it.

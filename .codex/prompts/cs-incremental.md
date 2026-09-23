@@ -1,5 +1,5 @@
 ---
-description: "Delivers changes incrementally. Use when implementing any feature or change that touches more than one file. Use when you're about to write a large amount of code at once, or when a task feels too big to land in one step. / 增量交付变更。用于跨多文件的特性实现、大量代码编写或任务过大无法一步完成时——垂直切片、合约优先、风险优先。"
+description: "Deliver multi-step changes in independently verifiable vertical slices. / 将多步骤变更按可独立验证的垂直切片交付。"
 argument-hint: "[args]"
 ---
 

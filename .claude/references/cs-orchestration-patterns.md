@@ -51,20 +51,17 @@ User invokes cs-shipping
     GO / NO-GO decision with rollback plan
 ```
 
-The same pattern drives the build side:
+Ordinary build work stays with the host. A new or materially changed architectural
+boundary can justify one focused architect consultation; accepted unchanged ADRs are reused.
+Delegate a concrete independent slice only when useful and authorized, or when an explicit
+team workflow requires it. Owner tags describe responsibility rather than mandating a spawn.
+Cross-domain work remains one end-to-end slice unless an independent/shared contract must
+land first. Pass only task-specific evidence and gaps to the delegated role.
 
-```
-cs-spec-driven (after objective approved)
-    │
-    └── Spawn cs-architect → ADRs → docs/adr/
-
-cs-incremental (per end-to-end slice, by primary owner)
-    ├── frontend primary → Spawn cs-frontend-lead
-    ├── backend primary  → Spawn cs-backend-lead
-    └── arch primary     → Spawn cs-architect
-```
-
-Cross-domain work remains one end-to-end slice with a primary owner and optional collaborator. Contract-first ordering applies only when a contract is independently delivered, shared, or needed before parallel frontend work.
+For `/cs-build`, the host checks for an existing knowledge base and changed indexed source
+before the final refresh. Defer refresh until all planned slices complete; when neither
+condition applies, skip without spawning an administrator. Explicit team workflows retain
+their own final-step contract.
 
 ## Anti-Patterns
 

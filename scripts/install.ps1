@@ -256,7 +256,7 @@ if ($doCodex) {
         Install-CodexUserTree (Join-Path $Repo '.agents\references') (Join-Path $destCodex 'references') 'references' $known $next
         Install-CodexUserTree (Join-Path $Repo '.codex\prompts') (Join-Path $destCodex 'prompts') 'prompts' $known $next
         Install-CodexUserTree (Join-Path $Repo '.codex\agents') (Join-Path $destCodex 'agents') 'agents' $known $next
-        Install-CodexUserFile (Join-Path $Repo 'AGENTS.md') (Join-Path $destCodex 'AGENTS.md') 'AGENTS.md' $known $next
+        Install-CodexUserFile (Join-Path $Repo '.codebuddy\references\cs-user-context.md') (Join-Path $destCodex 'AGENTS.md') 'AGENTS.md' $known $next
         Write-CodexManifest $manifestPath $next
         Write-Host "Installed Codex user-level adapters -> $destCodex"
     } else {

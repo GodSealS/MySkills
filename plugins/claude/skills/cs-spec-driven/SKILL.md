@@ -1,165 +1,53 @@
 ---
 name: cs-spec-driven
-description: "Creates specs before coding. Use when starting a new project, feature, or significant change and no specification exists yet. Use when requirements are unclear, ambiguous, or only exist as a vague idea. / 编码前先创建规范。用于启动新项目、新功能或重大变更且尚无规范时——需求不明确、模糊或仅作为粗略想法存在时（SPECIFY→PLAN→TASKS→IMPLEMENT）。"
+description: "Specify a new project or significant change when requirements or design boundaries are missing. / 为需求或设计边界不完整的新项目、重大变更编写规格。"
 ---
 
 # Spec-Driven Development
 
-## Overview
+## Scope
 
-Write a structured specification before writing any code. The spec is the shared source of truth between you and the human engineer — it defines what we're building, why, and how we'll know it's done. Code without a spec is guessing.
+Create or update the authoritative specification when requirements need definition.
+Clear, self-contained edits can proceed from user requirements without a separate spec.
+Preserve existing specifications instead of recreating them.
 
-## When to Use
+## Process
 
-- Starting a new project or feature
-- Requirements are ambiguous or incomplete
-- The change touches multiple files or modules
-- You're about to make an architectural decision
-- The task would take more than 30 minutes to implement
+1. Establish objective, acceptance criteria, constraints and exclusions from the request
+   and source. Ask only about missing information that changes the design. State
+   consequential assumptions briefly and reuse decisions already made by the user.
+2. Follow the [task-context protocol](../../references/sysdocs-design-context.md).
+   Reference existing commands, conventions and accepted ADRs rather than copying the
+   project's setup into every feature specification.
+3. Describe target behavior, affected interfaces, verification and material risks.
+   For a new project also define stack, structure, executable commands, code conventions
+   and test strategy. Keep a small change's spec proportionate to its scope.
+4. Consult `cs-architect` only for new or materially changed architectural boundaries,
+   public contracts, dependency direction or unresolved architectural conflicts.
+   Reuse unchanged accepted architecture. Record significant, durable decisions with
+   `cs-docs-adrs`; routine implementation choices stay in task notes.
+5. Save at the existing authoritative path, otherwise `SysDocs/specs/<topic>.md`.
+   New SysDocs specs use schema 2 metadata (`schema`, `doc_type: spec`, `updated`)
+   and a retrieval summary identifying relevant modules and proposed symbols as unimplemented.
+   Preserve external/historical formats; a spec alone does not initialize a full library.
+6. Resolve material open choices with the user. Reuse authorization for unchanged scope.
+   Use `cs-planning` once for dependency ordering and task breakdown when needed; do not
+   create separate PLAN and TASKS approval rounds. Stop after the spec when that is the
+   requested deliverable; continue implementation only within authorized scope.
 
-**When NOT to use:** Single-line fixes, typo corrections, or changes where requirements are unambiguous and self-contained.
+## Optional Design Review
 
-## The Gated Workflow
-
-```
-SPECIFY ──→ PLAN ──→ TASKS ──→ IMPLEMENT
-   │          │        │          │
-   ▼          ▼        ▼          ▼
- Human      Human    Human      Human
- reviews    reviews  reviews    reviews
-```
-
-### Phase 1: Specify
-
-Start with a high-level vision. Ask the human clarifying questions until requirements are concrete.
-
-**Surface assumptions immediately:**
-
-```
-ASSUMPTIONS I'M MAKING:
-1. This is a web application (not native mobile)
-2. Authentication uses session-based cookies (not JWT)
-3. The database is PostgreSQL (based on existing Prisma schema)
-4. We're targeting modern browsers only (no IE11)
-→ Correct me now or I'll proceed with these.
-```
-
-**Write a spec document covering six core areas:**
-
-1. **Objective** — What are we building and why?
-2. **Commands** — Full executable commands with flags
-3. **Project Structure** — Where source code, tests, docs live
-4. **Code Style** — One real code snippet showing style
-5. **Testing Strategy** — Framework, location, coverage expectations
-6. **Boundaries** — Always/Ask First/Never rules
-
-**Architecture Fan-Out:** After the human approves the objective, **FAN-OUT to `cs-architect`** (via `Task`) to produce module boundaries, dependency direction, tech stack and significant ADRs via `cs-docs-adrs`. Preserve an existing authoritative ADR location; new projects default to `SysDocs/decisions/`. The architect's output is required input for the spec's Project Structure section.
-
-**Spec template:**
-
-Keep an existing authoritative spec location; otherwise use `SysDocs/specs/<topic>.md`. For a newly created SysDocs specification, include the schema 2 metadata below and an applicable retrieval summary. Preserve existing external/historical formats; do not create a second authority or initialize the whole library.
-
-```markdown
----
-schema: 2
-doc_type: spec
-updated: <ISO date or timestamp>
----
-
-# Spec: [Project/Feature Name]
-
-## 检索摘要
-[Key existing or proposed classes/structures with one-sentence responsibilities and relevant constraints; label proposed symbols as unimplemented. Use real modules/processes when classes do not apply.]
-
-## Objective
-[What we're building and why. User stories or acceptance criteria.]
-
-## Tech Stack
-[Framework, language, key dependencies with versions]
-
-## Commands
-[Build, test, lint, dev — full commands]
-
-## Project Structure
-[Directory layout with descriptions]
-
-## Code Style
-[Example snippet + key conventions]
-
-## Testing Strategy
-[Framework, test locations, coverage requirements]
-
-## Boundaries
-- Always: [...]
-- Ask first: [...]
-- Never: [...]
-
-## Success Criteria
-[How we'll know this is done]
-
-## Open Questions
-[Anything unresolved that needs human input]
-
-## Grill Review
-- Status: pending
-- Findings: [Run `/cs-grill-me <actual-spec-path>` and summarize the vulnerabilities, or explicitly record a skip decision.]
-- Decision: [Address now / proceed with accepted risks / skipped with accepted risks]
-```
-
-### Phase 2: Plan
-
-> Follow `cs-planning` for the full dependency-graph and vertical-slicing mechanics.
-
-### Phase 3: Tasks
-
-> Follow `cs-planning` for task-sizing and dependency-ordering mechanics.
-
-### Phase 4: Implement
-
-Execute tasks one at a time following `cs-incremental` and `cs-tdd`.
-
-## Grill Review Gate
-
-Before invoking `cs-planning`, run `/cs-grill-me <spec-path>` and replace the `pending` Grill Review entry with the vulnerabilities found and the user's decision. A review may be skipped only when the spec explicitly records the accepted risks.
-
-## Keeping the Spec Alive
-
-- **Update when decisions change**
-- **Update when scope changes**
-- **Commit the spec** alongside code
-- **Reference the spec in PRs**
-
-## Common Rationalizations
-
-| Rationalization | Reality |
-|---|---|
-| "This is simple, I don't need a spec" | Simple tasks need acceptance criteria. A two-line spec is fine. |
-| "I'll write the spec after I code it" | That's documentation, not specification. |
-| "The spec will slow us down" | A 15-minute spec prevents hours of rework. |
-| "Requirements will change anyway" | An outdated spec is still better than no spec. |
-
-## Red Flags
-
-- Starting to write code without any written requirements
-- Asking "should I just start building?" before clarifying "done"
-- Implementing features not mentioned in any spec or task list
-- Skipping the spec because "it's obvious what to build"
-
-## Interaction with Other Skills
-
-- `cs-interview-me`: upstream — extracts what the user actually wants before specifying
-- `cs-idea-refine`: upstream — generates and refines options before writing a spec
-- `grill-me`: required gate before planning — stress-test the spec, then record the findings and decision in `## Grill Review`
-- `cs-architect` (agent): fan-out after the objective is approved — produces module boundaries, dependency direction, tech stack and ADRs via `cs-docs-adrs`, retaining the authoritative location or defaulting new projects to `SysDocs/decisions/`
-- `cs-planning`: downstream — break the spec into verifiable tasks
-- `cs-sysdocs-init` / `cs-sysdocs-update`: use the shared [task-context protocol](../../references/sysdocs-design-context.md). Preserve existing authoritative specs; new projects default to `SysDocs/specs/`. A specification alone does not trigger full initialization. Describe target behavior separately from implemented architecture, and synchronize only documentation affected by the authorized change.
+Use `cs-grill-me` for explicit stress-test requests or major design assumptions that remain
+uncertain. Record findings and decisions when a review occurs. Ordinary specifications
+need no `Grill Review` section or formal skip declaration.
 
 ## Verification
 
-- [ ] The spec covers all six core areas
-- [ ] The human has reviewed and approved the spec
-- [ ] Architecture fan-out to `cs-architect` completed and ADRs recorded (see `cs-docs-adrs`)
-- [ ] `## Grill Review` records completed findings and a decision, or an explicit skip with accepted risks
-- [ ] Success criteria are specific and testable
-- [ ] Boundaries (Always/Ask First/Never) are defined
-- [ ] The spec is saved to a file in the repository
+- [ ] Objective, scope, intended behavior and success criteria are concrete.
+- [ ] Changed boundaries and significant risks have evidence or explicit open decisions.
+- [ ] Verification is executable; existing conventions are linked rather than duplicated.
+- [ ] One authoritative spec separates proposed behavior from current implementation.
+- [ ] Required user decisions are resolved; existing approvals are reused for unchanged scope.
+
+Update the spec when accepted scope or decisions change. Implement using `cs-incremental`
+and apply `cs-tdd` to executable behavior changes.

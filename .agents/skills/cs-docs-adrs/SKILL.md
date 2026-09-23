@@ -12,7 +12,7 @@ Document decisions, not just code. The most valuable documentation captures the 
 ## When to Use
 
 - Making a significant architectural decision
-- Choosing between competing approaches
+- Choosing between approaches with significant, durable architectural consequences
 - Adding or changing a public API
 - Shipping a feature that changes user-facing behavior
 - Onboarding new team members (or agents)
@@ -20,6 +20,8 @@ Document decisions, not just code. The most valuable documentation captures the 
 **When NOT to use:** Don't document obvious code. Don't restate what the code already says.
 
 ## Architecture Decision Records (ADRs)
+
+Routine implementation choices belong in task notes. Reuse accepted ADRs for unchanged decisions.
 
 ### ADR Template
 
@@ -89,13 +91,6 @@ Preserve accepted ADR bodies. A changed decision uses a new ADR and supersession
 - Document non-obvious side effects
 - Reference related ADRs and issues
 
-## Common Rationalizations
-
-| Rationalization | Reality |
-|---|---|
-| "The code is self-documenting" | Code shows what; docs explain why. Both are needed. |
-| "I'll write docs later" | Context evaporates. Write docs while the reasoning is fresh. |
-| "Nobody reads documentation" | Future you will. And future agents. |
 
 ## Interaction with Other Skills
 

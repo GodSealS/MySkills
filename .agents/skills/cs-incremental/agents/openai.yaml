@@ -1,3 +1,3 @@
 interface:
   display_name: "CS Incremental"
-  short_description: "Delivers changes incrementally."
+  short_description: "Deliver multi-step changes in independently verifiable vertical slices."

@@ -1,48 +1,42 @@
 ---
-description: "Implement tasks incrementally — build, test, verify, commit. Add \"auto\" to run the whole plan in one approved pass. / 增量实现任务——构建、测试、验证、提交。添加\"auto\"一次性执行完整计划。"
+description: "Implement the next task; auto or all executes the authorized plan / 实现下一任务；auto 或 all 连续执行已授权计划"
 ---
 
-Invoke `cs-incremental` alongside `cs-tdd`.
-
-For documentation, follow `../references/sysdocs-design-context.md`: read applicable specs/ADRs, select relevant descriptions via summaries and knowledge-base/source candidates, and record semantic impact in the task. Update affected descriptions, summaries, indexes, links and approved requirements before the review snapshot/commit. Structural validation and content/behavior verification are separate; current-change omissions block DONE. Missing SysDocs or unrelated old defects do not force initialization/full repair. High-risk boundary changes expand flow reading. Reuse valid slice evidence at final delivery; only new changes or unresolved gaps require rechecking. Existing task authorization covers necessary reversible synchronization.
+Invoke `cs-incremental`; apply `cs-tdd` to executable logic and behavior changes.
+For documentation follow `../references/sysdocs-design-context.md`, synchronize affected
+content before review/delivery, and reuse valid evidence. Missing SysDocs does not require
+initialization; knowledge-graph refresh does not prove documentation correctness.
 
 ## Modes
 
-- **`/cs-build`** — implement the *next* pending task, then stop (careful, one slice at a time).
-- **`/cs-build auto`** — generate the plan if needed, get a single approval, then implement *every* task without stopping between them.
+- `/cs-build`: complete the next pending task, then stop.
+- `/cs-build auto` or `/cs-build all`: execute all authorized tasks in dependency order.
 
-`$ARGUMENTS` selects the mode. Treat `auto` or `all` as autonomous mode; anything else (or empty) is the default single-task mode.
+## Process
 
-## Default: one task
+1. Read selected requirements and the authoritative plan. If decomposition is needed,
+   invoke `cs-planning` once. Clear requirements suffice; a formal spec and Grill Review
+   section are optional. Reuse approval for unchanged scope; resolve material missing
+   decisions before dependent implementation.
+2. Inspect the worktree. Preserve unrelated user changes and stage only this task's files.
+   Ask only when changes conflict or their ownership cannot be safely separated.
+3. Execute tasks through `cs-incremental`. The host handles ordinary slices; delegation
+   requires a concrete independent task or explicit team workflow, not an owner tag.
+   Pass focused context when delegating.
+4. Run affected tests/checks after each slice. Run project-required full regression,
+   build, lint and type checks at integration/final delivery, or earlier when shared
+   infrastructure or uncertain impact warrants them. Reuse passing evidence for unchanged
+   inputs. Documentation-only changes use content, link and format checks.
+5. Record status and evidence in the authoritative plan. Commit coherent validated
+   increments when requested or established by project workflow; workspace delivery is
+   valid otherwise. Follow `cs-debugging` for failures without stopping for routine fixes.
+6. At the end of the entire plan, the host checks whether `.codegraph/`,
+   `.understand-anything/`, or `graphify-out/` exists and indexed source changed.
+   If both apply, FAN-OUT once to `cs-knowledge-base-admin` as the final execution step,
+   passing project root and changed scope. Otherwise skip without spawning. Single-task
+   invocations defer refresh while tasks remain pending; an explicit refresh request may
+   override deferral. Under Team Build, its final refresh owns this step.
+7. Summarize completed tasks, verification, remaining work and any refresh result briefly.
 
-Pick the next pending task from the plan. Then:
-
-1. Read the task's acceptance criteria
-2. Load relevant context (existing code, patterns, types)
-3. Write a failing test for the expected behavior (RED)
-4. Implement the minimum code to pass the test (GREEN)
-5. Run the full test suite to check for regressions
-6. Run the build to verify compilation
-7. Commit with a descriptive message
-8. Mark the task complete
-9. **Final step — FAN-OUT to `cs-knowledge-base-admin`.** Pass the current project root. At least one of `.codegraph/`, `.understand-anything/`, or `graphify-out/` must already exist; if none exists, the administrator terminates and reports that prerequisite without creating anything. Otherwise it refreshes each existing knowledge base independently and records missing directories or unavailable update tools as skipped.
-10. Stop
-
-## Autonomous: the whole plan (`/cs-build auto`)
-
-Use this once a spec exists and you want to collapse plan + build into one run. It removes the manual stepping between tasks — **not** the verification. Every task still earns a passing test and its own commit.
-
-1. **Require a spec.** Use the user's selected authoritative design/spec path; otherwise inspect `SysDocs/specs/` and existing conventions such as `SPEC.md`, `docs/SPEC.md` or `spec/`. Do not duplicate an existing spec or treat several unrelated specs as one approved target. If none exists, stop and tell the user to run `/cs-spec` first.
-2. **Require a Grill Review decision.** The selected spec must contain `## Grill Review` with either completed `/cs-grill-me` findings and a decision, or an explicit skip plus accepted risks. Otherwise stop and direct the user to complete or formally skip the review.
-3. **Establish a clean baseline.** Run `git status --porcelain`. If there are uncommitted changes outside planning artifacts, stop and ask the user to commit, stash, or confirm.
-4. **Plan if needed.** If no `tasks/plan.md`, invoke `cs-planning` to generate one.
-5. **Single checkpoint.** Present the full plan and wait for an unambiguous affirmative. This is the only human gate — after approval, run autonomously.
-6. **Execute every task in dependency order, routed by primary owner.** FAN-OUT to the primary domain lead (`cs-frontend-lead` for frontend tasks, `cs-backend-lead` for backend tasks, `cs-architect` for structural/contract tasks — not business features) and consult listed collaborators only at their boundary. Run RED → GREEN → regression → build → commit → mark complete. Contract-first applies only when a contract is independently delivered. Stage only the files that task touched — make one commit per task.
-7. **Stop and ask the user** when:
-   - A test can't be made to pass → follow `cs-debugging`
-   - The spec is ambiguous or a task needs an uncovered decision
-   - A task is high-risk or irreversible → follow `cs-doubt-driven` and get explicit sign-off
-8. **Final execution step — FAN-OUT to `cs-knowledge-base-admin`.** Pass the current project root. If none of `.codegraph/`, `.understand-anything/`, or `graphify-out/` exists, it terminates with a prerequisite message and creates nothing. Otherwise it refreshes every existing supported knowledge base independently.
-9. **Summarize the build:** tasks completed, tests added, commits made, anything skipped, and the administrator's update/skip/failure results.
-
-If any step fails, follow `cs-debugging`.
+Unresolved high-risk decisions use `cs-doubt-driven`. Ask for authorization only when the
+next action is outside existing authorization or is materially irreversible.

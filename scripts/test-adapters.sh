@@ -61,6 +61,12 @@ import re
 import sys
 
 root = Path(sys.argv[1])
+for name in ('cs-build', 'cs-plan', 'cs-spec'):
+    source = (root / '.codebuddy/commands' / (name + '.md')).read_text(encoding='utf-8-sig')
+    body = source.split('---', 2)[2].strip()
+    generated = (root / '.gemini/commands' / (name + '.toml')).read_text(encoding='utf-8-sig')
+    assert body in generated, (name, 'Gemini command lost source instructions')
+print('Generated Gemini command bodies: PASS')
 for command_path in ('.codebuddy/commands/cs-build.md', 'commands/cs-build.md',
                      '.gemini/commands/cs-build.toml', '.claude/commands/cs-build.md',
                      'plugins/claude/commands/cs-build.md'):
@@ -121,7 +127,7 @@ for agent in "$ROOT"/.codebuddy/agents/*.md "$ROOT"/.gemini/agents/*.md "$ROOT"/
       assert_not_contains "$agent" 'created, installed, repaired, or deleted'
       ;;
     *)
-      assert_contains "$agent" 'may autonomously load 2–3 skills when their triggers match; it must not load skills outside this roster'
+      assert_contains "$agent" 'may autonomously load 0–3 skills when their triggers match; there is no minimum skill count, and it must not load skills outside this roster'
       assert_not_contains "$agent" '下表是本角色可自主加载的技能边界'
       ;;
   esac
@@ -187,9 +193,6 @@ for command in cs-build cs-plan cs-spec; do
   assert_same "$ROOT/.codebuddy/commands/$command.md" "$ROOT/commands/$command.md"
   assert_not_contains "$ROOT/.claude/commands/$command.md" 'allowed-tools:'
 done
-assert_contains "$ROOT/.gemini/commands/cs-build.toml" 'routed by primary owner'
-assert_contains "$ROOT/.gemini/commands/cs-plan.toml" 'primary owner'
-assert_contains "$ROOT/.gemini/commands/cs-spec.toml" 'cs-architect'
 assert_contains "$ROOT/.codex/prompts/cs-incremental.md" 'Invoke the cs-incremental skill'
 assert_contains "$ROOT/.codex/prompts/cs-agent-brief-review.md" 'description: "审查 Agent Brief'
 assert_contains "$ROOT/.codex/prompts/cs-skill-review.md" 'description: "审查一个 skill'

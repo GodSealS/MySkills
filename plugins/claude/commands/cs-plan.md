@@ -1,20 +1,8 @@
 ---
-description: "Break work into small verifiable tasks with acceptance criteria and dependency ordering / 将工作拆分为小粒度的可验证任务，含验收标准和依赖排序"
+description: "Plan ordered, verifiable tasks from clear requirements or an existing spec / 根据明确需求或现有规格拆解可验证任务"
 ---
 
-Invoke the `cs-planning` skill.
-
-Read the selected authoritative spec (`SysDocs/specs/<topic>.md`, an existing `SPEC.md`, or the user's supplied design path) and relevant source. Follow the shared task-context protocol; do not copy the spec or initialize a full documentation library merely to plan work.
-
-Before planning, require a `## Grill Review` section in the spec. It must either summarize the completed `/cs-grill-me` findings and decision, or explicitly state that the review was skipped and the risks were accepted. If it is absent, stop and direct the user to run `/cs-grill-me <spec-path>` or record an explicit skip decision.
-
-Then:
-
-1. Enter plan mode — read only, no code changes
-2. Identify the dependency graph between components — FAN-OUT to `cs-architect` to validate module boundaries and dependency direction
-3. Slice work vertically (one complete path per task, not horizontal layers)
-4. Write tasks with acceptance criteria, verification steps, a **primary owner** tag (`arch` / `frontend` / `backend`), and optional collaborators; keep cross-domain work as an end-to-end slice unless its contract must be independently delivered first.
-5. Add checkpoints between phases
-6. Present the plan for human review
-
-Save the plan to tasks/plan.md and task list to tasks/todo.md.
+Invoke `cs-planning` for `$ARGUMENTS`. Reuse selected requirements, accepted decisions and
+existing tasks. Save one authoritative plan with status; any required `tasks/todo.md`
+contains only task IDs, status and links. Follow the skill's conditional architecture and
+design-review rules. A planning request does not itself authorize implementation.
