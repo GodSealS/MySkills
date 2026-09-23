@@ -135,7 +135,7 @@ for tree in "$ROOT"/skills "$ROOT"/.agents/skills "$ROOT"/.gemini/skills "$ROOT"
   done
 done
 for refs in "$ROOT"/references "$ROOT"/.agents/references "$ROOT"/.gemini/references "$ROOT"/.claude/references "$ROOT"/plugins/claude/references; do
-  for ref in sysdocs-system.md sysdocs-overview-template.md sysdocs-module-template.md sysdocs-vibe-template.md sysdocs-files-template.md sysdocs-flow-template.md; do
+  for ref in sysdocs-system.md sysdocs-overview-template.md sysdocs-project-map-template.md sysdocs-module-template.md sysdocs-vibe-template.md sysdocs-files-template.md sysdocs-flow-template.md; do
     [ -f "$refs/$ref" ] || fail "missing $refs/$ref"
   done
 done
@@ -166,7 +166,7 @@ for command in "$ROOT/.codebuddy/commands/cs-team-refactor.md" "$ROOT/commands/c
   assert_contains "$command" '$ARGUMENTS'
 done
 [ -f "$ROOT/.codex/prompts/cs-team-refactor.md" ] || fail 'missing Codex cs-team-refactor prompt'
-for ref in sysdocs-system.md sysdocs-overview-template.md sysdocs-module-template.md sysdocs-vibe-template.md sysdocs-files-template.md sysdocs-flow-template.md; do
+for ref in sysdocs-system.md sysdocs-overview-template.md sysdocs-project-map-template.md sysdocs-module-template.md sysdocs-vibe-template.md sysdocs-files-template.md sysdocs-flow-template.md; do
   [ -f "$ROOT/plugins/claude/references/$ref" ] || fail "missing plugin reference $ref"
 done
 

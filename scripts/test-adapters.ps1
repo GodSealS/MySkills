@@ -113,7 +113,7 @@ try {
     Assert 'advisor allows only the two external auxiliaries' ($advisor -match 'Only the following external auxiliaries' -and $advisor -match '\| `cs-code-query` \|' -and $advisor -match '\| `cs-docs-adrs` \|')
     $teamBuild = Get-Content -Raw (Join-Path $Temp '.agents\skills\cs-team-build\SKILL.md')
     Assert 'team-build skips nested knowledge-base refreshes during task implementation' ($teamBuild -match 'Skip the final knowledge-base-administrator step; Team Build owns its single invocation in Phase 5')
-    foreach ($ref in @('sysdocs-system.md', 'sysdocs-overview-template.md', 'sysdocs-module-template.md', 'sysdocs-vibe-template.md', 'sysdocs-files-template.md', 'sysdocs-flow-template.md')) {
+    foreach ($ref in @('sysdocs-system.md', 'sysdocs-overview-template.md', 'sysdocs-project-map-template.md', 'sysdocs-module-template.md', 'sysdocs-vibe-template.md', 'sysdocs-files-template.md', 'sysdocs-flow-template.md')) {
         foreach ($tree in @('references', '.agents\references', '.gemini\references', '.claude\references', 'plugins\claude\references')) {
             Assert "generated $tree/$ref" (Test-Path (Join-Path $Temp "$tree\$ref"))
         }

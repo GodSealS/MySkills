@@ -27,7 +27,7 @@ for name in skills:
             raise SystemExit(f'{path}: missing or invalid {key}')
     if fields.get('user-invocable') is not True:
         raise SystemExit(f'{path}: user-invocable must be true')
-for name in ('system', 'overview-template', 'module-template', 'files-template', 'flow-template', 'vibe-template'):
+for name in ('system', 'overview-template', 'project-map-template', 'module-template', 'files-template', 'flow-template', 'vibe-template'):
     path = Path('.codebuddy/references') / f'sysdocs-{name}.md'
     if not path.is_file() or not path.read_text(encoding='utf-8-sig').strip():
         raise SystemExit(f'{path}: missing or empty resource')
