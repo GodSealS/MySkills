@@ -68,6 +68,8 @@ Keep a short impact record in the existing task/review artifact: change, semanti
 
 ### 4. Update the necessary pages
 
+Maintain `SysDocs/PROJECT-MAP.md` under the shared protocol's root project-map contract and [template](../../references/sysdocs-project-map-template.md). In schema 2 repair, supply a missing map and README navigation; migration/full-refresh also require it. For incremental work, assess architecture, execution paths, module/interface dependencies and project workflow changes, then update affected views and their evidence alongside the detailed pages. An unrelated inherited absence does not force full-library repair; schema 1 stays under its legacy contract until explicit migration.
+
 Update affected module/flow descriptions, file responsibilities, summary text, navigation and incoming references in the existing supported layout. Use schema 2 templates for schema 2 pages. The summary names only key entry/major-responsibility classes or structures with a one-sentence responsibility each, real alternatives where classes are absent, and important cross-module boundaries. Complete file coverage belongs to `files/`, not a second symbol list.
 
 Preserve unknown metadata, manually owned material and all `<!-- human:start -->` / `<!-- human:end -->` contents. Unpaired, nested or ambiguous human markers prevent an unsafe rewrite. Keep unclassifiable original text and report it. Preserve the body of accepted ADRs; changed decisions need a new decision and supersession link. Source behavior does not automatically replace accepted requirements.
@@ -111,6 +113,7 @@ Record declared scope, verified items, failed checks and uncovered items in exis
 - [ ] KB, summaries and source candidates are combined; mismatches and missing-summary fallbacks resolved or reported.
 - [ ] High-risk changes inspect related flow bodies; unclear scope expands to all flow explanations.
 - [ ] Affected descriptions, file ownership, summaries and incoming links are synchronized; unrelated old gaps remain distinct.
+- [ ] Applicable PROJECT-MAP views and README navigation match current module/flow/workflow evidence; missing-map repair and unimplemented views follow the shared contract.
 - [ ] Human text, unknown fields, historical ADR bodies and authoritative locations are preserved.
 - [ ] Proposal integration satisfies all conditions; future designs remain explicitly unimplemented.
 - [ ] Migration/rebuild, if authorized, is staged, recoverable, idempotent and preserves unmapped originals.

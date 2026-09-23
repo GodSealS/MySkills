@@ -8,7 +8,7 @@ Create a unique `<run-id>` for the target project. Never overwrite an existing r
 
 ```text
 Idea/team-refactor/<run-id>/
-  proposal.md                unique proposal entry; draft until final
+  proposal.md                unique entry with architecture/workflow comparisons and interface/design assessment; draft until final
   implementation-plan.md     staged tasks, dependencies and acceptance
   decisions.md               optional proposed decisions, never accepted ADRs
 tasks/team-refactor/<run-id>/
@@ -75,7 +75,7 @@ Maintain a single writer using the host's supported atomic lock or equivalent. I
 Each `T-NN` task includes:
 
 - Type (`baseline | refactor | performance | migration | docs`), source `F-NNN` IDs, goal and evidence links.
-- Primary owner, collaborators, actual/proposed modules and likely files, verified current behavior, effective compatibility contract and separately approved behavior corrections.
+- Primary owner, collaborators, actual/proposed modules and likely files, verified current behavior, effective compatibility contract and separately approved behavior corrections; link affected interface-ledger entries and comparison-diagram changes.
 - Dependencies on prior tasks, measurements, data or decisions; one deliverable slice and any API/data coexistence or failure handling.
 - For each temporary migration mechanism (such as an adapter or dual operation), an observable exit condition, a linked removal task with owner and dependencies, and acceptance proving the temporary path can be retired while preserving the required behavior. Record when no temporary mechanism is introduced.
 - Observable acceptance, exact verification environment and steps or a specifically marked tool to build. Separate structure checks, source/behavior checks and comparable performance measurements. Include a guard metric when performance is claimed.
@@ -84,3 +84,33 @@ Each `T-NN` task includes:
 - Work estimate as a range with assumptions, risk and confidence. Do not state an unsupported precise benefit.
 
 Research-only outcomes put safe evidence-gathering tasks in the executable plan and label unverified production changes as candidates. `READY` hands the proposal to Team Build only when explicitly requested later; it does not bypass that workflow's prerequisites or checkpoints.
+
+## Proposal analysis
+
+After the required `## 检索摘要`, `proposal.md` includes the following source-backed views. They are part of the frozen review bundle, not separate unreviewed attachments. Keep full evidence in baseline/diagnostics and link it from the proposal.
+
+### Architecture and workflow comparisons
+
+- **架构变动对比图:** paired Mermaid diagrams (or clearly separated before/after subgraphs) showing current versus proposed modules, responsibility/deployment boundaries, interfaces and dependency direction. Label additions, removals, merges and retained relationships in text, not color alone.
+- **工作流程变动对比图:** paired flow/sequence diagrams for affected end-to-end paths: trigger, participants, call ordering, input/output, state and error/compensation. Include development/build/release workflow comparisons when those paths change; distinguish them from runtime execution.
+- Use the same module/step IDs across each pair, explain rename/split/merge mappings, and link changed nodes/edges to `F-NNN` findings, interface entries and `T-NN` tasks. Mark the after view as **proposed, unimplemented**. Current edges require source/configuration evidence; proposed edges require rationale and validation, never invented current behavior.
+- For `NO CHANGE`, show retained structure/flow and explain why. For research-only or blocked drafts, label alternatives and unknowns rather than fabricate a settled after view. If a view is genuinely inapplicable, state why with evidence. Verify diagram syntax/rendering when tools are available and report any unsupported check separately from source verification.
+
+### Interface-change ledger
+
+Use one row per changed interface (API, module contract, event, data boundary or shared component contract). Identify real interfaces by source path and qualified symbol/signature, or method/route or message/schema identity; proposed names must be labeled.
+
+| Interface / finding | Current → proposed contract and change type | Why change / coupling addressed | Providers, consumers and affected flows | Compatibility, migration and rollback | Validation / task |
+|---|---|---|---|---|---|
+
+Explain additions, removal, merge/split, ownership moves and signature/semantic changes, including applicable errors, permissions, ordering and data guarantees. If no interface changes, say so with scope evidence. Do not leave empty template rows in the published result.
+
+### Global coupling, consolidation and extension assessment
+
+Architect and relevant domain owners examine the target in context: direct callers/callees, shared contracts/data, dependency cycles and change propagation. Record inspected boundaries and gaps; a module-only scan cannot justify a whole-project conclusion. Report these three decisions in concise tables or prose, linking findings, source evidence and affected tasks:
+
+1. **Unnecessary versus beneficial coupling.** Reducing unnecessary coupling is the first priority. **Coupling that improves runtime performance is acceptable.** Identify the retained coupling, the runtime benefit, maintenance/change cost and why that balance is acceptable. With measurements, record workload/environment, baseline and guard metrics; without measurements, label the benefit a hypothesis and assign verification before the dependent decision. Lack of measurement alone is not an instruction to remove coupling. Respect correctness, security and accepted compatibility constraints.
+2. **Interfaces that can be merged.** Name candidate interfaces, semantic overlap, providers/consumers and duplicate responsibilities; compare merge versus keeping separate. Recommend consolidation only where contracts, ownership and evolution fit. Explain rejected merges where superficially similar interfaces serve different permissions, lifecycles or failure guarantees, or would create wider coupling. If none qualify, record the inspected candidates and reason.
+3. **Modules where a design pattern aids extension.** Identify the concrete variation point and likely supported change, then compare an applicable pattern (for example Strategy, Adapter or Observer) with a simpler local design and the current design. State extension benefit, dependency direction, complexity/runtime cost, migration and tests. Choose a pattern only when it solves that module's demonstrated problem; retaining the existing design or using no pattern is a valid conclusion. Avoid speculative frameworks and unmeasured performance claims.
+
+The host verifies that diagrams, the ledger, findings and tasks agree, all applicable interface changes are covered, retained performance coupling is reasoned, and independent experts reviewed the same candidate version. Proposal work never claims these changes have been implemented.

@@ -68,6 +68,23 @@ class SysDocsTests(unittest.TestCase):
         self.assertEqual("PARTIAL-INITIALIZED", self.report()["inventory"])
         self.assert_rule("SYSDOC-LAYOUT-01")
 
+    def test_missing_project_map_requires_repair_without_blocking_unrelated_edit(self):
+        project_map = self.docs / "PROJECT-MAP.md"
+        project_map.unlink(missing_ok=True)
+        # Old schema 2 libraries may lack both the page and its navigation link.
+        readme = self.docs / "README.md"
+        readme.write_text("\n".join(
+            line for line in readme.read_text(encoding="utf-8").splitlines()
+            if "PROJECT-MAP.md" not in line), encoding="utf-8")
+        self.assertEqual("PARTIAL-INITIALIZED", self.report()["inventory"])
+        self.assert_rule("SYSDOC-LAYOUT-01")
+        local = self.report("--files", "SysDocs/architecture/modules/order.md")
+        self.assertEqual("COMPLETE", local["status"], local)
+
+    def test_project_map_must_be_reachable_from_readme(self):
+        self.edit("README.md", "- [Project map](PROJECT-MAP.md)", "")
+        self.assert_rule("SYSDOC-LAYOUT-01")
+
     def test_missing_schema2_entry_cannot_pass_full_validation(self):
         (self.docs / "README.md").unlink()
         self.assert_rule("SYSDOC-LAYOUT-01")
@@ -75,6 +92,7 @@ class SysDocsTests(unittest.TestCase):
 
     def test_required_fact_pages_cannot_be_replaced_with_redirects(self):
         for name, target in (("README.md", "architecture/overview.md"),
+                             ("PROJECT-MAP.md", "architecture/overview.md"),
                              ("architecture/overview.md", "modules/order.md"),
                              ("files/README.md", "order.md")):
             with self.subTest(page=name):
@@ -112,7 +130,7 @@ class SysDocsTests(unittest.TestCase):
         for path in self.docs.rglob("*.md"):
             content = path.read_text(encoding="utf-8")
             content = "\n".join(line for line in content.splitlines()
-                                if "order.md)" not in line)
+                                if "order.md)" not in line and "service.py)" not in line)
             path.write_text(content, encoding="utf-8")
         report = self.report("--files", "SysDocs/README.md",
                              "SysDocs/architecture/modules/order.md", "SysDocs/files/order.md")
@@ -312,6 +330,10 @@ class SysDocsTests(unittest.TestCase):
 
     def test_fact_page_cannot_bypass_checks_by_claiming_spec_type(self):
         self.edit("architecture/modules/order.md", "doc_type: architecture", "doc_type: spec")
+        self.assert_rule("SYSDOC-FM-03")
+
+    def test_project_map_cannot_bypass_fact_checks_by_claiming_spec_type(self):
+        self.edit("PROJECT-MAP.md", "doc_type: architecture", "doc_type: spec")
         self.assert_rule("SYSDOC-FM-03")
 
     def test_unrelated_broken_link_on_incoming_navigation_is_not_in_scope(self):

@@ -178,7 +178,7 @@ def validate_legacy(root: Path, documents=None, requested=None):
 FACT_TYPES = {"overview", "architecture", "files"}
 NEW_TYPES = FACT_TYPES | {"spec", "decision", "vibe"}
 SOURCE_SCOPES = {"committed", "committed+working-tree", "unversioned"}
-REQUIRED = ("README.md", "architecture/overview.md", "files/README.md")
+REQUIRED = ("README.md", "PROJECT-MAP.md", "architecture/overview.md", "files/README.md")
 
 
 def summary(body):
@@ -249,7 +249,7 @@ def check_metadata(path, root, fm, body, issues):
     if not isinstance(doc_type, str) or doc_type not in NEW_TYPES:
         issue(issues, "SYSDOC-FM-03", "blocking", rel, "invalid doc_type")
         return
-    expected_type = "overview" if path == root / "README.md" else "architecture" if path.is_relative_to(root / "architecture") else "files" if path.is_relative_to(root / "files") else None
+    expected_type = "overview" if path == root / "README.md" else "architecture" if path == root / "PROJECT-MAP.md" or path.is_relative_to(root / "architecture") else "files" if path.is_relative_to(root / "files") else None
     if expected_type and doc_type != expected_type:
         issue(issues, "SYSDOC-FM-03", "blocking", rel, f"this location requires doc_type {expected_type}")
     if "status" in fm and (not isinstance(fm["status"], str) or fm["status"] not in STATUSES):
@@ -394,6 +394,11 @@ def check_coverage(root, docs, selected, issues, full):
 
 
 def check_navigation(root, docs, issues):
+    readme = root / "README.md"
+    project_map = root / "PROJECT-MAP.md"
+    if project_map in docs and readme in docs:
+        if project_map not in {local_target(readme, link) for link in links(docs[readme][1])}:
+            issue(issues, "SYSDOC-LAYOUT-01", "blocking", "SysDocs/PROJECT-MAP.md", "project map requires a direct README navigation link")
     reachable = set()
     pending = [root / "README.md"]
     while pending:
@@ -465,7 +470,7 @@ def inspect(root, files=None, summaries=False):
         else:
             out_of_scope_issues.append(item)
     # An interrupted library still has a layout even when its entry is missing.
-    new = any(p == root / "README.md" or p.relative_to(root).parts[0] in {"architecture", "files"} for p in docs)
+    new = any(p in {root / "README.md", root / "PROJECT-MAP.md"} or p.relative_to(root).parts[0] in {"architecture", "files"} for p in docs)
     old = root / "SYSTEM_ROOT.md" in docs and isinstance(docs[root / "SYSTEM_ROOT.md"][0], dict)
     fact_docs = [p for p in docs if p.relative_to(root).parts[0] not in {"VibeCoding", "specs", "decisions"}]
     inventory = "UNINITIALIZED" if not fact_docs else "PARTIAL-INITIALIZED"

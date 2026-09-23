@@ -15,6 +15,7 @@ source_paths:
 
 ## Navigation
 
+- [Project map](PROJECT-MAP.md)
 - [Architecture](architecture/overview.md)
 - [Order module](architecture/modules/order.md)
 - [Payment flow](architecture/flows/payment.md)

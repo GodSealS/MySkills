@@ -90,6 +90,20 @@ Keep `sources` limited to `code|design`, existing source-qualified IDs and finge
 
 Severity is `Critical|Important|Suggestion`. A Critical blocks approval; an Important produces `REQUEST CHANGES`; Suggestions alone may approve. `REJECT` is computed only by this skill when a design finding has `hard_constraint: true` and the architect records no compliant alternative. The code reviewer itself outputs only `APPROVE|REQUEST CHANGES`.
 
+### 问题总纲 — module, class and function index
+
+Place `## 问题总纲` first in the body of `final-review.md` and its blocked/pending-human draft, after frontmatter and an optional title. Render it from the current merged `findings.json` and verified target locators; it is a human-readable index, not a new machine schema or separate verdict source.
+
+| Finding / severity / lifecycle | Module | Class / structure | Function / method / entry | Source or design locator | Implementation problem and impact | Confirmation / detail |
+|---|---|---|---|---|---|---|
+
+- Cover every finding ID, grouped by module and ordered by severity within each module. Use separate rows for multiple affected locations when useful; counts deduplicate IDs. Explain what implementation is wrong, the trigger and consequence, with a link to its detailed evidence and recommendation. In pure design reviews describe the design problem, not a defect in nonexistent implementation.
+- Prefer source path plus qualified symbol/signature (line numbers are supplementary). If no class/function applies, say `不适用` and use the actual module, configuration or workflow entry. Unlocated symbols are `未定位` with an explicit coverage gap; proposed symbols are `拟议/未实现`. Never infer fictional classes/functions just to fill columns.
+- Distinguish confirmed open issues from blocked/unconfirmed claims; mark dismissed and resolved findings clearly so they are not presented as current implementation defects. Keep IDs, lifecycle, highest merged severity and source/design provenance consistent with JSON and expert evidence. Accepted advice alone cannot mark an issue repaired.
+- For zero findings, state `在已审查范围内未发现问题`, list the covered modules and any unreviewed scope or failed domains; do not fabricate rows or imply whole-project approval. In partial drafts prominently identify missing confirmations.
+
+The host checks this index against every merged finding and its target locator before publication. The static JSON validator does not verify the narrative index or prove symbol correctness.
+
 ## Process
 
 ### Phase 0 — Preflight
@@ -123,7 +137,7 @@ Severity is `Critical|Important|Suggestion`. A Critical blocks approval; an Impo
 
 ### Phase 3 — Deterministic synthesis
 
-1. The host merges confirmations into `findings.json` and writes `final-review.draft.md`. Any `CONFIRM` or `REFINE` keeps a finding open and uses the highest severity; mixed `REJECT` plus confirmation keeps the finding and records the disagreement; only all `REJECT` dismisses it. In a mixed review, findings with the same fingerprint may be merged while retaining both locators and unioning `sources` (and domains); zero findings is valid and must not be replaced with a synthetic finding.
+1. The host merges confirmations into `findings.json` and writes `final-review.draft.md`, starting its body with the problem index defined above. Any `CONFIRM` or `REFINE` keeps a finding open and uses the highest severity; mixed `REJECT` plus confirmation keeps the finding and records the disagreement; only all `REJECT` dismisses it. In a mixed review, findings with the same fingerprint may be merged while retaining both locators and unioning `sources` (and domains); zero findings is valid and must not be replaced with a synthetic finding.
 2. Detect conflicts. Fact conflicts take precedence: write `90-conflicts.json`, set `pending-human`, and stop. For severity conflicts, `cs-review-advisor` provides evidence and a recommendation only; the host sends it to relevant experts for re-detection, using the advice protocol above. If experts reject any part (including all) and the advisor still regards that part as blocking, **immediately open a user-choice dialog** with disputed parts, both evidence sets, impacts and available paths. Set `pending-human` and pause dependent operations; do not add discussion rounds or defer escalation. Without a dialog tool, ask the same question directly and wait. Record the actual answer in `human-decision.md` before resume. Expert-verified severity changes must retain original opinions and evidence and follow the highest-severity merge; unresolved conflicts never close the run. User choice cannot silently remove confirmed blockers or count as repair evidence.
 
    For architecture questions (modules, dependencies, public contracts, technology or ADR tradeoffs), the advisor records `Architecture questions` in the approved draft: finding ID, current constraint, alternatives, impacts and the exact decision needed. The host consults `cs-architect` and records its answer in that handoff. The architect handles architecture consequences and the no-compliant-alternative evidence for a hard design constraint, not general severity arbitration. Missing answers remain open/blocked; fact disputes remain pending-human. Any new advice from synthesis or consultation returns to relevant experts before the host accepts it. Persist follow-up evidence in the approved synthesis/conflict handoffs and corresponding existing JSON text fields, retaining original confirmations and provenance; this does not authorize overwriting a completed run or silently rerunning a valid stage on resume.
@@ -145,6 +159,7 @@ Severity is `Critical|Important|Suggestion`. A Critical blocks approval; an Impo
 - [ ] Every phase has a baseline and end manifest check; no unauthorized path changed.
 - [ ] DDD applicability and document snapshots are recorded; required context and phase-appropriate document verification evidence were assessed without mutating SysDocs or extending schema v1.
 - [ ] `team.md`, `scope.md`, `scope.json`, `state.json`, `assignments.json`, and `findings.json` exist and agree.
+- [ ] The draft/final report begins with `## 问题总纲`; every finding maps to a verified module/class/function or an explicit inapplicable/unlocated/design-only entry, and IDs, severity, lifecycle and counts agree with merged JSON. Coverage gaps and zero-findings results remain explicit.
 - [ ] The host checked advisor suggestions against itemized expert re-detection; acceptability did not substitute for confirmation, fix verification or verdict.
 - [ ] Blocking rejected advice caused immediate user choice and pending-human suspension; architecture consultation did not become general adjudication.
 - [ ] `sources` remain `code|design`; legacy authorship/protocol and completed runs are unchanged; repaired targets were verified in new linked runs.

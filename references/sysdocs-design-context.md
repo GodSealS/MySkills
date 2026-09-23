@@ -22,6 +22,8 @@ Shared context protocol for design, implementation and review. Follow [sysdocs-s
 
 Synchronize affected descriptions, summaries, indexes, incoming links and applicable requirements/decisions before fixing the review snapshot. Necessary reversible synchronization is part of an already authorized task. Code and documentation ship in the same change, or the same uncommitted workspace when requested.
 
+Include affected `SysDocs/PROJECT-MAP.md` views when architecture, module execution, interfaces/dependencies or project workflow changes; use the shared protocol's incremental and legacy boundaries for missing maps.
+
 Record structural checks separately from content/source/behavior verification. A structure-only `COMPLETE` result cannot certify documentation meaning. Current-change omissions prevent DONE; unrelated inherited defects are recorded separately. Final synthesis reuses valid slice evidence and checks only new or unresolved impacts. No unconditional full-library refresh or mandatory standalone impact report is required.
 
 For delegated work, supply the project root, task-specific documents or readable snapshots, applicable constraints and known gaps. When complete project documentation is explicitly required, full coverage is its acceptance criterion and cannot be waived using ordinary-task fallback rules.

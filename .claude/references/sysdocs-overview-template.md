@@ -33,7 +33,7 @@ source_paths: [<项目根相对源码目录>]
 
 ## 阅读路线
 
-1. 系统结构： [架构概览](architecture/overview.md)。
+1. 项目全景： [项目图册](PROJECT-MAP.md)，再读 [架构概览](architecture/overview.md)。
 2. 任务相关模块：<链接 architecture/modules/<id>.md，说明阅读入口>。
 3. 重要业务链路：<按实际内容链接 architecture/flows/>。
 4. 文件定位： [源码导航](files/README.md)。

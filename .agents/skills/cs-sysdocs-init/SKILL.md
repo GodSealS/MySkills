@@ -63,6 +63,7 @@ Where helpful and the host supports it, request a read-only `cs-architect` revie
 ### 4. Generate schema 2 pages
 
 - `SysDocs/README.md`: purpose, terminology, running boundaries and a short reading route.
+- `SysDocs/PROJECT-MAP.md`: required root-level current architecture, module execution flow, module relationships and project workflow diagrams, using the [project map template](../../references/sysdocs-project-map-template.md). Link it directly from README; mark unavailable/unimplemented views explicitly rather than inventing facts.
 - `architecture/overview.md`: implemented system and deployment boundaries; for a spec-only project, explain that no implementation exists and link the design requirements.
 - `architecture/modules/<module-id>.md`: responsibilities, collaborators, key entry points and important limitations.
 - `architecture/flows/<flow-id>.md`: important cross-module normal and exceptional paths when independently useful.
@@ -88,6 +89,7 @@ Record sanitized results with declared scope, checked items, failures and uncove
 - [ ] Source scope, actual baseline, exclusions and accepted source locations are recorded; no sensitive material copied.
 - [ ] KB queried only when usable; limitations and source verification are distinguished.
 - [ ] README, architecture and file navigation explain the project; every declared business file has one detailed responsibility owner.
+- [ ] PROJECT-MAP covers all four views, with source-backed diagrams where applicable, navigable evidence and explicit gaps; diagram syntax checks and content verification are reported separately.
 - [ ] Summaries use key real symbols plus one-sentence responsibilities and significant boundaries; no duplicated index.
 - [ ] Future designs remain identified as unimplemented; requirements/ADRs retain one authoritative location.
 - [ ] All writes stay in the allowlist; existing human text and proposals survive.
