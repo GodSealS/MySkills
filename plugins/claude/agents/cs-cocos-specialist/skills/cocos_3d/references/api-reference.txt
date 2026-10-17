@@ -1,0 +1,41 @@
+Migrated reference for `cs-cocos-specialist`; apply the parent skill and approved task. API names, example values and tool payloads require verification against the actual engine/server.
+
+# 3D Module - API Reference
+
+## Module Info
+- **Path**: `cocos/3d`
+- **Language**: TypeScript
+- **Files**: ~55 TS files
+
+## Exported APIs
+
+| Class | Description |
+|-------|-------------|
+| `MeshRenderer` | Mesh renderer, draws 3D models |
+| `SkinnedMeshRenderer` | Skinned mesh renderer, skeletal animation |
+| `Prefab` | Configured model/node hierarchy; not the internal render-scene Model |
+
+## Public Functions
+
+| Function | Description |
+|----------|-------------|
+| `resources.load(path, Prefab, callback)` | Load a configured Prefab from resources |
+| `instantiate(prefab)` | Create nodes from a loaded Prefab |
+| `setMaterial(material, index)` | Assign a material slot |
+| `getMaterialInstance(index)` | Get a per-renderer material instance |
+
+## Dependencies
+- `core` — Component base class, Node
+- `rendering` — Rendering pipeline
+
+## Design Patterns
+
+| Pattern | Use Case |
+|---------|----------|
+| component-based | MeshRenderer as a Component |
+| mesh-rendering | Mesh submission pipeline |
+
+## Naming Conventions
+- Classes: PascalCase (e.g., `MeshRenderer`)
+- Functions: camelCase (e.g., `getMaterialInstance`)
+- Constants: UPPER_CASE

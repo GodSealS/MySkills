@@ -1,0 +1,79 @@
+# 2D - Cocos Creator 2D Rendering System
+
+For `cs-cocos-specialist` only. Apply the [parent agent contract](../../../cs-cocos-specialist.md): execute the approved task; return design changes to `cs-frontend-lead` for a decision before applying them. These migrated examples are illustrative, not a tested SDK. Confirm APIs against the target engine declarations and matching official documentation before use. Read sibling private skills only when the assigned work needs them.
+
+## Overview
+
+The Cocos Creator 2D rendering module (`cocos/2d`) provides sprite, text, mask, and 2D graphics drawing for UI rendering.
+
+## Domain Knowledge
+
+### Core Design Patterns
+- **component-based** — 2D rendering components mounted on Nodes
+- **ui-system** — UI system based on Canvas and Widget layout
+
+### Key Concepts
+- `Sprite` — Sprite component, displays image assets
+- `Label` — Text component, renders text content
+- `Mask` — Mask component, clips child node rendering areas
+- `Graphics` — 2D graphics component, draws vector graphics
+- `UIComponent` — UI component base class
+
+## Key APIs
+
+### Classes
+- `Sprite` — Sprite (SpriteFrame, Type, SizeMode)
+- `Label` — Text (String, Font, FontSize, Overflow)
+- `Mask` — Mask (Type, SpriteFrame)
+- `Graphics` — 2D graphics drawing (moveTo, lineTo, fillRect, circle)
+- `UIComponent` — UI component base class
+
+### Functions
+- `updateVertexData()` — Update vertex data
+- `updateMaterial()` — Update material
+
+## Dependencies
+- Required modules: `core`, `rendering`
+
+## Examples
+
+When implementing a matching pattern, read [code examples](references/examples.txt).
+
+## Usage Guide
+
+### When to Use This Skill
+- Creating UI interfaces (buttons, panels, lists)
+- Implementing sprite animations (SpriteSheet, atlas)
+- Handling text display and localization
+- Drawing 2D vector graphics
+- Configuring masks and clipping effects
+
+### Best Practices
+1. Use SpriteAtlas for sprites to reduce Draw Calls
+2. Use BMFont or TTF caching for Labels to avoid frequent text texture rebuilding
+3. Be aware of vertex count limits when drawing complex shapes with Graphics
+4. Prefer RECT mask type; STENCIL type is more expensive
+5. Use Widget component on UI nodes for multi-resolution adaptation
+6. Monitor draw calls and fill-rate via Cocos Creator's **built-in profiler** (F12 or `cc.profiler`) when optimizing 2D scenes
+7. Provide fallback fonts via `Label.fontFamily` for internationalization: specify a font stack (e.g., `"CustomFont, Arial, sans-serif"`) to ensure text renders when the primary font is unavailable
+
+### Common Tasks
+- Create sprites and atlas animations
+- Implement rich text and text effects
+- Draw custom shapes with Graphics
+- Configure UI masks and clipping
+- UI adaptation and multi-resolution support
+
+## Related Skills
+- [cocos_core](../cocos_core/SKILL.txt) — Component, Node, Scene, Director, lifecycle management
+- [cocos_rendering](../cocos_rendering/SKILL.txt) — Materials, shaders, custom render passes, GFX layer
+- [cocos_ui](../cocos_ui/SKILL.txt) — Button, ScrollView, Layout, Widget, and MMORPG UI templates
+
+
+## API Lookup
+
+For subsystem API discovery, read [API reference](references/api-reference.txt), then verify the target engine declarations.
+
+## Verification
+
+Verify the assigned behavior in the actual project and report the checks and remaining gaps under the parent agent output contract. Loading this resource is not execution evidence. Any design deviation remains pending until `cs-frontend-lead` decides it.

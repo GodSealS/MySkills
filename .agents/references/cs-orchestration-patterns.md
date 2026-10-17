@@ -12,7 +12,20 @@ This project has three composable layers:
 
 ## Composition Rule
 
-The user (or AGENTS.md intent mapping) is the orchestrator. Personas do not invoke other personas. A persona may invoke skills.
+The user (or AGENTS.md intent mapping) is the orchestrator. A persona may invoke skills.
+Persona dispatch is limited to two fixed pairs: `cs-frontend-lead` directs
+`cs-cocos-specialist` for Cocos client work, and `cs-backend-lead` directs
+`cs-network-programmer` for Cocos server work. Workers only execute approved work; each
+assigning lead orders tasks, accepts results, requests rework and decides design changes. Use the installed
+agent tool where available, otherwise the host relays the lead's brief and returns the result
+to the assigning lead. Other persona orchestration stays with the host. Neither worker delegates.
+
+Each lead's Cocos dispatch contract defines required inputs and decision handoffs.
+The private Cocos engine bundle belongs only to `cs-cocos-specialist` and travels with its install;
+`cs-network-programmer` uses its own execution skill roster. Client and server work share the
+accepted protocol revision. Decisions beyond a lead's authority are resolved by the host with
+the relevant owner, then communicated to the worker through its assigning lead. A read-only assignment stays
+read-only, and this scoped dispatch does not activate a manual team workflow.
 
 ## Agent Families
 
@@ -21,15 +34,18 @@ Personas split into two families:
 - **Build-side owners** (triggered by Define/Plan/Build skills):
   - `cs-architect` — architecture, module boundaries, ADRs (via `cs-spec-driven`, `cs-planning`)
   - `cs-frontend-lead` — frontend domain owner (via `cs-frontend-ui`, `cs-browser-test`, `cs-tdd`, frontend security/performance work, and `cs-incremental`)
+  - `cs-cocos-specialist` — execution-only Cocos worker directed by `cs-frontend-lead`; private subsystem skills, no design decision authority
   - `cs-backend-lead` — backend domain owner (via `cs-api-design`, `cs-tdd`, backend security/performance work, and `cs-incremental`)
+  - `cs-network-programmer` — execution-only Cocos game server worker directed by `cs-backend-lead`; no design decision authority
 - **Review-side auditors** (triggered by Review/Ship skills):
   - `cs-code-reviewer`, `cs-review-advisor`, `cs-security-auditor`, `cs-test-engineer`, `cs-web-perf-auditor`
 
-Both families are invoked **by skills** — never by user slash commands directly.
+Regular owners and auditors are invoked **by skills**. The Cocos client/server workers are
+assigned by their respective leads under the dispatch contracts above.
 
 ## Endorsed Pattern: Parallel Fan-Out with Merge
 
-`cs-team-build`, `cs-team-review` and `cs-team-refactor` are the sanctioned skills that sequence multiple personas. They issue fan-outs from the skill layer; personas never invoke one another.
+`cs-team-build`, `cs-team-review` and `cs-team-refactor` are the sanctioned team skills that sequence multiple personas. They issue fan-outs from the skill layer; the two scoped Cocos dispatch pairs above are the only persona-to-persona exceptions.
 
 All three team workflows remain manual-only. The host executes their protocol and is not bound to any persona. Team Refactor reads an existing project and writes only its `Idea/` proposal and `tasks/` evidence; it neither changes target code nor invokes Team Build/Review. `cs-architect` retains Team Build decomposition, structural implementation and architecture consultation; in Team Refactor it proposes architecture and migration tasks without writing accepted ADRs. `cs-code-reviewer` retains the independent five-axis code first pass. `cs-review-advisor` proposes classification/assignment, reviews plans/designs, and gives focused recommendations and synthesis; these proposals do not grant orchestration or adjudication authority. Its private resources belong only to that role and are not public skills or another persona's roster.
 
@@ -65,8 +81,8 @@ their own final-step contract.
 
 ## Anti-Patterns
 
-- **Router Persona:** Do not build a persona that decides which other persona to call. That's the job of AGENTS.md intent mapping.
-- **Chain of Personas:** Persona A calling Persona B calling Persona C. Use skills instead.
+- **Router Persona:** General persona selection belongs to AGENTS.md intent mapping; the two leads' fixed Cocos workers are the scoped exceptions above.
+- **Chain of Personas:** Keep Cocos dispatch to each lead and its assigned execution-only worker; other multi-role sequencing belongs to the host/skills.
 - **Persona Override of User Intent:** A persona should never make orchestration decisions without user approval.
 
 ## Persona Resolution

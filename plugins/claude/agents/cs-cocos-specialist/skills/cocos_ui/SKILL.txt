@@ -1,0 +1,134 @@
+# Cocos Creator UI System & MMORPG UI Templates
+
+For `cs-cocos-specialist` only. Apply the [parent agent contract](../../../cs-cocos-specialist.md): execute the approved task; return design changes to `cs-frontend-lead` for a decision before applying them. These migrated examples are illustrative, not a tested SDK. Confirm APIs against the target engine declarations and matching official documentation before use. Read sibling private skills only when the assigned work needs them.
+
+## Overview
+
+The Cocos Creator UI system provides a full set of interactive widgets and layout components built on the 2D rendering layer. This skill covers **all interactive UI widgets** (Button, EditBox, ScrollView, Toggle, Slider, ProgressBar, PageView, Layout, Widget, RichText, etc.), the **UI event system**, and **illustrative MMORPG UI templates** modeled after World of Warcraft's battle-tested interface patterns.
+
+## Domain Knowledge
+
+### Core Design Patterns
+
+- **component-based** — each UI widget is a Component mounted on a Node
+- **event-driven** — UI interaction through `Button.clickEvents`, `EditBox` events, `ScrollView` scroll events
+- **layout-automated** — Layout + Widget for auto-arrangement and multi-resolution adaptation
+- **canvas-based** — all UI rendered under a Camera + Canvas hierarchy
+
+### UI Widget Components (Full Catalog)
+
+| Category | Components | Role |
+|----------|-----------|------|
+| **Interactive** | `Button`, `Toggle`, `ToggleContainer`, `Slider`, `ProgressBar` | Click, toggle, drag, progress |
+| **Input** | `EditBox`, `RichText` | Text input, styled text display |
+| **Scroll** | `ScrollView`, `PageView`, `PageViewIndicator` | Scrollable content, page flipping |
+| **Layout** | `Layout`, `Widget`, `SafeArea` | Auto-arrangement, alignment, safe zone |
+| **Transform** | `UITransform` | ContentSize, AnchorPoint for UI nodes |
+| **Visual** | `UIOpacity`, `UIReorder`, `BlockInputEvents`, `Canvas` | Opacity, ordering, event blocking |
+
+### UI Event System
+
+- `Node.EventType.TOUCH_START` / `TOUCH_MOVE` / `TOUCH_END` / `TOUCH_CANCEL` — raw touch events
+- `Button.clickEvents` — `EventHandler` array for click handling
+- `EditBox.EventType` — `TEXT_CHANGED`, `EDITING_RETURN`, `EDITING_DID_ENDED`
+- `ScrollView.EventType` — `SCROLL_TO_TOP`, `SCROLL_TO_BOTTOM`, `SCROLLING`
+- `PageView.EventType` — `PAGE_TURNING`
+- `Toggle.EventType` — `CLICK`
+- `Slider.EventType` — `SLIDE`
+
+### Multi-Resolution Adaptation
+
+- **Widget** — aligns UI elements to parent edges/corners/center with pixel/percentage offsets
+- **Resolution policy** — use the approved project design resolution and target-version `view` adaptation APIs
+- **SafeArea** — handles notch/rounded corners on mobile devices
+
+## Key APIs
+
+### Classes
+
+| Class | Source Module | Key Properties/Methods |
+|-------|--------------|----------------------|
+| `Button` | `cc` | `interactable`, `transition` (COLOR/SPRITE/SCALE), `clickEvents`, `target`, `normalColor`, `pressedColor`, `hoverColor`, `disabledColor`, `normalSprite`, `pressedSprite`, `hoverSprite`, `disabledSprite`, `duration`, `zoomScale` |
+| `Toggle` | `cc` | `isChecked`, `checkMark`, `toggleEvents`, `checkEvents`, `uncheckEvents` |
+| `ToggleContainer` | `cc` | `allowSwitchOff`, `toggleItems` (auto radio-group) |
+| `Slider` | `cc` | `handle`, `progress`, `slideEvents`, `direction` (HORIZONTAL/VERTICAL) |
+| `ProgressBar` | `cc` | `barSprite`, `mode` (HORIZONTAL/VERTICAL/FILLED), `totalLength`, `progress`, `reverse` |
+| `EditBox` | `cc` | `string`, `placeholder`, `placeholderLabel`, `inputMode` (SINGLE_LINE/MULTI_LINE/PASSWORD), `maxLength`, `returnType`, `editingEvents`, `textChangedEvents` |
+| `ScrollView` | `cc` | `content`, `horizontal`, `vertical`, `inertia`, `elastic`, `brake`, `scrollEvents`, `bounceDuration`, `horizontalScrollBar`, `verticalScrollBar` |
+| `PageView` | `cc` | `content`, `sizeMode`, `indicator`, `pageEvents`, `scrollThreshold`, `autoPageTurningThreshold`, `pageTurningEventTiming` |
+| `Layout` | `cc` | `type` (HORIZONTAL/VERTICAL/GRID), `resizeMode` (NONE/CHILDREN/CONTAINER), `spacingX`, `spacingY`, `paddingLeft/Right/Top/Bottom`, `constraint`, `constraintNum` |
+| `Widget` | `cc` | `isAlignLeft/Top/Right/Bottom`, `left/top/right/bottom`, `isAlignHorizontalCenter`, `isAlignVerticalCenter`, `target`, `alignMode` (ALWAYS/ONCE/ON_WINDOW_RESIZE) |
+| `UITransform` | `cc` | `contentSize`, `anchorPoint`, `width`, `height`, `priority` |
+| `UIOpacity` | `cc` | `opacity` (0-255) |
+| `RichText` | `cc` | `string` (HTML-like tags: `<color>`, `<b>`, `<i>`, `<u>`, `<size>`, `<img>`, `<br>`), `fontSize`, `maxWidth` |
+| `BlockInputEvents` | `cc` | Blocks touch events from passing through |
+| `Canvas` | `cc` | `cameraComponent`, `alignCanvasWithScreen`; resolve screen adaptation through the target version's `view` APIs |
+| `SafeArea` | `cc` | `updateArea()` |
+
+### Key Methods
+
+- `Button.updateTransition()` — force refresh transition state
+- `ScrollView.scrollToTop()` / `scrollToBottom()` / `scrollToOffset()` / `scrollToPercentVertical()` — programmatic scrolling
+- `Layout.updateLayout()` — force layout recalculation
+- `PageView.setCurrentPage()` / `getCurrentPage()` — programmatic page control
+
+## MMORPG Templates
+
+For an explicitly assigned MMORPG widget or HUD, read only the matching template in [MMORPG templates](references/mmorpg-templates.txt). These examples do not choose the project's UI design.
+
+## Examples
+
+When implementing a matching pattern, read [code examples](references/examples.txt).
+
+## Usage Guide
+
+### When to Use This Skill
+
+- Building interactive UI widgets (buttons, toggles, sliders, progress bars, input fields)
+- Implementing scrolling content (ScrollView, PageView)
+- Creating responsive layouts (Layout + Widget + SafeArea)
+- Displaying styled text (RichText with HTML-like tags)
+- Setting up MMORPG HUD elements (action bars, unit frames, minimap, chat, quest tracker, nameplates, combat text)
+- Implementing party/raid frames for group content
+- Building inventory/character/talent panels
+- Multi-resolution UI adaptation
+
+### Best Practices
+
+1. **Canvas Setup**: Apply the approved design resolution and adaptation policy through project settings or the target version's `view` APIs
+2. **Draw Call Optimization**: Use `SpriteAtlas` to batch UI sprites; avoid breaking batches with non-atlas sprites between atlas sprites
+3. **ScrollView Performance**: Implement virtual list (object pool) for scroll views with >50 items; destroy items far outside viewport
+4. **Event Debounce**: Throttle rapid button clicks (200ms minimum interval) to prevent double-purchase/item-use bugs
+5. **Layout Performance**: Avoid nested `Layout` with `resizeMode = CONTAINER` (triggers recalculation chain); prefer fixed-size containers
+6. **Tooltip Singleton**: Use a single global Tooltip node, reposition and show/hide rather than create/destroy per element
+7. **Nameplate Pooling**: Object-pool nameplates; only update visible ones; consider spatial partitioning for large-scale scenes
+8. **RichText Limitations**: `RichText` does not support BBCode or true HTML; use `<color>`, `<b>`, `<i>`, `<u>`, `<size>`, `<img>`, `<br>` tags only
+9. **Widget Alignment**: Use percentage-based offsets on parent-size-dependent edges for truer resolution independence
+10. **SafeArea**: Always enable `SafeArea` on UI root for mobile builds to handle notch and home indicator
+
+### Common Tasks
+
+- **Create a complete HUD**: Combine UnitFrame, ActionBar, Minimap, ChatWindow, QuestTracker, BuffFrame templates
+- **Build a party/raid UI**: Use PartyFrame + RaidFrame templates with Layout auto-arrangement
+- **Implement inventory**: BagPanel + Tooltip + drag-drop support
+- **Create a character panel**: CharacterPanel with equipment slots + stat display
+- **Set up combat feedback**: CombatText + Nameplate + CastingBar integration
+- **Build social panels**: ChatWindow + GuildPanel + FriendsList
+- **Implement trading UI**: VendorPanel + AuctionHouse + LootRoll
+- **Create modal dialogs and popups**: Dialog system with overlay + stacking
+
+---
+
+## Modal Dialogs
+
+For an assigned popup lifecycle, read [modal examples](references/modal-dialogs.txt) and adapt them to the approved interaction and state model.
+
+## Related Skills
+- [cocos_2d](../cocos_2d/SKILL.txt) — Sprite, Label, Mask, Graphics for UI rendering components
+- [cocos_core](../cocos_core/SKILL.txt) — Component lifecycle, event system, Node hierarchy
+- [cocos_editor](../cocos_editor/SKILL.txt) — MCP editor operations for creating UI nodes and components visually
+
+
+## Verification
+
+Verify the assigned behavior in the actual project and report the checks and remaining gaps under the parent agent output contract. Loading this resource is not execution evidence. Any design deviation remains pending until `cs-frontend-lead` decides it.

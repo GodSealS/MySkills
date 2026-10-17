@@ -1,0 +1,130 @@
+# Migrated cocos_animation examples
+
+Illustrative fragments; verify target-version types and lifecycle behavior before adapting. They do not change the approved design.
+
+
+### Basic animation playback and cross-fade
+```typescript
+import { Animation, AnimationClip, AnimationState } from 'cc';
+
+// Get animation component
+const animation = node.getComponent(Animation);
+
+// Play animation
+animation.play('walk');
+
+// Cross-fade to new animation (smooth transition)
+animation.crossFade('run', 0.3);
+
+// Manual state control
+const walkState = animation.getState('walk');
+if (walkState) {
+    walkState.speed = 1.5;   // 1.5x playback speed
+    walkState.wrapMode = AnimationClip.WrapMode.Loop;
+}
+```
+
+### State machine pattern (FSM)
+```typescript
+import { Animation, AnimationClip, Vec3 } from 'cc';
+
+class CharacterAnimator {
+    private animation: Animation;
+    private currentState: string = '';
+
+    constructor(anim: Animation) {
+        this.animation = anim;
+    }
+
+    update(velocity: Vec3): void {
+        const speed = velocity.length();
+        let targetState: string;
+
+        if (speed < 0.1) {
+            targetState = 'Idle';
+        } else if (speed < 5) {
+            targetState = 'Walk';
+        } else {
+            targetState = 'Run';
+        }
+
+        if (targetState !== this.currentState) {
+            this.animation.crossFade(targetState, 0.2);
+            this.currentState = targetState;
+        }
+    }
+}
+```
+
+### Skeletal animation setup
+```typescript
+import { SkeletalAnimation, Skeleton } from 'cc';
+
+// Skeletal animation — for 3D characters with bone hierarchy
+// Bones form a tree: root → spine → chest → arm → hand → fingers
+// Each bone influences nearby mesh vertices via weight painting
+const skelAnim = node.getComponent(SkeletalAnimation);
+skelAnim.play('Idle');
+
+// Cross-fade between skeletal clips
+skelAnim.crossFade('Run', 0.25);
+
+// Bone count guideline: ≤ 60 for mobile, ≤ 90 for desktop
+
+// For skinned mesh rendering setup (MeshRenderer + skeleton),
+// see cocos_3d Skill — it handles mesh asset loading and material binding.
+```
+
+### Animation layer blending
+
+Implement layers through the project's approved animation graph/controller. Resolve layer APIs against the installed version; `Animation.play` is not a layer-selection API.
+
+### Animation events and frame-accurate callbacks
+```typescript
+import { Animation, AnimationClip } from 'cc';
+
+const animation = node.getComponent(Animation);
+
+// 1. Lifecycle events (component-level)
+animation.on(Animation.EventType.PLAY, () => {
+    console.log('Animation started');
+});
+animation.on(Animation.EventType.FINISHED, () => {
+    console.log('Animation finished');
+});
+animation.on(Animation.EventType.PAUSE, () => {
+    console.log('Animation paused');
+});
+
+// 2. Clip frame events invoke named methods on components attached to the animation node.
+// Bind those methods in the editor; custom event names are not automatically EventTarget notifications.
+
+// Frame-rate independence note:
+// Animation events are evaluated per-frame, so on low-FPS devices
+// events may skip frames. For time-critical logic (hit detection),
+// use frame-number-relative checks and avoid relying on events for
+// game-state mutations that require guarantees.
+```
+
+### Animation performance optimization
+```typescript
+// 1. Animation LOD must preserve approved timing. Playback speed changes motion speed, not sampling frequency. Use a measured engine-supported strategy.
+
+// 2. Off-screen culling — Cocos Creator auto-culls renderers,
+// but animations still tick. Disable animation components when invisible.
+function onVisibilityChanged(visible: boolean, animation: Animation): void {
+    if (!visible) {
+        animation.stop();  // Save CPU
+    } else {
+        animation.play(this.currentClip);
+    }
+}
+
+// 3. Animation compression — reduce keyframe count in editor:
+//    - AnimationClip → Compression → reduce sample rate
+//    - Consider baking secondary animations (cloth, hair physics)
+
+// 4. Debug tools: monitor animation performance via
+//    Cocos Creator's built-in profiler (F12) → "Animation" panel
+//    Check: animation tick time, active animation count per frame
+```

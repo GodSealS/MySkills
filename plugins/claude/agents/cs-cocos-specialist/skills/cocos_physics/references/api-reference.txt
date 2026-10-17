@@ -1,0 +1,5 @@
+Migrated reference for `cs-cocos-specialist`; apply the parent skill and approved task. API names, example values and tool payloads require verification against the actual engine/server.
+
+# 3D Physics API lookup
+
+Use the installed backend and engine declarations as the authority. The [official 3.8 PhysicsSystem reference](https://docs.cocos.com/creator/3.8/api/en/class/physics.PhysicsSystem) distinguishes boolean raycast return values from `raycastResults` / `raycastClosestResult`. Resolve the matching version for the target project.

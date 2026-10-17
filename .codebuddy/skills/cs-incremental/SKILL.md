@@ -19,7 +19,7 @@ allowed-tools: Read, Glob, Grep, Write, Edit, Bash, Task
 3. The host implements ordinary slices. Delegate only a concrete independent subtask
    that benefits from specialist work or when an explicit team workflow requires it.
    Owner tags identify responsibility, not a mandatory new agent. Pass focused context;
-   personas never invoke other personas.
+   persona dispatch is limited to each lead's assigned Cocos client/server worker contract; other orchestration stays with the host.
 4. Implement one coherent outcome. Apply `cs-minimal` when choosing a new solution and
    `cs-tdd` for executable behavior changes and bug fixes. Deliver independent contracts
    before consumers; keep other cross-domain slices end-to-end.

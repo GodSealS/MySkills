@@ -164,6 +164,49 @@ are `cs-code-query` and `cs-docs-adrs`, within the assigned read/write scope.
 Existing completed review runs remain immutable. Resume older runs under their recorded
 role protocol, or preserve them and create a new run when that protocol is unavailable.
 
+### Cocos implementation worker
+
+`cs-frontend-lead` directs `cs-cocos-specialist`: the lead assigns and orders tasks,
+decides design changes, accepts results and requests rework. The Cocos specialist only
+implements and verifies the approved design. It returns a design-change request before
+altering behavior, contracts, UI layout, scene/prefab structure or engine strategy.
+Decisions beyond frontend authority return through the host and the relevant owner;
+the specialist always receives the decision from the frontend lead.
+
+The specialist ships with `agents/cs-cocos-specialist/`, containing nine private Cocos
+skills (core, 2D, 3D, animation, rendering, 3D physics, 2D physics, UI and editor), API
+references, UI examples and editor workflows. All are Markdown `.txt` resources so they
+do not register as extra personas or public skills. Install the agent and bundle together;
+the caller supplies the installed agent-file path for resource resolution. Source hashes
+and adaptation details are in `PROVENANCE.txt`. Examples still need validation against
+the actual target engine; this skill-pack migration does not run a Cocos project.
+
+Claude adapters expose `Agent(cs-cocos-specialist)` to the frontend lead (plugin installs
+use `Agent(agent-skills-cs:cs-cocos-specialist)`). When a runtime
+cannot dispatch nested agents, the host relays the lead's task and returns the result for
+lead acceptance. This fixed delegation does not start Team Build/Review/Refactor.
+
+The dispatch and design boundaries are role instructions. Claude currently enforces
+the `Agent(type)` type allowlist only for a main-thread `--agent`; nested subagents
+ignore the parenthesized type list. Workers omit `Agent` entirely. See the
+[Claude subagent tool rules](https://code.claude.com/docs/en/sub-agents#restrict-which-subagents-can-be-spawned).
+
+### Cocos server implementation worker
+
+`cs-backend-lead` assigns and orders Cocos game server tasks for `cs-network-programmer`,
+decides every proposed design change, accepts results and requests rework. The worker
+only implements and verifies the accepted protocol/server design using the project's
+approved runtime and framework. Protocol, synchronization, matchmaking, session, security
+or dependency changes return to the backend lead before implementation; client changes
+are coordinated through the leads and host.
+
+The source `network-programmer` declares no private skills. Its adapted persona uses a
+bounded execution roster from this pack and has no agent-delegation tool. Claude project
+adapters give the backend lead `Agent(cs-network-programmer)`; the plugin uses
+`Agent(agent-skills-cs:cs-network-programmer)`. If nested dispatch is unavailable, the host
+relays the backend lead's brief and returns results for lead acceptance. Source provenance
+is recorded in the agent file. This migration does not run a Cocos server or deploy one.
+
 ### Public skills
 
 Define: cs-interview-me, cs-idea-refine, cs-grill-me, cs-spec-driven

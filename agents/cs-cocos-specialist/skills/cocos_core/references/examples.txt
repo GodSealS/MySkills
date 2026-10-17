@@ -1,0 +1,224 @@
+# Migrated cocos_core examples
+
+Illustrative fragments; verify target-version types and lifecycle behavior before adapting. They do not change the approved design.
+
+
+### Component lifecycle
+```typescript
+import { _decorator, Component, Node, director, find } from 'cc';
+const { ccclass, property } = _decorator;
+
+@ccclass('PlayerController')
+export class PlayerController extends Component {
+    @property(Node)
+    targetNode: Node | null = null;
+
+    onLoad() {
+        // Initialize when component loads — resources, references
+        console.log('Component loaded');
+    }
+
+    start() {
+        // Called before first frame update — other components ready
+        console.log('Component started');
+    }
+
+    update(deltaTime: number) {
+        // Per-frame update — keep lightweight
+    }
+
+    onDestroy() {
+        // Cleanup: unregister events, release pools, null references
+        console.log('Component destroyed');
+    }
+}
+
+// Scene transition
+director.loadScene('main-menu');
+```
+
+### Event communication system
+```typescript
+import { EventTarget } from 'cc';
+
+// Typed event definitions
+interface GameEvents {
+    'score-changed': (newScore: number) => void;
+    'player-died': (playerId: string) => void;
+    'level-complete': () => void;
+}
+
+// Singleton event bus
+class EventBus extends EventTarget {
+    private static _instance: EventBus;
+
+    static get instance(): EventBus {
+        if (!this._instance) {
+            this._instance = new EventBus();
+        }
+        return this._instance;
+    }
+}
+
+// Publisher (e.g., score manager)
+EventBus.instance.emit('score-changed', 100);
+
+// Subscriber (e.g., UI controller)
+const onScoreChanged = (score: number) => {
+    console.log(`Score updated: ${score}`);
+};
+EventBus.instance.on('score-changed', onScoreChanged, this);
+
+// Cleanup in onDestroy to prevent memory leaks
+// onDestroy() {
+//     EventBus.instance.off('score-changed', onScoreChanged, this);
+// }
+
+// Component-local events
+class MyComponent extends Component {
+    onLoad() {
+        this.node.on('custom-event', this.onCustomEvent, this);
+    }
+    onDestroy() {
+        this.node.off('custom-event', this.onCustomEvent, this);  // cleanup!
+    }
+    private onCustomEvent() { /* ... */ }
+}
+```
+
+### Object pooling (NodePool)
+```typescript
+import { NodePool, Prefab, instantiate } from 'cc';
+
+class BulletPool {
+    private pool = new NodePool();
+    private prefab: Prefab;
+    private maxSize: number = 50;
+
+    constructor(prefab: Prefab) {
+        this.prefab = prefab;
+        this.preheat(10);  // Pre-allocate for smooth start
+    }
+
+    // Pre-allocate pool entries
+    private preheat(count: number): void {
+        for (let i = 0; i < count; i++) {
+            const node = instantiate(this.prefab);
+            this.pool.put(node);
+        }
+    }
+
+    // Get a node from pool (or create if empty)
+    get(): Node {
+        if (this.pool.size() > 0) {
+            return this.pool.get();
+        }
+        return instantiate(this.prefab);
+    }
+
+    // Return node to pool for reuse
+    put(node: Node): void {
+        if (this.pool.size() >= this.maxSize) {
+            node.destroy();  // Cap pool size, destroy excess
+            return;
+        }
+        node.removeFromParent();  // Detach from scene
+        this.pool.put(node);
+    }
+
+    // Clear entire pool (e.g., on scene change)
+    clear(): void {
+        this.pool.clear();
+    }
+}
+```
+
+### Scene graph navigation & async loading
+```typescript
+import { find, director, Node, Scene } from 'cc';
+
+// 1. Find node by path — always check for null
+const playerNode = find('Canvas/GameWorld/Player');
+if (playerNode) {
+    const controller = playerNode.getComponent(PlayerController);
+    if (controller) {
+        controller.Activate();
+    }
+}
+
+// 2. Access current scene root
+const currentScene = director.getScene();
+if (currentScene) {
+    const childNodes = currentScene.children;
+}
+
+// 3. Async scene preloading (load in background, then switch)
+director.preloadScene(
+    'battle-scene',
+    (completed: number, total: number) => {
+        // Progress callback: completed/total assets loaded
+        console.log(`Loading: ${(completed / total * 100).toFixed(0)}%`);
+    },
+    (err: Error | null) => {
+        if (err) {
+            console.error('Scene preload failed:', err);
+            return;
+        }
+        // Scene is loaded and cached — switch instantly
+        director.loadScene('battle-scene');
+    }
+);
+```
+
+### Game state machine
+```typescript
+import { director, Game, game } from 'cc';
+
+enum GameState {
+    Menu,
+    Playing,
+    Paused,
+    GameOver
+}
+
+class GameStateManager {
+    private currentState: GameState = GameState.Menu;
+
+    transition(newState: GameState): void {
+        this.exitState(this.currentState);
+        this.currentState = newState;
+        this.enterState(newState);
+    }
+
+    private enterState(state: GameState): void {
+        switch (state) {
+            case GameState.Menu:
+                director.loadScene('menu-scene');
+                break;
+            case GameState.Playing:
+                director.loadScene('game-scene');
+                game.resume();
+                break;
+            case GameState.Paused:
+                game.pause();       // Pauses engine main loop
+                // Show pause UI overlay
+                break;
+            case GameState.GameOver:
+                game.pause();
+                director.loadScene('gameover-scene');
+                break;
+        }
+    }
+
+    private exitState(state: GameState): void {
+        switch (state) {
+            case GameState.Paused:
+                game.resume();      // Resume engine before leaving pause
+                break;
+            // ... other cleanup
+        }
+    }
+
+    getCurrent(): GameState { return this.currentState; }
+}
+```

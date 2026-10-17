@@ -1,0 +1,177 @@
+# Migrated cocos_ui examples
+
+Illustrative fragments; verify target-version types and lifecycle behavior before adapting. They do not change the approved design.
+
+
+### Creating a Button with All Transition Modes
+
+```typescript
+import { Button, Sprite, Label, SpriteFrame, Color } from 'cc';
+
+// COLOR transition
+const colorBtn = node.addComponent(Button);
+colorBtn.transition = Button.Transition.COLOR;
+colorBtn.normalColor = new Color(255, 255, 255);
+colorBtn.pressedColor = new Color(200, 200, 200);
+colorBtn.hoverColor = new Color(230, 230, 230);
+colorBtn.disabledColor = new Color(128, 128, 128);
+colorBtn.clickEvents.push(/* EventHandler */);
+
+// SPRITE transition
+const spriteBtn = node.addComponent(Button);
+spriteBtn.transition = Button.Transition.SPRITE;
+spriteBtn.normalSprite = normalSF;
+spriteBtn.pressedSprite = pressedSF;
+spriteBtn.hoverSprite = hoverSF;
+spriteBtn.disabledSprite = disabledSF;
+
+// SCALE transition
+const scaleBtn = node.addComponent(Button);
+scaleBtn.transition = Button.Transition.SCALE;
+scaleBtn.zoomScale = 0.9;
+scaleBtn.duration = 0.1;
+```
+
+### Toggle Group (Radio Buttons)
+
+```typescript
+import { Toggle, ToggleContainer } from 'cc';
+
+const containerNode = new Node('ToggleGroup');
+const container = containerNode.addComponent(ToggleContainer);
+container.allowSwitchOff = false;  // At least one always checked
+
+for (let i = 0; i < 4; i++) {
+    const toggleNode = new Node(`Toggle_${i}`);
+    const toggle = toggleNode.addComponent(Toggle);
+    toggle.isChecked = (i === 0);  // First selected by default
+    toggle.checkEvents.push(/* onChecked */);
+    toggle.uncheckEvents.push(/* onUnchecked */);
+    containerNode.addChild(toggleNode);
+    // ToggleContainer auto-manages radio behavior
+}
+```
+
+### ScrollView with Dynamic Content (Virtual List Pattern)
+
+```typescript
+import { ScrollView, Layout, Node, UITransform } from 'cc';
+
+class VirtualList {
+    private scrollView: ScrollView;
+    private itemPool: Node[] = [];
+    private itemHeight: number = 80;
+    private totalItems: number = 0;
+    private visibleCount: number = 0;
+
+    constructor(scrollNode: Node, itemPrefab: Node, visibleCount: number) {
+        this.visibleCount = visibleCount;
+        this.scrollView = scrollNode.getComponent(ScrollView);
+
+        // Pre-create visible items
+        for (let i = 0; i < visibleCount + 2; i++) {  // +2 for buffer
+            const item = instantiate(itemPrefab);
+            item.active = false;
+            this.scrollView.content.addChild(item);
+            this.itemPool.push(item);
+        }
+
+        // Listen to scroll
+        this.scrollView.scrollEvents.push((scrollOffset: Vec2) => {
+            this.onScroll();
+        });
+    }
+
+    setData(data: any[], totalCount: number) {
+        this.totalItems = totalCount;
+        const layout = this.scrollView.content.getComponent(UITransform);
+        layout.height = totalCount * this.itemHeight;
+        this.onScroll();
+    }
+
+    private onScroll() {
+        const offset = this.scrollView.getScrollOffset();
+        const firstVisibleIndex = Math.floor(offset.y / this.itemHeight);
+        // Recycle items that scrolled out of view
+        // Assign new data to visible items
+        // (Full implementation depends on specific needs)
+    }
+}
+```
+
+### Layout + Widget for Responsive Design
+
+```typescript
+import { Layout, Widget, UITransform } from 'cc';
+
+// Auto-arranging horizontal button bar
+const bar = new Node('ButtonBar');
+bar.addComponent(UITransform).setContentSize(600, 50);
+const layout = bar.addComponent(Layout);
+layout.type = Layout.Type.HORIZONTAL;
+layout.spacingX = 8;
+layout.resizeMode = Layout.ResizeMode.NONE;
+
+// Widget: anchor to bottom-center, stretch horizontally
+const widget = bar.addComponent(Widget);
+widget.isAlignBottom = true;
+widget.bottom = 20;
+widget.isAlignHorizontalCenter = true;
+widget.alignMode = Widget.AlignMode.ALWAYS;
+```
+
+### RichText with Images and Styling
+
+```typescript
+import { RichText } from 'cc';
+
+const richText = node.addComponent(RichText);
+richText.string = `
+    <color=#FFD700><size=24><b>传说物品</b></size></color><br>
+    <img src='sword_icon' height=20/> <size=16>龙息之刃</size><br>
+    <color=#999999>装备后绑定</color><br>
+    <color=#00FF00>+45 力量</color><br>
+    <color=#00FF00>+60 耐力</color><br>
+`;
+richText.maxWidth = 260;
+richText.fontSize = 14;
+```
+
+### EditBox with Validation
+
+```typescript
+import { EditBox } from 'cc';
+
+const editBox = node.addComponent(EditBox);
+editBox.inputMode = EditBox.InputMode.SINGLE_LINE;
+editBox.maxLength = 20;
+editBox.placeholder = '请输入角色名...';
+editBox.returnType = EditBox.ReturnType.DONE;
+
+editBox.node.on(EditBox.EventType.TEXT_CHANGED, (edit: EditBox) => {
+    // Validate: only allow alphanumeric + Chinese chars
+    const valid = /^[a-zA-Z0-9\u4e00-\u9fa5]*$/.test(edit.string);
+    if (!valid) {
+        edit.string = edit.string.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '');
+    }
+});
+```
+
+### Slider with Value Display
+
+```typescript
+import { Slider, Label } from 'cc';
+
+const slider = node.addComponent(Slider);
+slider.direction = Slider.Direction.Horizontal;
+
+const valueLabel = new Node('ValueLabel');
+const lbl = valueLabel.addComponent(Label);
+lbl.fontSize = 14;
+
+slider.slideEvents.push((slider: Slider) => {
+    lbl.string = Math.round(slider.progress * 100) + '%';
+});
+```
+
+---

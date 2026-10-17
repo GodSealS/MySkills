@@ -1,0 +1,33 @@
+# Migrated cocos_physics examples
+
+Illustrative fragments; verify target-version types and lifecycle behavior before adapting. They do not change the approved design.
+
+
+### Rigid body and collision
+```typescript
+import { RigidBody, BoxCollider, PhysicsSystem, Vec3, geometry } from 'cc';
+
+// Add rigid body
+const rigidBody = node.addComponent(RigidBody);
+rigidBody.type = RigidBody.Type.DYNAMIC;
+rigidBody.mass = 1.0;
+
+// Add collider
+const collider = node.addComponent(BoxCollider);
+collider.size = new Vec3(1, 1, 1);
+collider.on('onCollisionEnter', (event) => {
+    console.log('Collision detected:', event.otherCollider.node.name);
+});
+
+// Raycast
+const ray = new geometry.Ray(origin.x, origin.y, origin.z, direction.x, direction.y, direction.z);
+const physics = PhysicsSystem.instance;
+if (physics.raycastClosest(ray)) {
+    const hit = physics.raycastClosestResult;
+    console.log('Hit:', hit.collider.node.name, hit.distance);
+}
+```
+
+### Constraints
+
+Implement only the constraint in the approved brief. Resolve supported classes, anchors, limits and motor parameters against the installed engine and selected backend.

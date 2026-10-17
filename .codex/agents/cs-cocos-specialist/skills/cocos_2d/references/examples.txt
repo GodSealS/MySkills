@@ -1,0 +1,42 @@
+# Migrated cocos_2d examples
+
+Illustrative fragments; verify target-version types and lifecycle behavior before adapting. They do not change the approved design.
+
+
+```typescript
+import { Sprite, Label, Mask, Graphics, UIOpacity } from 'cc';
+
+// Sprite
+const sprite = node.addComponent(Sprite);
+sprite.spriteFrame = this.spriteFrame;
+sprite.type = Sprite.Type.SIMPLE;
+
+// Label
+const label = node.addComponent(Label);
+label.string = 'Hello Cocos';
+label.fontSize = 24;
+label.overflow = Label.Overflow.CLAMP;
+
+// Label with custom TTF font
+const customLabel = node.addComponent(Label);
+customLabel.string = 'Custom Font Text';
+customLabel.font = this.customTTFFont;  // Assign imported TTF Font asset
+customLabel.fontSize = 32;
+customLabel.enableOutline = true;
+customLabel.outlineColor = new Color(0, 0, 0, 255);
+customLabel.outlineWidth = 2;
+
+// Mask
+const mask = node.addComponent(Mask);
+mask.type = Mask.Type.RECT;
+
+// Dynamic mask: resize or animate alphaThreshold for effects
+mask.alphaThreshold = 0.5;  // Controls STENCIL mask softness
+// To animate mask size, adjust the mask node's scale or the referenced SpriteFrame
+
+// 2D graphics drawing
+const g = node.addComponent(Graphics);
+g.fillColor = new Color(255, 0, 0, 255);
+g.circle(0, 0, 50);
+g.fill();
+```

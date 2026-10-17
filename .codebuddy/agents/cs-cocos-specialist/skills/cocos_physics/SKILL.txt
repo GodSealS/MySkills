@@ -1,0 +1,79 @@
+# Physics - Cocos Creator 3D Physics Engine
+
+For `cs-cocos-specialist` only. Apply the [parent agent contract](../../../cs-cocos-specialist.md): execute the approved task; return design changes to `cs-frontend-lead` for a decision before applying them. These migrated examples are illustrative, not a tested SDK. Confirm APIs against the target engine declarations and matching official documentation before use. Read sibling private skills only when the assigned work needs them.
+
+## Overview
+
+The Cocos Creator 3D physics module (`cocos/physics`) provides 3D physics simulation using the project-selected backend, supporting rigid body dynamics, collision detection, and joint systems.
+
+## Domain Knowledge
+
+### Core Design Patterns
+- **component-based** — Physics components (RigidBody, Collider) mounted on Nodes
+- **physics-integration** — Physics simulation driven by the configured backend
+
+### Key Concepts
+- `RigidBody` — Rigid body component, controls physical motion properties
+- `Collider` — Collider component, defines collision shapes
+- `PhysicsWorld` — Physics world, manages all physics objects and simulation stepping
+- `Joint` — Joint component, constrains relative motion between two rigid bodies
+- `PhysicsSystem` — Global physics system singleton (gravity, fixedTimeStep, raycast)
+
+## Key APIs
+
+### Classes
+- `RigidBody` — Rigid body (mass, velocity, force, damping)
+- `Collider` — Collider (Box, Sphere, Cylinder, etc.)
+- `PhysicsWorld` — Physics world (gravity, stepping, debugging)
+- `Joint` — Joint (HingeJoint, FixedJoint, PointToPointJoint)
+
+### Functions
+- `PhysicsSystem.instance.raycast()` — Raycast detection, returns hit information
+- Shape queries and constraints depend on the enabled backend and engine version; verify supported methods before implementation.
+
+## Dependencies
+- Required modules: `core`
+- Backend engine: inspect the project settings and supported capabilities
+
+## Examples
+
+When implementing a matching pattern, read [code examples](references/examples.txt).
+
+## Usage Guide
+
+### When to Use This Skill
+- Adding 3D rigid bodies and colliders
+- Implementing character collision detection and physics interaction
+- Configuring physics world parameters (gravity, step size)
+- Using raycasts for click-picking
+- Creating joint constraints (hinges, springs, etc.)
+
+### Best Practices
+1. Use `RigidBody.Type.STATIC` for static objects to avoid unnecessary physics computation
+2. Prefer simple collider shapes (Box > Sphere > Mesh)
+3. Avoid heavy computation in physics callbacks; only set flags, process in `update`
+4. Use `mask` for raycast filtering to reduce detection scope
+5. Adjust physics step size (fixedDeltaTime) to balance precision and performance
+6. Monitor physics performance via Cocos Creator's **built-in profiler** (F12 → Physics panel): check step time, active body count, collision pairs
+
+### Common Tasks
+- Add rigid body and collider components
+- Implement character controller collision
+- Configure physics collision matrix
+- Raycast for object picking
+- Create joint constraints (hinge doors, fixed connections, ball joints)
+
+## Related Skills
+- [cocos_physics-2d](../cocos_physics-2d/SKILL.txt) — 2D Box2D physics for side-scrollers and platformers
+- [cocos_core](../cocos_core/SKILL.txt) — Component lifecycle, Node hierarchy for physics object management
+- [cocos_3d](../cocos_3d/SKILL.txt) — Skinned mesh + physics interaction for ragdolls and hit detection
+- [cocos_editor](../cocos_editor/SKILL.txt) — MCP editor operations for adding physics components visually
+
+
+## API Lookup
+
+For subsystem API discovery, read [API reference](references/api-reference.txt), then verify the target engine declarations.
+
+## Verification
+
+Verify the assigned behavior in the actual project and report the checks and remaining gaps under the parent agent output contract. Loading this resource is not execution evidence. Any design deviation remains pending until `cs-frontend-lead` decides it.

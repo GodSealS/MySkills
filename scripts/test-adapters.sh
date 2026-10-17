@@ -98,7 +98,7 @@ PY
 fi
 
 for target in agents .gemini/agents .codex/agents .claude/agents plugins/claude/agents; do
-  for agent in cs-architect cs-frontend-lead cs-backend-lead cs-knowledge-base-admin; do
+  for agent in cs-architect cs-frontend-lead cs-backend-lead cs-knowledge-base-admin cs-network-programmer; do
     [ -f "$ROOT/$target/$agent.md" ] || fail "missing $target/$agent.md"
   done
 done
@@ -107,12 +107,15 @@ assert_contains "$ROOT/.gemini/agents/cs-architect.md" 'model: gemini-2.5-pro'
 assert_contains "$ROOT/.codex/agents/cs-frontend-lead.md" 'model: gpt-5.6-sol'
 assert_contains "$ROOT/.claude/agents/cs-backend-lead.md" 'model: opus'
 assert_contains "$ROOT/.gemini/agents/cs-test-engineer.md" 'model: gemini-2.5-flash'
-for agent in cs-test-engineer cs-web-perf-auditor cs-knowledge-base-admin; do
+for agent in cs-test-engineer cs-web-perf-auditor cs-knowledge-base-admin cs-cocos-specialist; do
   assert_contains "$ROOT/.codex/agents/$agent.md" 'model: gpt-5.6-luna'
 done
 for agent in "$ROOT"/.codebuddy/agents/*.md "$ROOT"/.gemini/agents/*.md "$ROOT"/.codex/agents/*.md "$ROOT"/.claude/agents/*.md "$ROOT"/plugins/claude/agents/*.md; do
   assert_not_contains "$agent" 'skills:'
   case "$agent" in
+    */cs-cocos-specialist.md)
+      assert_not_contains "$agent" '## Optional Skill Roster'
+      ;;
     */cs-review-advisor.md)
       assert_contains "$agent" 'there is no minimum skill count'
       assert_contains "$agent" '| `cs-code-query` |'
@@ -132,6 +135,55 @@ for agent in "$ROOT"/.codebuddy/agents/*.md "$ROOT"/.gemini/agents/*.md "$ROOT"/
       ;;
   esac
 done
+"$PYTHON" -B - "$ROOT" <<'PY'
+from pathlib import Path
+import re
+import sys
+
+root = Path(sys.argv[1])
+source = root / '.codebuddy/agents/cs-cocos-specialist'
+assert len(list(source.rglob('SKILL.txt'))) == 9
+models = {'agents': 'DeepSeek-V4-Flash', '.gemini/agents': 'gemini-2.5-flash',
+          '.codex/agents': 'gpt-5.6-luna', '.claude/agents': 'sonnet', 'plugins/claude/agents': 'sonnet'}
+for tree, model in models.items():
+    agents = root / tree
+    worker = agents / 'cs-cocos-specialist.md'
+    raw = worker.read_text(encoding='utf-8-sig')
+    assert re.search(r'^model:\s*' + re.escape(model) + r'\s*$', raw, re.M), tree
+    tools = re.search(r'^tools:\s*(.+)$', raw, re.M)[1]
+    assert 'Write' in tools and 'Edit' in tools and not re.search(r'\b(Task|Agent)\b', tools), tree
+    bundle = agents / source.name
+    assert not list(bundle.rglob('*.md')), tree
+    for path in source.rglob('*'):
+        if path.is_file():
+            assert (bundle / path.relative_to(source)).read_bytes() == path.read_bytes(), (tree, path)
+    for doc in [worker, *bundle.rglob('*.txt')]:
+        for link in re.findall(r'\[[^\]\n]+\]\(([^)\n]+)\)', doc.read_text(encoding='utf-8-sig')):
+            if not re.match(r'[a-z]+://|#', link):
+                assert (doc.parent / link.split('#')[0]).is_file(), (doc, link)
+    if 'claude' in tree:
+        for agent in agents.glob('*.md'):
+            tools = re.search(r'^tools:\s*(.+)$', agent.read_text(encoding='utf-8-sig'), re.M)[1]
+            dispatch = {'cs-frontend-lead': 'cs-cocos-specialist', 'cs-backend-lead': 'cs-network-programmer'}
+            if agent.stem in dispatch:
+                target = ('agent-skills-cs:' if tree.startswith('plugins/') else '') + dispatch[agent.stem]
+                assert re.findall(r'\b(?:Agent|Task)(?:\([^)]*\))?', tools) == [f'Agent({target})'], (tree, agent)
+            else:
+                assert not re.search(r'\b(Task|Agent)\b', tools), agent
+for tree in ('skills', '.agents/skills', '.gemini/skills', '.claude/skills', 'plugins/claude/skills'):
+    assert not list((root / tree).glob('*cocos*')), tree
+network_models = {'agents': 'DeepSeek-V4-Pro', '.gemini/agents': 'gemini-2.5-pro',
+                  '.codex/agents': 'gpt-5.6-sol', '.claude/agents': 'opus', 'plugins/claude/agents': 'opus'}
+source_worker = (root / '.codebuddy/agents/cs-network-programmer.md').read_text(encoding='utf-8-sig')
+for tree, model in network_models.items():
+    raw = (root / tree / 'cs-network-programmer.md').read_text(encoding='utf-8-sig')
+    assert re.search(r'^model:\s*' + re.escape(model) + r'\s*$', raw, re.M), tree
+    tools = re.search(r'^tools:\s*(.+)$', raw, re.M)[1]
+    assert 'Write' in tools and 'Edit' in tools and not re.search(r'\b(Task|Agent)\b', tools), tree
+    body_pattern = r'(?s)^---\n.*?\n---\n'
+    assert re.sub(body_pattern, '', raw).strip() == re.sub(body_pattern, '', source_worker).strip(), tree
+print('Cocos client/server models, dispatch tools, execution contract, private resources and links: passed')
+PY
 assert_contains "$ROOT/.agents/skills/cs-team-build/SKILL.md" 'Skip the final knowledge-base-administrator step; Team Build owns its single invocation in Phase 5'
 
 # Skills run on the host's active model, so no skill tree may pin one.

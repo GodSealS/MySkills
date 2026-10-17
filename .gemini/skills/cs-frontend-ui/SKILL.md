@@ -11,6 +11,8 @@ Build production-quality user interfaces that are accessible, performant, and vi
 
 **Domain Owner:** The host implements ordinary UI work. Delegate to `cs-frontend-lead` only for a concrete independent task or an explicit team workflow. Consume the accepted API contract; verify missing endpoint shapes with source or the interface owner.
 
+**Cocos Creator:** Route Cocos implementation through `cs-frontend-lead`, which assigns code work to `cs-cocos-specialist` and decides its proposed design changes. The specialist executes and verifies the approved task using its private bundle. If nested dispatch is unavailable, the host relays the lead's brief and returns results for lead acceptance. Use Creator runtime/visual verification for canvas content; DOM checks apply to accompanying web UI.
+
 ## When to Use
 
 - Building new UI components or pages

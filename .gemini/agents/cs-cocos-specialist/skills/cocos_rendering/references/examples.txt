@@ -1,0 +1,36 @@
+# Migrated cocos_rendering examples
+
+Illustrative fragments; verify target-version types and lifecycle behavior before adapting. They do not change the approved design.
+
+
+```typescript
+import { Camera, DirectionalLight, director } from 'cc';
+
+// Camera setup
+const camera = node.getComponent(Camera);
+camera.fov = 60;
+camera.near = 0.1;
+camera.far = 1000;
+camera.visibility = Layers.Enum.DEFAULT;
+
+// Directional light with shadows
+const light = lightNode.addComponent(DirectionalLight);
+light.shadowEnabled = true;
+
+// GFX — Create shader from source
+const device = director.root.device;
+const shader = device.createShader({
+    stages: [
+        { stage: ShaderStage.VERTEX, source: vertSource },
+        { stage: ShaderStage.FRAGMENT, source: fragSource },
+    ],
+});
+
+// GFX — Render target
+const rt = device.createTexture({
+    textureType: TextureType.TEX2D,
+    usage: TextureUsage.COLOR_ATTACHMENT | TextureUsage.SAMPLED,
+    format: Format.RGBA8,
+    width: 1024, height: 1024,
+});
+```

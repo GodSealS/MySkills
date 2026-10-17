@@ -11,6 +11,8 @@ Design stable, well-documented interfaces that are hard to misuse. Good interfac
 
 **Domain Owner:** The host designs ordinary interfaces. Delegate to `cs-backend-lead` only for a concrete independent task or an explicit team workflow. Define public contracts explicitly before their consumers depend on them.
 
+**Cocos game server:** `cs-backend-lead` assigns implementation of the accepted server/protocol design to `cs-network-programmer`. The worker implements and verifies; protocol or other design changes return to the backend lead for a decision before implementation. If nested dispatch is unavailable, the host relays the lead's brief and returns results for acceptance. Client changes remain with the frontend owner under the same accepted protocol revision.
+
 ## When to Use
 
 - Designing new API endpoints

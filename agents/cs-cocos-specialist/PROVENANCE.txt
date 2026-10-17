@@ -1,0 +1,47 @@
+# Cocos specialist migration
+
+Source: E:/Work/AgentTeams_UE/.codesquad (user-requested local import, 2026-10-17).
+Agent renamed from cocos-specialist to cs-cocos-specialist to follow this pack's persona names.
+The nine skills named by the source agent are private role resources; cocos-build is a separate skill not referenced by that agent and is not imported.
+
+Adaptations:
+- Execution-only role; cs-frontend-lead assigns work and decides every proposed design change.
+- Removed old project reporting lines, collaboration approval loop and mandatory engine-reference paths.
+- Private Markdown uses .txt to avoid recursive persona/skill registration; all relative links travel with the agent.
+- Replaced UseSkill assumptions with direct resource reads; editor tools must be discovered from the actual host.
+- Moved code examples, MMORPG templates and modal examples behind on-demand references.
+- Corrected obvious animation naming/layer/LOD examples, 3D raycast result use, 2D debug-flag typo and unconditional MCP version/setup claims.
+- Review corrected 3D Prefab loading/imports, destroyed-component callback handling, shadow enum ownership and nonexistent mesh-renderer methods; these corrections are source-checked, not Creator runtime validation.
+- Retained illustrative templates and source-domain material; these have not been compiled or run against a Cocos project and require target-version validation before use. Numeric sample budgets and editor payloads are examples, not approved design.
+- Removed Unity-specific advice from the original agent instead of treating it as Cocos API guidance.
+
+Sources consulted for specific corrections and dispatch:
+- https://code.claude.com/docs/en/sub-agents
+- https://docs.cocos.com/creator/3.8/api/en/class/physics.PhysicsSystem
+- https://docs.cocos.com/creator/3.8/api/zh/class/View
+- https://docs.cocos.com/creator/3.8/manual/en/asset/dynamic-load-resources.html
+- https://github.com/cocos/cocos-engine/blob/v3.8.8/cocos/3d/framework/mesh-renderer.ts
+
+Source SHA-256 (before adaptation):
+8221ff94b4f6271cc706f37d855c3d69ac0fd98df18a320a2f79b31cf1dc5cb7  agents/cocos-specialist.md
+9b45f605da96f0a63be5d235bb226960040206346a2f80e68bde909f8f0f3053  skills/cocos_2d/SKILL.md
+37b5a551d78322089a23dfa3f8672de54c9043a662c8771e0ed684e1d2bc0e5a  skills/cocos_2d/references/api-reference.md
+b43086bbdff4ecfef1b2c4614c51a96a688fbd87910b9b0751344defd57f31de  skills/cocos_3d/SKILL.md
+c15fe4d9f07cbd4ba1b19f1563965d722247bf835133df0677e88b4d4b6c2596  skills/cocos_3d/references/api-reference.md
+7db3d35f6eeac7c98cc1e18daed3afcf4984ad2777458fdf57afae6e27d9efc3  skills/cocos_animation/SKILL.md
+8db802d05772cf63c07c565f13e8168617e934f4559563ef7787d05610bc5305  skills/cocos_animation/references/api-reference.md
+a1317d59962f752762f1f6e46aef5c127b47c93f7a36e48b3371db8b39379f38  skills/cocos_core/SKILL.md
+5e324bb01e8556ddd57f86c8c737b5e81fb563d366f36ad889ac98415dbafc5e  skills/cocos_core/references/api-reference.md
+d4b232680c88f6aa9a1199f7d5976c815ced811d5eb4e7f82bc8bedbb4bdd2fb  skills/cocos_physics/SKILL.md
+20926d9c2ae78ac34f0799e0fafaba4703dfb8063e92c64dcede01157fcc8fa6  skills/cocos_physics/references/api-reference.md
+7e19d3428dff41654b4e79fa4361e696f674ce2077152b92a92b448586eef0c2  skills/cocos_physics-2d/SKILL.md
+e1266e708853f70a4717264e7c936e7f65b6f50e6a1e09c10f982ab6f9187c42  skills/cocos_physics-2d/references/api-reference.md
+039c56e36de91b3910722626a19254471d4588b866615cd8723e7d76a91a8d8d  skills/cocos_rendering/SKILL.md
+4c345961a3bbe134dbbb0563e772b9998663d76c7c705519b3a5f9efc4e4839d  skills/cocos_rendering/references/api-reference.md
+70c5d930232aa326c7419da8c12f7380464de3e442427d9ffe050120db9922f3  skills/cocos_ui/SKILL.md
+400e711304777f84a679cd4f88ca47bcc718ae368036f98de13712636ccc3a04  skills/cocos_editor/SKILL.md
+69936ac442a3db903dd1ae6187cba4062982aa07c53a5454c42a77cca8fed201  skills/cocos_editor/workflow-character.md
+10d3eb22b2c11f7dda5864dfcf9fa20d0a8886b2ec87539fef58612b72d36fe1  skills/cocos_editor/workflow-prefab.md
+998b152649dbc489ec296cd5dc9a7d91563b5156aef19e8fb92d38b4a5e045ff  skills/cocos_editor/workflow-scene.md
+c6a3205de53a50759c84cfd679b9bac3cb913be5d9965ca994963b843bb74940  skills/cocos_editor/workflow-ui.md
+70532d480703e069bd451567f770826d094e9ffe6e98cf454ca5c6c89e13ee2f  skills/cocos_editor/workflow-vfx.md

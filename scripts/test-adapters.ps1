@@ -92,6 +92,59 @@ try {
         $expectedModel = [regex]::Escape($knowledgeBaseAdminModels[$tree])
         Assert "$tree/cs-knowledge-base-admin uses the platform low-cost model" ($raw -match "(?m)^model:\s*$expectedModel\s*$")
     }
+    $cocosSource = Join-Path $Temp '.codebuddy\agents\cs-cocos-specialist'
+    Assert 'Cocos bundle contains nine private skill entrypoints' (@(Get-ChildItem -LiteralPath $cocosSource -Recurse -Filter 'SKILL.txt').Count -eq 9)
+    foreach ($tree in $knowledgeBaseAdminModels.Keys) {
+        $agentRoot = Join-Path $Temp $tree
+        $worker = Get-Content -Raw -LiteralPath (Join-Path $agentRoot 'cs-cocos-specialist.md')
+        $expectedModel = [regex]::Escape($knowledgeBaseAdminModels[$tree])
+        Assert "$tree Cocos worker uses the platform low-cost model" ($worker -match "(?m)^model:\s*$expectedModel\s*$")
+        $workerTools = [regex]::Match($worker, '(?m)^tools:\s*(.+)$').Groups[1].Value
+        Assert "$tree Cocos worker can implement but cannot delegate" ($workerTools -match '\bWrite\b' -and $workerTools -match '\bEdit\b' -and $workerTools -notmatch '\b(Task|Agent)\b')
+        $bundle = Join-Path $agentRoot 'cs-cocos-specialist'
+        Assert "$tree Cocos resources cannot register as personas" (@(Get-ChildItem -LiteralPath $bundle -Recurse -Filter '*.md').Count -eq 0)
+        foreach ($source in (Get-ChildItem -LiteralPath $cocosSource -Recurse -File)) {
+            $relative = $source.FullName.Substring($cocosSource.Length).TrimStart('\', '/')
+            $copy = Join-Path $bundle $relative
+            Assert "$tree copies Cocos resource $relative" ((Test-Path -LiteralPath $copy) -and (Get-FileHash -LiteralPath $copy).Hash -eq (Get-FileHash -LiteralPath $source.FullName).Hash)
+        }
+        $documents = @((Get-Item -LiteralPath (Join-Path $agentRoot 'cs-cocos-specialist.md'))) + @(Get-ChildItem -LiteralPath $bundle -Recurse -File)
+        foreach ($document in $documents) {
+            foreach ($link in [regex]::Matches((Get-Content -Raw -LiteralPath $document.FullName), '\[[^\]\r\n]+\]\(([^\)\r\n]+)\)')) {
+                $target = $link.Groups[1].Value
+                if ($target -match '^[a-z]+://|^#') { continue }
+                Assert "$tree resolves Cocos resource link $target" (Test-Path -LiteralPath (Join-Path $document.DirectoryName ($target -split '#')[0]) -PathType Leaf)
+            }
+        }
+    }
+    foreach ($tree in @('.claude\agents', 'plugins\claude\agents')) {
+        $dispatch = @{ 'cs-frontend-lead' = 'cs-cocos-specialist'; 'cs-backend-lead' = 'cs-network-programmer' }
+        foreach ($leadName in $dispatch.Keys) {
+            $lead = Get-Content -Raw -LiteralPath (Join-Path $Temp "$tree\$leadName.md")
+            $workerTarget = if ($tree -like 'plugins*') { 'agent-skills-cs:' + $dispatch[$leadName] } else { $dispatch[$leadName] }
+            $leadTools = [regex]::Match($lead, '(?m)^tools:\s*(.+)$').Groups[1].Value
+            $agentTools = @([regex]::Matches($leadTools, '\b(?:Agent|Task)(?:\([^)]*\))?') | ForEach-Object Value)
+            Assert "$tree $leadName dispatches only its assigned worker" ($agentTools.Count -eq 1 -and $agentTools[0] -eq "Agent($workerTarget)")
+        }
+        foreach ($file in (Get-ChildItem -LiteralPath (Join-Path $Temp $tree) -Filter '*.md' | Where-Object BaseName -NotIn @('cs-frontend-lead', 'cs-backend-lead'))) {
+            Assert "$tree/$($file.Name) has no delegation tool" ((Get-Content -Raw -LiteralPath $file.FullName) -notmatch '(?m)^tools:.*\b(Task|Agent)\b')
+        }
+    }
+    $networkModels = @{ 'agents' = 'DeepSeek-V4-Pro'; '.gemini\agents' = 'gemini-2.5-pro'; '.codex\agents' = 'gpt-5.6-sol'; '.claude\agents' = 'opus'; 'plugins\claude\agents' = 'opus' }
+    foreach ($tree in $networkModels.Keys) {
+        $workerPath = Join-Path $Temp "$tree\cs-network-programmer.md"
+        Assert "$tree includes the network worker" (Test-Path -LiteralPath $workerPath -PathType Leaf)
+        $worker = Get-Content -Raw -LiteralPath $workerPath
+        Assert "$tree network worker preserves its source model tier" ($worker -match ('(?m)^model:\s*' + [regex]::Escape($networkModels[$tree]) + '\s*$'))
+        $workerTools = [regex]::Match($worker, '(?m)^tools:\s*(.+)$').Groups[1].Value
+        Assert "$tree network worker can implement but cannot delegate" ($workerTools -match '\bWrite\b' -and $workerTools -match '\bEdit\b' -and $workerTools -notmatch '\b(Task|Agent)\b')
+        $sourceWorker = Get-Content -Raw -LiteralPath (Join-Path $Temp '.codebuddy\agents\cs-network-programmer.md')
+        $bodyPattern = '(?s)^---\r?\n.*?\r?\n---\r?\n'
+        Assert "$tree preserves the network execution contract" (($worker -replace $bodyPattern, '').Trim() -ceq ($sourceWorker -replace $bodyPattern, '').Trim())
+    }
+    foreach ($tree in @('skills', '.agents\skills', '.gemini\skills', '.claude\skills', 'plugins\claude\skills')) {
+        Assert "$tree does not expose private Cocos skills" (@(Get-ChildItem -LiteralPath (Join-Path $Temp $tree) -Directory | Where-Object Name -Match 'cocos').Count -eq 0)
+    }
     foreach ($agent in @('cs-test-engineer', 'cs-web-perf-auditor', 'cs-knowledge-base-admin')) {
         $file = Join-Path $Temp ".codex\agents\$agent.md"
         $raw = Get-Content -Raw $file
@@ -101,7 +154,7 @@ try {
     Assert 'knowledge-base admin requires an existing supported knowledge base' ($knowledgeBaseAdmin -match 'At least one supported knowledge base must already exist')
     Assert 'knowledge-base admin terminates when no supported knowledge base exists' ($knowledgeBaseAdmin -match 'TERMINATED — no supported knowledge base exists')
     Assert 'knowledge-base admin does not prohibit refresh-time deletion' ($knowledgeBaseAdmin -notmatch 'created, installed, repaired, or deleted')
-    foreach ($agent in @('cs-architect', 'cs-backend-lead', 'cs-frontend-lead', 'cs-code-reviewer', 'cs-security-auditor', 'cs-test-engineer', 'cs-web-perf-auditor')) {
+    foreach ($agent in @('cs-architect', 'cs-backend-lead', 'cs-frontend-lead', 'cs-code-reviewer', 'cs-security-auditor', 'cs-test-engineer', 'cs-web-perf-auditor', 'cs-network-programmer')) {
         $raw = Get-Content -Raw (Join-Path $Temp ".codex\agents\$agent.md")
         Assert ".codex/agents/$agent limits autonomous skill loading to its own roster" ($raw -match 'may autonomously load 0–3 skills when their triggers match; there is no minimum skill count, and it must not load skills outside this roster')
         $roster = [regex]::Match($raw, '(?ms)^## Optional Skill Roster\s*(.*?)(?=^## |\z)').Groups[1].Value

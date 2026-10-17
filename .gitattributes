@@ -1,0 +1,3 @@
+# These fixtures contain byte sizes and SHA-256 hashes of their source snapshots.
+# CRLF checkout conversion invalidates the evidence before the validator runs.
+tests/fixtures/team-review/** text eol=lf

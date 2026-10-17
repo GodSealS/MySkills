@@ -1,0 +1,148 @@
+# Migrated cocos_physics-2d examples
+
+Illustrative fragments; verify target-version types and lifecycle behavior before adapting. They do not change the approved design.
+
+
+### Basic 2D physics setup
+```typescript
+import { RigidBody2D, BoxCollider2D, ERigidBody2DType, EPhysics2DDrawFlags } from 'cc';
+
+// Add 2D rigid body
+const rigidBody = node.addComponent(RigidBody2D);
+rigidBody.type = ERigidBody2DType.Dynamic;
+
+// Add 2D collider
+const collider = node.addComponent(BoxCollider2D);
+collider.size = new Size(100, 50);
+collider.apply();
+
+// Collision callback
+collider.on(Contact2DType.BEGIN_CONTACT, (selfCollider, otherCollider, contact) => {
+    console.log('2D Collision:', otherCollider.node.name);
+});
+```
+
+### Platformer: ground detection and jump
+```typescript
+import { RigidBody2D, BoxCollider2D, ERigidBody2DType, Contact2DType, Vec2 } from 'cc';
+
+class PlatformerCharacter {
+    private rb: RigidBody2D;
+    private isGrounded: boolean = false;
+    private jumpForce: number = 500;
+    private moveSpeed: number = 300;
+
+    constructor(node: Node) {
+        this.rb = node.getComponent(RigidBody2D);
+        this.rb.type = ERigidBody2DType.Dynamic;
+        this.rb.fixedRotation = true;  // No tipping over
+
+        const collider = node.getComponent(BoxCollider2D);
+        // Ground detection via collision enter/exit
+        collider.on(Contact2DType.BEGIN_CONTACT, (self, other, contact) => {
+            // Check if contact normal is pointing up (ground below feet)
+            if (contact.getWorldManifold().normal.y > 0.5) {
+                this.isGrounded = true;
+            }
+        });
+        collider.on(Contact2DType.END_CONTACT, () => {
+            this.isGrounded = false;
+        });
+    }
+
+    move(horizontal: number): void {
+        this.rb.linearVelocity = new Vec2(horizontal * this.moveSpeed, this.rb.linearVelocity.y);
+    }
+
+    jump(): void {
+        if (!this.isGrounded) return;
+        this.rb.applyLinearImpulse(new Vec2(0, this.jumpForce), this.rb.node.getWorldPosition(), true);
+        this.isGrounded = false;
+    }
+
+    // Slope handling: increase gravity scale on slopes to prevent sliding
+    update(dt: number): void {
+        // Raycast downward for slope angle detection
+        const origin = this.rb.node.getWorldPosition();
+        const hit = PhysicsSystem2D.instance.raycast(
+            new Vec2(origin.x, origin.y),
+            new Vec2(origin.x, origin.y - 10)
+        );
+        if (hit && hit.length > 0) {
+            this.isGrounded = true;
+        }
+    }
+}
+```
+
+### Collision matrix and world configuration
+```typescript
+import { PhysicsSystem2D, RigidBody2D } from 'cc';
+
+// Configure 2D physics world
+const physics = PhysicsSystem2D.instance;
+physics.gravity = new Vec2(0, -980);  // Custom gravity
+
+// Collision groups: define categories
+const GROUP_PLAYER = 1 << 0;   // 0x0001
+const GROUP_ENEMY = 1 << 1;    // 0x0002
+const GROUP_GROUND = 1 << 2;   // 0x0004
+const GROUP_PICKUP = 1 << 3;   // 0x0008
+
+// Player collider: collides with ground + enemy + pickup
+playerCollider.group = GROUP_PLAYER;
+playerCollider.apply();  // Must call after group change
+
+// Enemy collider: collides with ground + player
+enemyCollider.group = GROUP_ENEMY;
+
+// Ground: only collides with everything (default)
+groundCollider.group = GROUP_GROUND;
+
+// Pickup: only collides with player (trigger-style)
+pickupCollider.group = GROUP_PICKUP;
+pickupCollider.sensor = true;  // No physical response, only events
+```
+
+### One-way platforms (pass-through from below)
+```typescript
+import { RigidBody2D, BoxCollider2D, Contact2DType, Vec2 } from 'cc';
+
+// One-way platform: player falls through from below, lands from above
+class OneWayPlatform {
+    private platformCollider: BoxCollider2D;
+
+    setup(platformNode: Node): void {
+        this.platformCollider = platformNode.getComponent(BoxCollider2D);
+
+        this.platformCollider.on(Contact2DType.PRE_SOLVE, (self, other, contact) => {
+            const otherRB = other.node.getComponent(RigidBody2D);
+            if (!otherRB) return;
+
+            // Check if player is below the platform (trying to jump through)
+            const playerY = other.node.getWorldPosition().y;
+            const platformTop = self.node.getWorldPosition().y + (self.node.getComponent(UITransform)?.height ?? 0) / 2;
+
+            // If player is below platform top, disable this contact (pass through)
+            if (playerY < platformTop) {
+                contact.disabled = true;
+            }
+            // If player is above and falling (vy < 0), allow landing
+            // Edge case: player standing on platform → normal collision
+        });
+    }
+}
+```
+
+### Physics debug visualization
+```typescript
+import { PhysicsSystem2D, EPhysics2DDrawFlags } from 'cc';
+
+// Enable debug drawing during development
+PhysicsSystem2D.instance.debugDrawFlags =
+    EPhysics2DDrawFlags.Shape |             // Show collider shapes
+    EPhysics2DDrawFlags.Joint |             // Show joints
+    EPhysics2DDrawFlags.Pair |              // Show contact pairs
+    EPhysics2DDrawFlags.CenterOfMass |      // Show CoM points
+    EPhysics2DDrawFlags.Aabb;  // Show bounding boxes
+```

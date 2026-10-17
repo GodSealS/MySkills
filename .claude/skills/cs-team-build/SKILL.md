@@ -14,7 +14,7 @@ The team is not a chat. Every handoff is a **file** under a unique run directory
 
 Two rules hold throughout:
 
-1. **The skill orchestrates, not the personas.** Personas never call each other. Every fan-out is issued by this skill. (See `../../references/cs-orchestration-patterns.md` — this skill is the sanctioned orchestrator for the team loop.)
+1. **The skill owns the team loop.** Team fan-outs come from the host. Within an assigned Cocos implementation task, `cs-frontend-lead` may dispatch `cs-cocos-specialist` for client work and `cs-backend-lead` may dispatch `cs-network-programmer` for server work. Both workers only execute; the assigning lead decides proposed design changes. This does not transfer team gates or architecture authority. See `../../references/cs-orchestration-patterns.md` for the scoped handoffs and host-relay fallback.
 2. **Files are the handoff medium.** No "as we discussed" context. If it isn't in the handoff doc, it doesn't exist.
 
 ## When to Use

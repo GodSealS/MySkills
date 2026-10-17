@@ -1,0 +1,107 @@
+# Migrated cocos_3d examples
+
+Illustrative fragments; verify target-version types and lifecycle behavior before adapting. They do not change the approved design.
+
+
+### Async model Prefab loading
+
+Import the model in Creator and save the configured hierarchy as a Prefab under
+`assets/resources/models/character.prefab`. This loads that Prefab, not a raw glTF URL.
+
+```typescript
+import { _decorator, Component, MeshRenderer, resources, Mesh, Prefab, instantiate, isValid } from 'cc';
+const { ccclass, property } = _decorator;
+
+@ccclass('ModelLoader')
+export class ModelLoader extends Component {
+    @property(Mesh)
+    public fallbackMesh: Mesh | null = null;
+
+    start() {
+        this.loadModel('models/character');
+    }
+
+    loadModel(path: string) {
+        resources.load(path, Prefab, (err, prefab) => {
+            // Loading may complete after this component or its node was destroyed.
+            if (!isValid(this, true) || !isValid(this.node, true)) return;
+            if (err) {
+                console.error(`Failed to load model at ${path}:`, err);
+                // Fallback: use a default mesh if available
+                if (this.fallbackMesh) {
+                    const renderer = this.node.addComponent(MeshRenderer);
+                    renderer.mesh = this.fallbackMesh;
+                }
+                return;
+            }
+            const modelNode = instantiate(prefab);
+            this.node.addChild(modelNode);
+        });
+    }
+}
+```
+
+### Basic mesh renderer setup
+```typescript
+import { MeshRenderer } from 'cc';
+
+// Add mesh renderer
+const renderer = node.addComponent(MeshRenderer);
+renderer.mesh = this.meshAsset;
+renderer.setMaterial(this.material, 0);
+
+// Shadow settings
+renderer.shadowCastingMode = MeshRenderer.ShadowCastingMode.ON;
+```
+
+### Skinned mesh with animation
+```typescript
+import { SkinnedMeshRenderer, SkeletalAnimation, Skeleton } from 'cc';
+
+// Skinned mesh setup
+const skinnedRenderer = node.addComponent(SkinnedMeshRenderer);
+skinnedRenderer.mesh = this.skinnedMesh;
+skinnedRenderer.skeleton = this.skeletonAsset;
+
+// Skeletal animation playback
+const skeletalAnim = node.addComponent(SkeletalAnimation);
+skeletalAnim.play('Idle');  // Play idle animation
+
+// Cross-fade between animation clips
+skeletalAnim.crossFade('Walk', 0.3);  // Blend to Walk over 0.3 seconds
+
+// Bone count recommendations:
+// - < 30 bones: mobile-friendly, GPU skinning efficient
+// - 30-60 bones: moderate, verify on low-end devices
+// - > 60 bones: consider bone reduction or baked animation
+```
+
+### Material customization
+```typescript
+import { MeshRenderer, Material, Color } from 'cc';
+
+// Get material instance (avoids modifying shared materials)
+const renderer = node.getComponent(MeshRenderer);
+const matInstance = renderer?.getMaterialInstance(0);
+
+if (matInstance) {
+    // Custom material properties
+    matInstance.setProperty('mainColor', new Color(255, 128, 64, 255));
+    matInstance.setProperty('roughness', 0.3);
+    matInstance.setProperty('metallic', 0.8);
+}
+
+// For advanced shader customization (toon shading, custom effects),
+// see cocos_rendering Skill — it covers Effect assets, shader variants,
+// and custom pipeline states.
+```
+
+### Bounds and mesh changes
+
+Assign imported geometry through `renderer.mesh`; the renderer updates its model
+when the mesh changes. For procedural geometry, follow the target version's mesh
+update API and bounds contract. There is no public `MeshRenderer.updateBound()` in
+Creator 3.8; do not invent a manual bounds update after instantiating a Prefab.
+
+API corrections checked against [Creator 3.8 asset loading](https://docs.cocos.com/creator/3.8/manual/en/asset/dynamic-load-resources.html)
+and [MeshRenderer v3.8.8 source](https://github.com/cocos/cocos-engine/blob/v3.8.8/cocos/3d/framework/mesh-renderer.ts).

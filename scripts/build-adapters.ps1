@@ -89,9 +89,21 @@ function Neutralize-AgentFrontmatter($content) {
         $close = $matches[3]
         $body  = $content.Substring($matches[0].Length)
         $keep  = @()
+        $dispatchWorker = if ($fm -match '(?m)^name:\s*cs-frontend-lead\s*$') { 'cs-cocos-specialist' }
+                          elseif ($fm -match '(?m)^name:\s*cs-backend-lead\s*$') { 'cs-network-programmer' }
+                          else { $null }
         foreach ($l in ($fm -split "`r?`n")) {
             if ($l -match '^(thinkingLevel|agentMode|subagent|enabled|enabledAutoRun)\s*:') { continue }
-            if ($l -match '^tools\s*:') { $l = $l -replace '(,\s*)?Task(,\s*)?', '' }
+            if ($l -match '^tools\s*:') {
+                $toolList = @()
+                foreach ($tool in (($l -replace '^tools\s*:\s*', '') -split ',')) {
+                    $tool = $tool.Trim()
+                    if ($tool -ceq 'Task') {
+                        if ($dispatchWorker) { $toolList += "Agent($dispatchWorker)" }
+                    } elseif ($tool) { $toolList += $tool }
+                }
+                $l = 'tools: ' + ($toolList -join ', ')
+            }
             $keep += $l
         }
         return $open + ($keep -join "`n") + $close + $body
@@ -175,8 +187,8 @@ function Get-PlatformModel([string]$sourceModel, [string]$platform) {
 function Set-AgentPlatformModel([string]$path, [string]$platform) {
     $content = Get-Content -Raw -Path $path
     $agentName = if ($content -match '(?m)^name:\s*(.+?)\s*$') { $matches[1].Trim() } else { throw "Agent name missing: $path" }
-    $proAgents = @('cs-architect', 'cs-backend-lead', 'cs-frontend-lead', 'cs-code-reviewer', 'cs-security-auditor', 'cs-review-advisor')
-    $flashAgents = @('cs-test-engineer', 'cs-web-perf-auditor', 'cs-knowledge-base-admin')
+    $proAgents = @('cs-architect', 'cs-backend-lead', 'cs-frontend-lead', 'cs-code-reviewer', 'cs-security-auditor', 'cs-review-advisor', 'cs-network-programmer')
+    $flashAgents = @('cs-test-engineer', 'cs-web-perf-auditor', 'cs-knowledge-base-admin', 'cs-cocos-specialist')
     if ($proAgents -contains $agentName) {
         $tier = 'DeepSeek-V4-Pro'
     } elseif ($flashAgents -contains $agentName) {
@@ -507,6 +519,19 @@ Copy-Tree -src $dstSkillsClaude -dst (Join-Path $dstClaudePluginPackage 'skills'
 $pluginAgents = Join-Path $dstClaudePluginPackage 'agents'
 New-Item -ItemType Directory -Force -Path $pluginAgents | Out-Null
 Get-ChildItem -LiteralPath $dstAgentsClaude -File -Filter '*.md' | Copy-Item -Destination $pluginAgents -Force
+foreach ($lead in @('cs-frontend-lead', 'cs-backend-lead')) {
+    $pluginLead = Join-Path $pluginAgents "$lead.md"
+    if (Test-Path -LiteralPath $pluginLead) {
+        $leadContent = [IO.File]::ReadAllText($pluginLead)
+        if ($leadContent -match '(?s)^(---\r?\n)(.*?)(\r?\n---\r?\n)') {
+            $open = $matches[1]; $fm = $matches[2]; $close = $matches[3]
+            $body = $leadContent.Substring($matches[0].Length)
+            $fm = $fm -replace '(?m)^(tools:.*)Agent\((cs-cocos-specialist|cs-network-programmer)\)', '$1Agent(agent-skills-cs:$2)'
+            $leadContent = $open + $fm + $close + $body
+        }
+        Write-TextFile $pluginLead $leadContent
+    }
+}
 Sync-AgentResources $SrcAgents $pluginAgents
 Copy-Tree -src $dstRefsClaude -dst (Join-Path $dstClaudePluginPackage 'references')
 Copy-Tree -src $dstCmdClaude -dst (Join-Path $dstClaudePluginPackage 'commands')

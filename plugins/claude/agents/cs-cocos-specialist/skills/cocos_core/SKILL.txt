@@ -1,0 +1,90 @@
+# Core - Cocos Creator Core Engine
+
+For `cs-cocos-specialist` only. Apply the [parent agent contract](../../../cs-cocos-specialist.md): execute the approved task; return design changes to `cs-frontend-lead` for a decision before applying them. These migrated examples are illustrative, not a tested SDK. Confirm APIs against the target engine declarations and matching official documentation before use. Read sibling private skills only when the assigned work needs them.
+
+## Overview
+
+The Cocos Creator core module (`cocos/core`) is the foundation of the entire engine, providing component system, scene graph management, lifecycle control, event mechanisms, object pooling, and game state orchestration.
+
+## Domain Knowledge
+
+### Core Design Patterns
+- **component-based** — Nodes own Components; this does not prescribe a separate ECS architecture
+- **object-pool** — Object pool pattern, reusing frequently created/destroyed objects
+- **event-emitter** — Event emitter for decoupled inter-module communication
+- **state-machine** — Finite state machine for managing game phases (menu, playing, paused)
+
+### Key Concepts
+- `Component` — Base class for all components, mounted on Nodes to provide behavior
+- `Node` — Scene node, the basic unit of the scene tree
+- `Director` — Game director, manages main loop and scene transitions
+- `Game` — Game entry point, initializes engine and drives main loop
+- `Scene` — Scene root node, hosts all game objects
+- `EventTarget` — Event emitter base for pub/sub communication
+
+## Key APIs
+
+### Classes
+- `Component` — Component base class (`onLoad`, `start`, `update`, `onDestroy`)
+- `Node` — Scene node (`addChild`, `removeChild`, `getComponent`)
+- `Director` — Game director (`loadScene`, `preloadScene`, `getScene`)
+- `Game` — Game instance (`run`, `pause`, `resume`)
+- `Scene` — Scene container
+- `NodePool` — Object pool for Node reuse
+- `EventTarget` — Event emitter for decoupled communication
+
+### Functions
+- `find(path)` — Find a node by path (returns Node | null)
+- `isValid(obj)` — Check if an object is valid (not destroyed)
+- `node.destroy()` — Schedule node destruction; verify lifetime with `isValid`
+- `director.loadScene(name)` — Switch to named scene
+- `director.preloadScene(name, onProgress, onLoaded)` — Async preload scene
+
+## Dependencies
+- No external dependencies; this is the foundation for all other modules
+
+## Examples
+
+When implementing a matching pattern, read [code examples](references/examples.txt).
+
+## Usage Guide
+
+### When to Use This Skill
+- Creating custom Components with lifecycle methods
+- Managing scene node trees and parent-child relationships
+- Handling engine lifecycle callbacks (onLoad, start, update, onDestroy)
+- Implementing inter-module event communication
+- Using object pools (NodePool) for performance optimization
+- Managing game states (menu, playing, paused) via FSM + Game.pause/resume
+
+### Best Practices
+1. Keep component logic within `onLoad`/`start`/`update` lifecycle methods
+2. Use `isValid()` to check node references, avoiding access to destroyed objects
+3. Use object pools (`NodePool`) for frequently created/destroyed objects — preheat pools on scene load
+4. Register event listeners in `onLoad`, unregister in `onDestroy` with matching `.off()` calls
+5. Avoid heavy computation in `update`; use schedulers or async operations
+6. Always null-check results from `find()` — it returns `Node | null`
+7. Use `preloadScene` for large scenes to avoid frame drops during loading
+
+### Common Tasks
+- Create custom component classes with `@ccclass` / `@property`
+- Manage node parent-child relationships (`addChild`, `removeChild`)
+- Implement scene transition logic (`loadScene`, `preloadScene`)
+- Use event system (`EventTarget`) for decoupled communication
+- Implement object pool reuse via `NodePool` with capacity limits
+- Build game state machines integrating `Game.pause`/`resume`
+
+## Related Skills
+- [cocos_animation](../cocos_animation/SKILL.txt) — Animation component lifecycle, event-driven animation callbacks
+- [cocos_2d](../cocos_2d/SKILL.txt) — 2D component patterns (Sprite, Label extend Component)
+- [cocos_3d](../cocos_3d/SKILL.txt) — 3D component patterns (MeshRenderer, SkinnedMeshRenderer)
+- [cocos_ui](../cocos_ui/SKILL.txt) — UI component lifecycle, Button events, Widget layout
+
+
+## API Lookup
+
+For subsystem API discovery, read [API reference](references/api-reference.txt), then verify the target engine declarations.
+
+## Verification
+
+Verify the assigned behavior in the actual project and report the checks and remaining gaps under the parent agent output contract. Loading this resource is not execution evidence. Any design deviation remains pending until `cs-frontend-lead` decides it.

@@ -1,0 +1,84 @@
+# Physics 2D - Cocos Creator 2D Physics Engine
+
+For `cs-cocos-specialist` only. Apply the [parent agent contract](../../../cs-cocos-specialist.md): execute the approved task; return design changes to `cs-frontend-lead` for a decision before applying them. These migrated examples are illustrative, not a tested SDK. Confirm APIs against the target engine declarations and matching official documentation before use. Read sibling private skills only when the assigned work needs them.
+
+## Overview
+
+The Cocos Creator 2D physics module (`cocos/physics-2d`) provides 2D physics simulation based on Box2D, supporting rigid bodies, colliders, joint systems, collision filtering, and platformer mechanics.
+
+## Domain Knowledge
+
+### Core Design Patterns
+- **component-based** — Physics components mounted on Nodes
+- **2d-physics** — Box2D-driven 2D physics simulation
+- **collision-filtering** — Category bits + mask bits for selective collision
+
+### Key Concepts
+- `RigidBody2D` — 2D rigid body component (Static, Dynamic, Kinematic, Animated)
+- `Collider2D` — 2D collider component (Box, Circle, Polygon, Edge, Capsule)
+- `PhysicsWorld2D` — 2D physics world (gravity vector, stepping, collision matrix)
+- `Contact2DType` — BEGIN_CONTACT, END_CONTACT, PRE_SOLVE, POST_SOLVE
+
+## Key APIs
+
+### Classes
+- `RigidBody2D` — 2D rigid body (type, linearVelocity, angularVelocity, damping, bullet, fixedRotation)
+- `Collider2D` — 2D collider (BoxCollider2D, CircleCollider2D, PolygonCollider2D, EdgeCollider2D, CapsuleCollider2D)
+- `PhysicsWorld2D` — 2D physics world (gravity, stepping)
+- `Contact2DType` — Collision contact event types
+- `EPhysics2DDrawFlags` — Debug draw flags for visualization
+
+### Functions
+- `PhysicsSystem2D.instance.raycast()` — 2D raycast detection (returns array of results)
+- `PhysicsSystem2D.instance.testPoint()` — Test if a point is inside a collider
+- `collider.group` / `collider.apply()` — Collision group + apply property changes
+
+## Dependencies
+- Required modules: `core`
+- Backend engine: Box2D
+
+## Examples
+
+When implementing a matching pattern, read [code examples](references/examples.txt).
+
+## Usage Guide
+
+### When to Use This Skill
+- Adding physics effects to 2D games
+- Implementing 2D collision detection and collision events
+- Configuring Box2D physics world parameters
+- Implementing platformer physics interaction (ground detection, jump, slopes)
+- Setting up collision filtering (categories + masks)
+- Creating one-way platforms and passthrough mechanics
+
+### Best Practices
+1. Prefer simple colliders in 2D physics (Box > Circle > Polygon); Polygon only for complex shapes
+2. Call `collider.apply()` after editing collider properties (group, sensor, size)
+3. Enable physics debug drawing during development (`EPhysics2DDrawFlags`)
+4. Do not mix 2D and 3D physics on the same node
+5. Set `fixedRotation = true` on player rigidbodies to prevent tipping
+6. Use `bullet = true` on fast-moving RigidBody2D to prevent tunneling
+7. Set `allowSleep = true` on static/resting bodies to reduce physics overhead
+8. Use collision groups/layers to minimize unnecessary collision checks
+
+### Common Tasks
+- Add 2D rigid bodies and colliders
+- Implement platformer physics with ground detection and jump
+- Configure 2D collision matrix via group bits
+- 2D raycast detection
+- Create one-way platforms
+- Debug physics visually with EPhysics2DDrawFlags
+
+## Related Skills
+- [cocos_physics](../cocos_physics/SKILL.txt) — 3D physics for Cannon.js-driven simulation
+- [cocos_core](../cocos_core/SKILL.txt) — Component lifecycle, Node hierarchy for physics object management
+- [cocos_2d](../cocos_2d/SKILL.txt) — 2D rendering and sprite integration with physics bodies
+
+
+## API Lookup
+
+For subsystem API discovery, read [API reference](references/api-reference.txt), then verify the target engine declarations.
+
+## Verification
+
+Verify the assigned behavior in the actual project and report the checks and remaining gaps under the parent agent output contract. Loading this resource is not execution evidence. Any design deviation remains pending until `cs-frontend-lead` decides it.

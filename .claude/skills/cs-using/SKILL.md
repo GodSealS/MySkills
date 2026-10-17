@@ -40,7 +40,9 @@ An ordinary implementation request does not select a team workflow.
   Reuse accepted decisions and valid verification evidence for unchanged inputs.
 - Ordinary implementation stays with the host. Delegate a bounded independent task only
   when useful and authorized, or when the explicitly selected workflow requires it.
-  Personas never invoke other personas; their optional rosters are allowlists, not quotas.
+  Persona dispatch is limited to `cs-frontend-lead` directing `cs-cocos-specialist` and
+  `cs-backend-lead` directing `cs-network-programmer`; both workers only execute.
+  Other orchestration stays with the host. Optional rosters are allowlists, not quotas.
 - Team-role handoffs follow [orchestration patterns](../../references/cs-orchestration-patterns.md)
   only when a team or specialist handoff is active. Load private advisor protocols solely
   for that role's assigned review.

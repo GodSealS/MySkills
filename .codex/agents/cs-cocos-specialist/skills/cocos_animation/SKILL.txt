@@ -1,0 +1,87 @@
+# Animation - Cocos Creator Animation System
+
+For `cs-cocos-specialist` only. Apply the [parent agent contract](../../../cs-cocos-specialist.md): execute the approved task; return design changes to `cs-frontend-lead` for a decision before applying them. These migrated examples are illustrative, not a tested SDK. Confirm APIs against the target engine declarations and matching official documentation before use. Read sibling private skills only when the assigned work needs them.
+
+## Overview
+
+The Cocos Creator animation module (`cocos/animation`) provides a complete animation system supporting skeletal animation, keyframe animation, state-machine-driven animation blending, animation layers, and event-driven callbacks.
+
+## Domain Knowledge
+
+### Core Design Patterns
+- **component-based** — Animation functionality mounted on Nodes as Components
+- **event-driven** — Animation callbacks driven by the event system
+- **state-machine** — State machine for managing animation state transitions
+- **layer-blending** — Multiple animation layers blended via weights for partial-body control
+
+### Key Concepts
+- `AnimationClip` — Animation clip, stores keyframe data
+- `AnimationState` — Animation state, controls playback parameters for a single clip
+- `Animation` — Animation component, manages multiple AnimationStates
+- `SkeletalAnimation` — Skeletal animation component, handles bone skinning
+- `Skeleton` — Bone hierarchy asset; each bone influences nearby mesh vertices via weight painting
+- `AnimationGraph` — Visual state machine for defining animation transitions and conditions
+
+## Key APIs
+
+### Classes
+- `AnimationClip` — Animation clip data container
+- `AnimationState` — Animation state controller (speed, time, weight, wrapMode)
+- `Animation` — Animation component (mounted on Node)
+- `SkeletalAnimation` — Skeletal animation component
+- `AnimationGraph` — Animation state machine graph
+
+### Functions
+- `play()` — Play a specified animation clip
+- `stop()` — Stop the current animation
+- `crossFade(name, duration)` — Cross-fade to target animation over duration (seconds)
+- `getState(name)` — Get AnimationState by clip name for manual control
+- `addClip(clip)` — Add an AnimationClip at runtime
+
+## Dependencies
+- Required modules: `core`, `scene-graph`
+- Related: `cocos/3d` (SkeletalAnimation depends on skeleton/mesh from 3D rendering)
+
+## Examples
+
+When implementing a matching pattern, read [code examples](references/examples.txt).
+
+## Usage Guide
+
+### When to Use This Skill
+- Creating or modifying animation components
+- Implementing character animation state machines
+- Handling skeletal animation and skinning
+- Configuring animation layers and blend weights
+- Optimizing animation performance (LOD, culling, compression)
+
+### Best Practices
+1. Use `crossFade()` for smooth animation transitions instead of abrupt switching
+2. Build state machines for common animation states rather than manually managing playback logic
+3. Use `SkeletalAnimation` for skeletal animation, `Animation` for keyframe animation
+4. Handle animation event callbacks through the event-driven pattern
+5. Use animation layers to separate upper/lower body blending — layer 0 for base, layer 1+ for additive
+6. Implement the approved animation LOD strategy; changing playback speed is not a sampling optimization
+7. Monitor animation performance via the **built-in profiler** (F12 → Animation panel) — check active clip count and tick time
+8. Avoid relying on per-frame animation events for game-state-critical logic on low-FPS devices
+
+### Common Tasks
+- Add character idle/walk/run animations with cross-fade transitions
+- Implement animation state machines (FSM) driven by velocity/state
+- Configure animation layers and blend weights for partial-body control
+- Handle animation event callbacks (footsteps, attack frames)
+- Optimize animation performance with LOD and culling
+
+## Related Skills
+- [cocos_core](../cocos_core/SKILL.txt) — Component, Node, Scene, lifecycle management
+- [cocos_3d](../cocos_3d/SKILL.txt) — MeshRenderer, SkinnedMeshRenderer, skeleton/mesh loading for skeletal animation
+- [cocos_rendering](../cocos_rendering/SKILL.txt) — GPU skinning, animation texture baking, custom animation shaders
+
+
+## API Lookup
+
+For subsystem API discovery, read [API reference](references/api-reference.txt), then verify the target engine declarations.
+
+## Verification
+
+Verify the assigned behavior in the actual project and report the checks and remaining gaps under the parent agent output contract. Loading this resource is not execution evidence. Any design deviation remains pending until `cs-frontend-lead` decides it.

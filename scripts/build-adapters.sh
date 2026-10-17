@@ -80,10 +80,30 @@ strip_skill_frontmatter() {
 strip_claude_agent_frontmatter() {
   file=$1
   tmp="$file.tmp.$$"
-  awk '
-    /^---[[:space:]]*$/ { in_fm = !in_fm; print; next }
+  # Read the name before transforming tools: YAML key order is not significant.
+  case "$(frontmatter_value name "$file" | tr -d '\r')" in
+    cs-frontend-lead) worker=cs-cocos-specialist ;;
+    cs-backend-lead) worker=cs-network-programmer ;;
+    *) worker= ;;
+  esac
+  awk -v worker="$worker" '
+    NR == 1 && /^---[[:space:]]*$/ { in_fm = 1; print; next }
+    in_fm && /^---[[:space:]]*$/ { in_fm = 0; print; next }
     in_fm && $0 ~ /^(thinkingLevel|agentMode|subagent|enabled|enabledAutoRun):[[:space:]]/ { next }
-    in_fm && $0 ~ /^tools:[[:space:]]/ { sub(/(,[[:space:]]*)?Task(,[[:space:]]*)?/, ""); sub(/,[[:space:]]*$/, ""); print; next }
+    in_fm && $0 ~ /^tools:[[:space:]]/ {
+      sub(/^tools:[[:space:]]*/, "")
+      count = split($0, tool_list, ","); result = ""
+      for (i = 1; i <= count; i++) {
+        tool = tool_list[i]
+        sub(/^[[:space:]]*/, "", tool); sub(/[[:space:]]*$/, "", tool)
+        if (tool == "Task") {
+          if (!worker) continue
+          tool = "Agent(" worker ")"
+        }
+        if (tool != "") result = result (result == "" ? "" : ", ") tool
+      }
+      print "tools: " result; next
+    }
     { print }
   ' "$file" > "$tmp"
   mv "$tmp" "$file"
@@ -169,8 +189,8 @@ build_agents() (
     if [ "$platform" = claude ]; then strip_claude_agent_frontmatter "$target"; fi
     if [ "$platform" != neutral ]; then
       case "$name" in
-        cs-architect.md|cs-backend-lead.md|cs-frontend-lead.md|cs-code-reviewer.md|cs-security-auditor.md|cs-review-advisor.md) tier=DeepSeek-V4-Pro ;;
-        cs-test-engineer.md|cs-web-perf-auditor.md|cs-knowledge-base-admin.md) tier=DeepSeek-V4-Flash ;;
+        cs-architect.md|cs-backend-lead.md|cs-frontend-lead.md|cs-code-reviewer.md|cs-security-auditor.md|cs-review-advisor.md|cs-network-programmer.md) tier=DeepSeek-V4-Pro ;;
+        cs-test-engineer.md|cs-web-perf-auditor.md|cs-knowledge-base-admin.md|cs-cocos-specialist.md) tier=DeepSeek-V4-Flash ;;
         *) die "unsupported persona $name" ;;
       esac
       replace_model "$target" "$(platform_model "$platform" "$tier")"
@@ -333,6 +353,20 @@ done
 copy_tree "$ROOT/.claude/skills" "$PLUGIN/skills"
 mkdir -p "$PLUGIN/agents"
 cp "$ROOT/.claude/agents/"*.md "$PLUGIN/agents/"
+for lead in cs-frontend-lead cs-backend-lead; do
+  if [ -f "$PLUGIN/agents/$lead.md" ]; then
+    awk '
+      NR == 1 && /^---[[:space:]]*$/ { in_fm = 1; print; next }
+      in_fm && /^---[[:space:]]*$/ { in_fm = 0; print; next }
+      in_fm && /^tools:/ {
+        gsub(/Agent\(cs-cocos-specialist\)/, "Agent(agent-skills-cs:cs-cocos-specialist)")
+        gsub(/Agent\(cs-network-programmer\)/, "Agent(agent-skills-cs:cs-network-programmer)")
+      }
+      { print }
+    ' "$PLUGIN/agents/$lead.md" > "$PLUGIN/agents/$lead.md.tmp"
+    mv "$PLUGIN/agents/$lead.md.tmp" "$PLUGIN/agents/$lead.md"
+  fi
+done
 sync_agent_resources "$SRC_AGENTS" "$PLUGIN/agents"
 copy_tree "$ROOT/.claude/references" "$PLUGIN/references"
 copy_tree "$ROOT/.claude/commands" "$PLUGIN/commands"
