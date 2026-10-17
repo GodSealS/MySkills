@@ -64,6 +64,10 @@ Copy `.codebuddy/` into your project (or `~/.codebuddy` for global):
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install.ps1 -Target codebuddy -Destination <your-project-or-home>
 ```
+The installer records its source branch and commit in `.codebuddy/.agent-skills-install`.
+Reinstalling from another source branch is blocked; pass `-AllowVersionSwitch` (or
+`--allow-version-switch` with `install.sh`) only when you intend to replace that version.
+An existing unmarked installation also needs this flag once to adopt it.
 
 ### Gemini CLI
 Project-level (auto-discovered from the repo) — just keep `.gemini/` in your project root.
