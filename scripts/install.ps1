@@ -286,6 +286,9 @@ if ($doClaude) {
             if (-not (Test-Path $destClaudeSkills)) { New-Item -ItemType Directory -Force -Path $destClaudeSkills | Out-Null }
             Install-CodexUserSkills $srcSkillsClaude $destClaudeSkills $known $next
         }
+        # Shared references: Claude skills point at ../../references/<name>.md, which
+        # resolves to ~/.claude/references/ for a user-level install.
+        Install-CodexUserTree (Join-Path $Repo '.claude\references') (Join-Path $destClaude 'references') 'references' $known $next
         # Persona agents: use the Claude adapter and preserve user-owned agents.
         Install-CodexUserTree (Join-Path $Repo '.claude\agents') (Join-Path $destClaude 'agents') 'agents' $known $next
         # Slash commands: ~/.claude/commands/<name>.md
