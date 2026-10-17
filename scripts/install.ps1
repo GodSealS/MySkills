@@ -31,7 +31,8 @@ param(
     [switch]$UserHome,
     [string]$UserHomePath,
     [switch]$Merge,
-    [switch]$Clean
+    [switch]$Clean,
+    [switch]$AllowVersionSwitch
 )
 
 $ErrorActionPreference = 'Stop'
@@ -123,6 +124,60 @@ function Copy-File($src, $dst, [string]$label) {
     if (-not (Test-Path (Split-Path $dst))) { New-Item -ItemType Directory -Force -Path (Split-Path $dst) | Out-Null }
     Copy-Item -Force -Path $src -Destination $dst
     Write-Host "Installed $label -> $dst"
+}
+
+function Get-CodebuddySourceVersion {
+    $branchOutput = & git -C $Repo symbolic-ref --quiet --short HEAD 2>$null
+    $branchExitCode = $LASTEXITCODE
+    $branch = [string]$branchOutput
+    if ($branchExitCode -ne 0 -or -not $branch) {
+        throw 'Cannot determine the Agent-Skills source branch. Check out a named Git branch before installing CodeBuddy.'
+    }
+    $commitOutput = & git -C $Repo rev-parse --verify HEAD 2>$null
+    $commitExitCode = $LASTEXITCODE
+    $commit = [string]$commitOutput
+    if ($commitExitCode -ne 0 -or -not $commit) {
+        throw 'Cannot determine the Agent-Skills source commit; CodeBuddy installation was stopped.'
+    }
+    return [pscustomobject]@{ Branch = $branch.Trim(); Commit = $commit.Trim() }
+}
+
+function Assert-CodebuddyInstallVersion($sourceVersion) {
+    $markerPath = Join-Path $destCodebuddy '.agent-skills-install'
+    if (Test-Path -LiteralPath $markerPath -PathType Leaf) {
+        $marker = Get-Content -Raw -LiteralPath $markerPath
+        $branchMatch = [regex]::Match($marker, '(?m)^source_branch=(.*)$')
+        $installedBranch = if ($branchMatch.Success) { $branchMatch.Groups[1].Value.Trim() } else { '' }
+        if ($installedBranch -ne $sourceVersion.Branch -and -not $AllowVersionSwitch) {
+            $shownBranch = if ($installedBranch) { $installedBranch } else { 'unknown' }
+            throw "CodeBuddy version switch blocked: destination is marked '$shownBranch', source is '$($sourceVersion.Branch)'. Use -AllowVersionSwitch only for an intentional switch."
+        }
+        if ($installedBranch -ne $sourceVersion.Branch) {
+            Write-Warning "Updating CodeBuddy installation marker from '$installedBranch' to '$($sourceVersion.Branch)'."
+        }
+        return
+    }
+
+    if (Test-Path -LiteralPath $destCodebuddy -PathType Container) {
+        $existingFiles = @(Get-ChildItem -LiteralPath $destCodebuddy -Recurse -File -Force)
+        if ($existingFiles.Count -gt 0 -and -not $AllowVersionSwitch) {
+            throw "CodeBuddy destination has files but no branch marker: $destCodebuddy. Use -AllowVersionSwitch once to adopt this installation."
+        }
+        if ($existingFiles.Count -gt 0) {
+            Write-Warning "Adopting the unmarked CodeBuddy installation at $destCodebuddy for source branch '$($sourceVersion.Branch)'."
+        }
+    }
+}
+
+function Write-CodebuddyInstallVersion($sourceVersion) {
+    if (-not (Test-Path -LiteralPath $destCodebuddy)) {
+        New-Item -ItemType Directory -Force -Path $destCodebuddy | Out-Null
+    }
+    $markerPath = Join-Path $destCodebuddy '.agent-skills-install'
+    $content = "format=1`nplatform=codebuddy`nsource_branch=$($sourceVersion.Branch)`nsource_commit=$($sourceVersion.Commit)`n"
+    $encoding = New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false
+    [System.IO.File]::WriteAllText($markerPath, $content, $encoding)
+    Write-Host "Recorded CodeBuddy source branch '$($sourceVersion.Branch)' ($($sourceVersion.Commit.Substring(0, 12))) -> $markerPath"
 }
 
 function Get-Sha256($path) {
@@ -232,6 +287,8 @@ $doClaude    = ($Target -eq 'claude')    -or ($Target -eq 'all')
 # subdirs (even in -Clean mode) to avoid wiping co-located user skills like
 # graphify. -Clean only governs the generated platform dirs (.gemini/.codex).
 if ($doCodebuddy) {
+    $codebuddySourceVersion = Get-CodebuddySourceVersion
+    Assert-CodebuddyInstallVersion $codebuddySourceVersion
     foreach ($d in @('skills', 'agents', 'commands', 'references', 'hooks')) {
         $s = Join-Path $Repo (Join-Path '.codebuddy' $d)
         if (Test-Path $s) { Merge-Platform $s (Join-Path $destCodebuddy $d) "CodeBuddy/$d" }
@@ -239,6 +296,7 @@ if ($doCodebuddy) {
     Copy-File (Join-Path $Repo '.codebuddy\AGENTS.md')      (Join-Path $destCodebuddy 'AGENTS.md')      'CodeBuddy/AGENTS.md'
     Copy-File (Join-Path $Repo '.codebuddy\settings.json')  (Join-Path $destCodebuddy 'settings.json')  'CodeBuddy/settings.json'
     Copy-File (Join-Path $Repo '.codebuddy\CODEBUDDY.md')   (Join-Path $destCodebuddy 'CODEBUDDY.md')   'CodeBuddy/CODEBUDDY.md'
+    Write-CodebuddyInstallVersion $codebuddySourceVersion
 }
 # Gemini: generated platform dir. Obey the selected mode (merge/clean).
 if ($doGemini) {

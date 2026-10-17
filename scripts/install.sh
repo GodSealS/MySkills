@@ -8,11 +8,12 @@ TARGET=all
 DESTINATION=.
 USER_HOME=0
 USER_HOME_PATH=
+ALLOW_VERSION_SWITCH=0
 
 usage() {
   cat <<'EOF'
 Usage: scripts/install.sh [--target codebuddy|gemini|codex|claude|all]
-                         [--destination PATH] [--user-home]
+                         [--destination PATH] [--user-home] [--allow-version-switch]
 EOF
 }
 
@@ -22,6 +23,7 @@ while [ "$#" -gt 0 ]; do
     --destination) [ "$#" -ge 2 ] || { usage >&2; exit 2; }; DESTINATION=$2; shift 2 ;;
     --user-home) USER_HOME=1; shift ;;
     --user-home-path) [ "$#" -ge 2 ] || { usage >&2; exit 2; }; USER_HOME_PATH=$2; shift 2 ;;
+    --allow-version-switch) ALLOW_VERSION_SWITCH=1; shift ;;
     -h|--help) usage; exit 0 ;;
     *) usage >&2; exit 2 ;;
   esac
@@ -83,8 +85,55 @@ install_tree() (
   printf 'Installed %s -> %s\n' "$src" "$dst"
 )
 
+assert_codebuddy_install_version() (
+  destination_root=$1
+  source_branch=$2
+  marker="$destination_root/.agent-skills-install"
+  if [ -f "$marker" ]; then
+    installed_branch=$(sed -n 's/^source_branch=//p' "$marker" | head -n 1)
+    if [ "$installed_branch" != "$source_branch" ] && [ "$ALLOW_VERSION_SWITCH" -ne 1 ]; then
+      printf "CodeBuddy version switch blocked: destination is marked '%s', source is '%s'. Use --allow-version-switch only for an intentional switch.\n" "${installed_branch:-unknown}" "$source_branch" >&2
+      return 1
+    fi
+    if [ "$installed_branch" != "$source_branch" ]; then
+      printf "Updating CodeBuddy installation marker from '%s' to '%s'.\n" "${installed_branch:-unknown}" "$source_branch" >&2
+    fi
+    return 0
+  fi
+  if [ -d "$destination_root" ] && find "$destination_root" -type f -print 2>/dev/null | grep -q .; then
+    if [ "$ALLOW_VERSION_SWITCH" -ne 1 ]; then
+      printf 'CodeBuddy destination has files but no branch marker: %s. Use --allow-version-switch once to adopt this installation.\n' "$destination_root" >&2
+      return 1
+    fi
+    printf "Adopting the unmarked CodeBuddy installation at %s for source branch '%s'.\n" "$destination_root" "$source_branch" >&2
+  fi
+)
+
+write_codebuddy_install_version() (
+  destination_root=$1
+  source_branch=$2
+  source_commit=$3
+  mkdir -p "$destination_root"
+  marker="$destination_root/.agent-skills-install"
+  tmp="$marker.tmp.$$"
+  printf 'format=1\nplatform=codebuddy\nsource_branch=%s\nsource_commit=%s\n' "$source_branch" "$source_commit" > "$tmp"
+  mv -f "$tmp" "$marker"
+  printf "Recorded CodeBuddy source branch '%s' (%s) -> %s\n" "$source_branch" "$(printf '%s' "$source_commit" | cut -c1-12)" "$marker"
+)
+
 install_codebuddy() (
-  install_tree "$ROOT/.codebuddy" "$DESTINATION/.codebuddy"
+  source_branch=$(git -C "$ROOT" symbolic-ref --quiet --short HEAD) || {
+    printf 'Cannot determine the Agent-Skills source branch. Check out a named Git branch before installing CodeBuddy.\n' >&2
+    exit 1
+  }
+  source_commit=$(git -C "$ROOT" rev-parse --verify HEAD) || {
+    printf 'Cannot determine the Agent-Skills source commit; CodeBuddy installation was stopped.\n' >&2
+    exit 1
+  }
+  destination_root="$DESTINATION/.codebuddy"
+  assert_codebuddy_install_version "$destination_root" "$source_branch"
+  install_tree "$ROOT/.codebuddy" "$destination_root"
+  write_codebuddy_install_version "$destination_root" "$source_branch" "$source_commit"
 )
 
 install_gemini() (
