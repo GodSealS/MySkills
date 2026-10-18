@@ -59,8 +59,9 @@ Everything lives under `tasks/team-build/<run-id>/` at the repo root. Create a f
 ```
 tasks/team-build/<run-id>/
 ├── team.md                      # roster + why each member was picked
-├── plan.md                      # cs-planning output — the task breakdown
+├── plan.md                      # versioned task breakdown + interface contracts/readiness
 ├── todo.md                      # checklist: id, title, owner, status, rounds used
+├── handoffs/                    # attempt-specific lead/worker briefs, results and acceptance
 ├── reviews/
 │   ├── 00-plan-review.md        # advisor recommendations + expert verification
 │   ├── T01-r1-code-review.md    # cs-code-reviewer, round 1
@@ -88,17 +89,22 @@ Fan-out to `cs-architect` with the design doc path and the preflight SysDocs con
 1. Reads the whole design doc.
 2. **Proposes the roster, including the three mandatory roles.** Which domain leads are actually needed — `cs-backend-lead`, `cs-frontend-lead`, or both — and says why in one line each. Record it in `<run-dir>/team.md`; the host validates it.
 3. **Invokes the `cs-planning` skill** to break the doc into executable tasks. Vertical slices, not horizontal layers. Every task needs: id, title, description, **primary owner** (`arch` / `frontend` / `backend`), acceptance criteria, verification steps, dependencies, files likely touched.
-4. Writes `<run-dir>/plan.md` (full breakdown) and `<run-dir>/todo.md` (tracking checklist with a `Rounds` column).
+4. Writes `<run-dir>/plan.md` (full breakdown) and `<run-dir>/todo.md` (tracking checklist with a `Rounds` column). Give the plan an explicit revision; change it when scope, design/interfaces, dependencies or acceptance criteria change. Tracking-only status updates do not change the design revision. Preserve revision/decision history and record which revision the human approves.
 5. Constraint: `arch` tasks are limited to public contracts, module skeletons, and cross-cutting config. Business features go to a domain lead.
 6. Each task references affected modules and verified boundaries, maps requirements to acceptance criteria, and records semantic/documentation impact or a specific no-impact reason. Proposed boundaries require architect decisions and corresponding navigation/index updates in the active layout; absent documentation does not justify invented established module IDs.
 
-**Plan review:** the host fans out `cs-review-advisor` with the plan, constraints, preflight SysDocs context, allowed context and `<run-dir>/reviews/00-plan-review.md`. The advisor checks executability, module traceability and acceptance gaps. The host sends its recommendations to relevant experts under the Advice and verification protocol below; architecture questions return to `cs-architect`. Record how each plan finding was addressed or explicitly accepted as risk before presenting the plan. The host records `review-advisor-v1`, this skill path and its source version in `team.md`.
+**Cocos task preparation — before plan review and human approval.** The host assigns each Cocos task section to its frontend/backend lead to complete the lead's Plan Before Implementation Dispatch contract. Use this run's `<run-dir>/plan.md` as the single authoritative plan, including any worker subtasks under the parent task ID. The host explicitly permits and serializes these plan edits; the architect retains decomposition and architecture authority.
+
+- The assigning lead records task behavior, boundaries/permitted files, dependencies, acceptance/verification and externally exposed interface agreements. Apply the detailed contract fields in the installed lead/worker definitions: exact signatures/schemas, owners/consumers and relevant behavior/error/compatibility policies, or precise accepted-contract references with the task's obligations. Record `No externally exposed interface changes` where applicable. Client/server tasks share the same accepted protocol revision; unresolved cross-domain decisions go through the host to the authorized owner.
+- The lead records `READY` or `BLOCKED`, the assessed plan revision and evidence or blocking reason for each Cocos task. Resolve design/interface gaps before presenting the plan for approval. A fully specified task may remain `BLOCKED` while named predecessor outputs are pending; the lead rechecks availability before dispatch. Human plan approval does not itself mark a task `READY`.
+
+**Plan review:** the host fans out `cs-review-advisor` with the plan, constraints, preflight SysDocs context, allowed context and `<run-dir>/reviews/00-plan-review.md`. The advisor checks executability, module traceability, acceptance gaps and the Cocos preparation above when applicable. The host sends its recommendations to relevant experts under the Advice and verification protocol below; architecture questions return to `cs-architect`. Record how each plan finding was addressed or explicitly accepted as risk before presenting the plan; risk acceptance cannot substitute for a required interface contract or dispatch prerequisite. The host records `review-advisor-v1`, this skill path and its source version in `team.md`.
 
 **Checkpoint:** present `<run-dir>/team.md` + `<run-dir>/plan.md` + plan review to the human. Get an unambiguous affirmative before any code is written. After it, the team runs task by task, subject to the existing escalation gates and immediate blocking-dispute rule below.
 
 ### Phase 2 — Execution loop (per task, max 3 rounds)
 
-For each task `T<NN>` in dependency order, run at most **3 rounds**. A round has three steps.
+For each task `T<NN>` in dependency order, run at most **3 rounds**. A round has three steps. The host counts a round as used when its implementation snapshot enters Step 2, and records the count in `todo.md`. A prerequisite/design pause before that review keeps the pending round number and all previously used rounds; worker attempts are not additional team rounds.
 
 **Step 1 — IMPLEMENT.** FAN-OUT to the task's primary owner:
 
@@ -108,7 +114,19 @@ For each task `T<NN>` in dependency order, run at most **3 rounds**. A round has
 
 Supply applicable specs/ADRs, affected descriptions and source evidence to the lead using the shared task-context protocol. Instruct the lead to reuse only `/cs-build`'s implementation cycle (`cs-incremental` + `cs-tdd`) for exactly this task: read acceptance criteria → RED → GREEN → regression suite → build → **stage only this task's files and stop before committing**. Skip the final knowledge-base-administrator step; Team Build owns its single invocation in Phase 5. Team Build also owns the single task commit after review approval.
 
-For round 1 the input is `<run-dir>/plan.md#T<NN>`. For rounds 2-3 the input is `<run-dir>/reviews/T<NN>-r<k>-fixes.md` — the lead implements the directive, stages only this task's files, and does nothing else. Scope discipline applies: no drive-by refactors, no "while I'm here" changes.
+**Every round** receives `<run-dir>/plan.md#T<NN>` and its explicit approved revision. Rounds 2-3 additionally receive the preceding round's `<run-dir>/reviews/T<NN>-r<k>-fixes.md`; the directive supplements the plan rather than replacing it. The task owner checks both inputs for consistency before implementation and stages only the task's permitted implementation and authorized document changes; no drive-by refactors.
+
+**Design-changing fixes.** Pause affected work while its design owner (the assigning lead for Cocos worker tasks) records its decision in the plan, obtains any cross-domain/architecture decision through the host, updates affected task contracts/dependencies/acceptance criteria and the plan revision, then rechecks dispatch prerequisites, including Cocos `READY`, before reissuing a brief and directive bound to that revision. Material scope or architecture changes return to Phase 1 review/approval; reuse existing authorization for unchanged scope. Invalidate affected downstream readiness and stale review evidence when obligations change. Retain parent task IDs and round/approval history through revision or re-slicing.
+
+**Cocos dispatch and return gate.** Before each worker attempt, the assigning lead verifies the current plan revision, task `READY` decision at that revision, required predecessor outputs/contracts and applicable approvals. Preserve the lead-issued brief and worker result in separate, attempt-specific files under `<run-dir>/handoffs/` (for example, `T01-r2-a1-brief.md` and `T01-r2-a1-result.md`); link them from `todo.md`. Include the run directory and all inputs required by the worker's dispatch contract. The host routes the result back to the assigning lead even when it relays the worker call.
+
+| Worker result | Required transition before team review |
+|---|---|
+| `BLOCKED` | The host records the task as blocked with the missing prerequisite, responsible owner and resumption condition; pause affected/dependent work. After resolution, the lead rechecks readiness and reissues the brief for the pending round. |
+| `DESIGN_CHANGE_REQUIRED` | Record the pending decision and block affected/dependent work. The assigning lead resolves it within its authority, using the host for cross-domain/architecture decisions, then follows the plan revision procedure above before resuming. |
+| `IMPLEMENTED` | The lead checks the diff, verification and interface conformance against the assigned revision; record acceptance or concrete rework in an attempt-specific handoff. Only after the lead accepts all required outputs for the parent task may it enter Step 2. Lead acceptance does not replace independent team review or authorize DONE/commit. |
+
+For either blocked result, the lead updates affected readiness in the plan and the host updates `todo.md`. Neither status enters code review, commits, marks DONE or consumes an additional round. Preserve partial changes as unaccepted work and exclude them from other task review snapshots. Independent `READY` tasks may proceed with isolated write/staging scopes. Unresolvable prerequisites follow the existing escalation rules; blocking disputes still become `pending-human` immediately. A new worker attempt, plan revision or re-slice never resets the task's used rounds.
 
 Before fixing each review snapshot, synchronize the slice's affected descriptions, summaries, file indexes, incoming links and approved requirements/decisions; use `cs-sysdocs-update` when maintaining a library. Existing authorization covers necessary reversible synchronization. Combine KB and summary candidates, verify source, and expand high-risk flow reading as the shared protocol requires. Stage corresponding document changes with the task and record scoped structural checks separately from content/behavior verification in the round's existing handoff. Reuse valid evidence; a specific no-impact explanation needs no empty update report. Current-change omissions block DONE; unrelated inherited defects are recorded separately. Later related changes invalidate affected reviews and require new verification.
 
@@ -127,13 +145,17 @@ Specialists run **within the same round**, writing `<run-dir>/reviews/T<NN>-r<k>
 
 The host merges original reviews and verified advice. Only `APPROVE` with no open Critical or Important findings, completed specialist triggers, required fix verification, and passing SysDocs synchronization/validation evidence for the reviewed snapshot permits the host to commit staged task files once (when authorized), mark DONE, and continue. A user instruction not to commit takes precedence; report the uncommitted result. Suggestions alone never consume another round.
 
-Otherwise the advisor writes actionable recommendations to `<run-dir>/reviews/T<NN>-r<k>-fixes.md`; the host records expert verification and accepted instructions there, then increments the round counter. Unresolved blocking disputes immediately follow the user escalation protocol below, before another implementation round. Architecture changes or repeated P0 require `cs-architect` consultation/re-slicing in Phase 1, retaining round and approval history.
+Otherwise the advisor writes actionable recommendations to `<run-dir>/reviews/T<NN>-r<k>-fixes.md`; the host records expert verification, accepted instructions and the authoritative plan reference/revision there, then selects the next round if budget remains. The used-round count already includes the reviewed snapshot; it increases again only when the next snapshot enters Step 2. Unresolved blocking disputes immediately follow the user escalation protocol below, before another implementation round. Architecture changes or repeated P0 require `cs-architect` consultation/re-slicing in Phase 1, retaining round and approval history.
 
 The directive is not a summary. It is an actionable work order:
 
 ```markdown
 # Fix Directive: T03 — <title> · Round 1 → 2
 Source: <run-dir>/reviews/T03-r1-code-review.md (+ -security.md, -perf.md)
+Plan: <run-dir>/plan.md#T03 @ <approved-revision>
+Contract (when applicable): <accepted protocol/interface revision, or explicit no-interface-change statement>
+Cocos readiness (when applicable): <assigning lead's READY assessment/evidence, or BLOCKED with reason>
+Design decisions: <plan sections recording accepted changes, or unchanged>
 
 ## P0 — must fix before this task can pass
 - [ ] [file:line] [what is wrong] → [concrete fix]  (owner: backend)
@@ -148,8 +170,10 @@ Source: <run-dir>/reviews/T03-r1-code-review.md (+ -security.md, -perf.md)
 - [Constraint the reviewer raised that isn't a code change: e.g. "keep the contract shape, fix the handler"]
 
 ## Definition of done for round 2
+- [ ] Directive agrees with the assigned plan revision; required decisions and applicable dispatch prerequisites are recorded
 - [ ] P0 and P1 closed
 - [ ] Full suite green, build green
+- [ ] For Cocos worker output, assigning lead acceptance is recorded before independent review
 - [ ] Changes staged, this task's files only; host commits once after approval when authorized
 ```
 
@@ -231,7 +255,8 @@ New runs record `review-advisor-v1`, the skill path and source version in `team.
 
 Every handoff document is self-contained — the receiving agent must be able to act without any chat history:
 
-- **Context:** design doc path + run directory + task spec location
+- **Context:** design doc path + run directory + task spec location and explicit plan revision; repair directives supplement that plan
+- **Cocos implementation state (when applicable):** task/protocol revision, lead readiness evidence or blocking reason, worker result and lead acceptance/rework handoff; preserve attempt and team-round history
 - **What was done:** specific, with file paths
 - **Review range:** base commit, exact staged file list, and `git diff --cached` command when code is awaiting review
 - **Findings:** severity, `file:line`, concrete fix — never "consider improving X"
@@ -275,8 +300,11 @@ Every handoff document is self-contained — the receiving agent must be able to
 - [ ] `<run-dir>/team.md` lists ≥4 members, including `cs-architect`, `cs-review-advisor`, and `cs-code-reviewer`, with a reason for each
 - [ ] Preflight records task-specific inventory, authoritative constraints, relevant document/source evidence and gaps without forcing unrelated initialization or repair.
 - [ ] Each slice synchronizes its affected scope and separates structure/content evidence; final synthesis reuses valid checks. Current-change omissions or required gaps prevent DONE/SHIP, while unrelated old defects remain separate.
-- [ ] `<run-dir>/plan.md` exists; every task has acceptance criteria, verification, and a primary owner
+- [ ] `<run-dir>/plan.md` has an explicit revision; every task has acceptance criteria, verification, and a primary owner
 - [ ] The human approved the roster + plan before implementation started
+- [ ] Cocos task contracts were completed by the assigning lead before plan review/approval; named pending dependencies stayed BLOCKED until available
+- [ ] Every implementation round received the authoritative plan/task/revision, with fixes only as supplemental input; affected design changes were recorded and readiness rechecked before resumption
+- [ ] Cocos worker attempts have file-based briefs/results and lead acceptance before independent review; BLOCKED/design-decision pauses never reached review/DONE/commit or reset the round budget
 - [ ] Every task ran ≤3 rounds; any task that hit the cap was escalated, not silently continued
 - [ ] Every round has a `<run-dir>/reviews/T<NN>-r<k>-code-review.md` with an explicit verdict and base commit/staged file list
 - [ ] Every non-approved round has a matching `-fixes.md` directive with P0/P1/P2 and concrete fixes
