@@ -220,13 +220,33 @@ function Install-CodexUserFile($src, $dst, [string]$key, $known, $next) {
     $next[$key] = $sourceHash
 }
 
-function Install-CodexUserTree($src, $dst, [string]$prefix, $known, $next) {
+function Install-CodexUserTree($src, $dst, [string]$prefix, $known, $next, [switch]$CodexAgentTomlOnly) {
     if (-not (Test-Path $src)) { Write-Warning "Source missing, skipped: $src"; return }
     if ($prefix -eq 'agents') { Assert-ResourcePathNoLink $dst }
+
+    if ($CodexAgentTomlOnly) {
+        foreach ($key in @($known.Keys | Where-Object { $_ -match '^agents/[^/\\]+\.md$' })) {
+            $relativePath = $key.Substring('agents/'.Length).Replace('/', [IO.Path]::DirectorySeparatorChar)
+            $targetFile = Join-Path $dst $relativePath
+            if (-not (Test-Path -LiteralPath $targetFile -PathType Leaf)) { continue }
+            $item = Get-Item -LiteralPath $targetFile -Force
+            if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+                Write-Warning "Preserved linked Codex agent file: $targetFile"
+                continue
+            }
+            if ((Get-Sha256 $targetFile) -eq $known[$key]) {
+                Remove-Item -LiteralPath $targetFile -Force
+                Write-Host "Removed obsolete managed Markdown Codex agent -> $targetFile"
+            } else {
+                Write-Warning "Preserved modified Codex agent file: $targetFile"
+            }
+        }
+    }
 
     foreach ($file in (Get-ChildItem -Path $src -File -Recurse)) {
         $relativePath = $file.FullName.Substring($src.Length).TrimStart('\', '/')
         if ($prefix -eq 'agents' -and ($relativePath -match '[/\\]' -or $relativePath -eq '.agent-resources-manifest')) { continue }
+        if ($CodexAgentTomlOnly -and $prefix -eq 'agents' -and $file.Extension -ne '.toml') { continue }
         $key = ($prefix + '/' + $relativePath).Replace('\', '/')
         Install-CodexUserFile $file.FullName (Join-Path $dst $relativePath) $key $known $next
     }
@@ -313,7 +333,7 @@ if ($doCodex) {
         Install-CodexUserSkills (Join-Path $Repo '.agents\skills') (Join-Path $destCodex 'skills') $known $next
         Install-CodexUserTree (Join-Path $Repo '.agents\references') (Join-Path $destCodex 'references') 'references' $known $next
         Install-CodexUserTree (Join-Path $Repo '.codex\prompts') (Join-Path $destCodex 'prompts') 'prompts' $known $next
-        Install-CodexUserTree (Join-Path $Repo '.codex\agents') (Join-Path $destCodex 'agents') 'agents' $known $next
+        Install-CodexUserTree (Join-Path $Repo '.codex\agents') (Join-Path $destCodex 'agents') 'agents' $known $next -CodexAgentTomlOnly
         Install-CodexUserFile (Join-Path $Repo '.codebuddy\references\cs-user-context.md') (Join-Path $destCodex 'AGENTS.md') 'AGENTS.md' $known $next
         Write-CodexManifest $manifestPath $next
         Write-Host "Installed Codex user-level adapters -> $destCodex"
