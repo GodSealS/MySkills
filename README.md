@@ -177,6 +177,15 @@ altering behavior, contracts, UI layout, scene/prefab structure or engine strate
 Decisions beyond frontend authority return through the host and the relevant owner;
 the specialist always receives the decision from the frontend lead.
 
+Before implementation dispatch, the frontend lead must save the task breakdown and
+externally exposed interface agreements in the project's authoritative plan file
+(reuse the existing location, otherwise `tasks/plan.md`). Each task records behavior,
+dependencies, scope and checkable acceptance criteria; APIs, shared types, events and
+network contracts are agreed before coding. Only tasks marked `READY` with resolved
+design decisions and satisfied dependencies may be assigned. The worker checks the
+plan path, task and revision; missing or ambiguous contracts return to the lead.
+Design/interface changes require an updated plan and readiness decision before work resumes.
+
 The specialist ships with `agents/cs-cocos-specialist/`, containing nine private Cocos
 skills (core, 2D, 3D, animation, rendering, 3D physics, 2D physics, UI and editor), API
 references, UI examples and editor workflows. All are Markdown `.txt` resources so they
@@ -203,6 +212,16 @@ only implements and verifies the accepted protocol/server design using the proje
 approved runtime and framework. Protocol, synchronization, matchmaking, session, security
 or dependency changes return to the backend lead before implementation; client changes
 are coordinated through the leads and host.
+
+Before server implementation dispatch, the backend lead must save the task breakdown
+and externally exposed interface agreements in the authoritative plan file (reuse the
+existing location, otherwise `tasks/plan.md`). Service APIs, HTTP/RPC endpoints, message
+schemas, events and shared persistence contracts are agreed before coding, including
+relevant access, error, idempotency, timeout/reconnect and compatibility rules. Only
+`READY` tasks with resolved design decisions and satisfied dependencies may be assigned.
+The worker checks the plan path, task and revision; missing or ambiguous contracts return
+to the backend lead. Design/interface changes require an updated plan and readiness
+decision before work resumes; client/server tasks use the same accepted protocol revision.
 
 The source `network-programmer` declares no private skills. Its adapted persona uses a
 bounded execution roster from this pack and has no agent-delegation tool. Claude project

@@ -21,6 +21,11 @@ agent tool where available, otherwise the host relays the lead's brief and retur
 to the assigning lead. Other persona orchestration stays with the host. Neither worker delegates.
 
 Each lead's Cocos dispatch contract defines required inputs and decision handoffs.
+For Cocos client/server implementation, the assigning lead first records the task breakdown and
+externally exposed interface agreements in one authoritative plan file (normally
+`tasks/plan.md`). It dispatches only tasks marked `READY` at an identified plan revision;
+the worker reads that plan and returns missing or ambiguous contracts to its assigning lead.
+Design/interface changes must be recorded in the plan before affected implementation resumes.
 The private Cocos engine bundle belongs only to `cs-cocos-specialist` and travels with its install;
 `cs-network-programmer` uses its own execution skill roster. Client and server work share the
 accepted protocol revision. Decisions beyond a lead's authority are resolved by the host with
