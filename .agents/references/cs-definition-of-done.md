@@ -8,6 +8,14 @@
 - Behavior changes and bug fixes have appropriate tests; affected checks pass.
 - Relevant documentation is synchronized; secrets and unrelated user changes are protected.
 - Documentation-only edits use content, link and format verification rather than unrelated application tests.
+- Low-impact configuration edits without behavior changes use relevant validators and inspection; behavior-affecting configuration requires appropriate behavior tests.
+
+## Failed Checks and Existing Defects
+
+- Record the failed command/environment, current snapshot and available comparable pre-change results. Diagnose before classifying; an old failure is not automatically unrelated.
+- Resolve new/worsened failures and inherited failures affecting the task's required behavior/contracts. Missing evidence or uncertain relevance remains blocking; route decisions beyond the assigned scope to the owner.
+- A demonstrated unrelated inherited failure may be recorded separately after required affected checks pass and the assigning lead (or host for ordinary work) accepts the baseline/scope evidence. Record the classification and follow-up owner; this permits scoped completion review, not a waiver of project/team integration or merge gates.
+- Preserve the broader command's actual failure, failed/skipped cases and limitations. Never report a failed suite as passing or remove assertions/cases to hide the failure.
 
 ## Integration and Final Delivery
 

@@ -112,7 +112,7 @@ For each task `T<NN>` in dependency order, run at most **3 rounds**. A round has
 - `frontend` → `cs-frontend-lead`
 - `arch` → `cs-architect`
 
-Supply applicable specs/ADRs, affected descriptions and source evidence to the lead using the shared task-context protocol. Instruct the lead to reuse only `/cs-build`'s implementation cycle (`cs-incremental` + `cs-tdd`) for exactly this task: read acceptance criteria → RED → GREEN → regression suite → build → **stage only this task's files and stop before committing**. Skip the final knowledge-base-administrator step; Team Build owns its single invocation in Phase 5. Team Build also owns the single task commit after review approval.
+Supply applicable specs/ADRs, affected descriptions and source evidence to the lead using the shared task-context protocol. Instruct the lead to reuse only `/cs-build`'s implementation cycle (`cs-incremental` + `cs-tdd`) for exactly this task: read acceptance criteria → RED → GREEN → affected regression/applicable build checks → **stage only this task's files and stop before committing**. Documentation-only and low-impact configuration tasks without behavior changes use the assigned validators/inspection. Check frequency follows the shared Definition of Done plus explicit project/team requirements; Phase 3 retains the full-plan test sweep. Skip the final knowledge-base-administrator step; Team Build owns its single invocation in Phase 5. Team Build also owns the single task commit after review approval.
 
 **Every round** receives `<run-dir>/plan.md#T<NN>` and its explicit approved revision. Rounds 2-3 additionally receive the preceding round's `<run-dir>/reviews/T<NN>-r<k>-fixes.md`; the directive supplements the plan rather than replacing it. The task owner checks both inputs for consistency before implementation and stages only the task's permitted implementation and authorized document changes; no drive-by refactors.
 
@@ -124,7 +124,7 @@ Supply applicable specs/ADRs, affected descriptions and source evidence to the l
 |---|---|
 | `BLOCKED` | The host records the task as blocked with the missing prerequisite, responsible owner and resumption condition; pause affected/dependent work. After resolution, the lead rechecks readiness and reissues the brief for the pending round. |
 | `DESIGN_CHANGE_REQUIRED` | Record the pending decision and block affected/dependent work. The assigning lead resolves it within its authority, using the host for cross-domain/architecture decisions, then follows the plan revision procedure above before resuming. |
-| `IMPLEMENTED` | The lead checks the diff, verification and interface conformance against the assigned revision; record acceptance or concrete rework in an attempt-specific handoff. Only after the lead accepts all required outputs for the parent task may it enter Step 2. Lead acceptance does not replace independent team review or authorize DONE/commit. |
+| `IMPLEMENTED` | First require the worker's applicable plan checks for the delivered snapshot: executed, passing unit/regression tests for executable-code/behavior changes and bug fixes, or the lead-recorded non-applicability reason plus relevant checks for documentation-only/low-impact configuration work without behavior changes. Apply the shared Definition of Done failure triage: new/worsened, task-related or uncertain failures block; demonstrated unrelated inherited failures need the lead's recorded classification and passing affected checks, with broader failed results and team gates preserved. Missing/stale evidence returns to rework/`BLOCKED`. The lead then checks the diff, verification and interface conformance against the assigned revision; record acceptance or concrete rework in an attempt-specific handoff. Only after the lead accepts all required outputs for the parent task may it enter Step 2. Lead acceptance does not replace independent team review or authorize DONE/commit. |
 
 For either blocked result, the lead updates affected readiness in the plan and the host updates `todo.md`. Neither status enters code review, commits, marks DONE or consumes an additional round. Preserve partial changes as unaccepted work and exclude them from other task review snapshots. Independent `READY` tasks may proceed with isolated write/staging scopes. Unresolvable prerequisites follow the existing escalation rules; blocking disputes still become `pending-human` immediately. A new worker attempt, plan revision or re-slice never resets the task's used rounds.
 
@@ -172,7 +172,7 @@ Design decisions: <plan sections recording accepted changes, or unchanged>
 ## Definition of done for round 2
 - [ ] Directive agrees with the assigned plan revision; required decisions and applicable dispatch prerequisites are recorded
 - [ ] P0 and P1 closed
-- [ ] Full suite green, build green
+- [ ] Affected tests/checks pass; project-required full regression/build checks for this stage pass
 - [ ] For Cocos worker output, assigning lead acceptance is recorded before independent review
 - [ ] Changes staged, this task's files only; host commits once after approval when authorized
 ```
@@ -305,6 +305,7 @@ Every handoff document is self-contained — the receiving agent must be able to
 - [ ] Cocos task contracts were completed by the assigning lead before plan review/approval; named pending dependencies stayed BLOCKED until available
 - [ ] Every implementation round received the authoritative plan/task/revision, with fixes only as supplemental input; affected design changes were recorded and readiness rechecked before resumption
 - [ ] Cocos worker attempts have file-based briefs/results and lead acceptance before independent review; BLOCKED/design-decision pauses never reached review/DONE/commit or reset the round budget
+- [ ] Each Cocos implementation/rework handoff passed applicable checks on the delivered snapshot before lead completion review; unit-test non-applicability and unrelated inherited failures have lead-recorded evidence, while missing required tests, required skipped cases or related/uncertain failures blocked the handoff
 - [ ] Every task ran ≤3 rounds; any task that hit the cap was escalated, not silently continued
 - [ ] Every round has a `<run-dir>/reviews/T<NN>-r<k>-code-review.md` with an explicit verdict and base commit/staged file list
 - [ ] Every non-approved round has a matching `-fixes.md` directive with P0/P1/P2 and concrete fixes

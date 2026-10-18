@@ -230,6 +230,18 @@ adapters give the backend lead `Agent(cs-network-programmer)`; the plugin uses
 relays the backend lead's brief and returns results for lead acceptance. Source provenance
 is recorded in the agent file. This migration does not run a Cocos server or deploy one.
 
+Both Cocos workers must run affected unit/regression tests for executable-code/behavior
+changes and bug fixes before submitting `IMPLEMENTED` for lead review. Documentation-only
+and low-impact configuration tasks without behavior changes use lead-recorded validators
+and inspection; their plans state why unit tests are not applicable. Other plans name
+permitted test files, required cases and the test command/environment. Reuse passing
+evidence only while tested inputs remain unchanged; handoffs include the snapshot,
+commands, results/counts and logs. New/worsened, task-related or uncertain failures block.
+Demonstrated unrelated inherited failures need baseline evidence and the lead's recorded
+classification, with affected checks passing and broader failed results preserved.
+Full regression follows the shared Definition of Done and project/team gates. Passing
+tests does not prove the absence of undiscovered bugs or replace independent review.
+
 ### Public skills
 
 Define: cs-interview-me, cs-idea-refine, cs-grill-me, cs-spec-driven
