@@ -26,13 +26,9 @@ externally exposed interface agreements in one authoritative plan file (normally
 `tasks/plan.md`). It dispatches only tasks marked `READY` at an identified plan revision;
 the worker reads that plan and returns missing or ambiguous contracts to its assigning lead.
 Design/interface changes must be recorded in the plan before affected implementation resumes.
-Before an `IMPLEMENTED` handoff, each worker completes its Unit Tests Before Lead Review gate:
-executable-code/behavior changes and bug fixes require passing affected unit/regression tests;
-documentation-only and low-impact configuration tasks without behavior changes use the lead-recorded
-validators/inspection. Evidence covers the delivered snapshot and its required behavior. Related or
-uncertain failures block completion review. Demonstrated unrelated inherited failures require the
-lead's recorded baseline/scope classification and passing affected checks; broader failed results and
-project/team gates stay explicit. The lead may handle blocker/design reports immediately.
+Each lead's Agent definition owns the TDD applicability decision and verification plan.
+Workers follow that recorded decision and the plan's steps, returning gaps and execution
+evidence to the lead for acceptance under the same dispatch contract.
 The private Cocos engine bundle belongs only to `cs-cocos-specialist` and travels with its install;
 `cs-network-programmer` uses its own execution skill roster. Client and server work share the
 accepted protocol revision. Decisions beyond a lead's authority are resolved by the host with
