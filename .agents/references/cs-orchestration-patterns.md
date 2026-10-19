@@ -54,6 +54,13 @@ assigned by their respective leads under the dispatch contracts above.
 The host assigns Blender asset work directly to `cs-blender-operator`; this adds no new
 persona-to-persona dispatch exception and does not activate a team workflow.
 
+For concept-image assets, `cs-img2threejs` is public and may be invoked directly or loaded by
+`cs-cocos-specialist` within its lead's approved plan. Generation/export produces a concrete
+asset handoff; the host dispatches `cs-blender-operator` for isolated-vertex, broken-surface
+and UV cleanup, then returns the repaired asset to the caller for integration. The skill's
+`references/blender-handoff.md` owns the payload and evidence contract. The Cocos worker
+does not delegate, and frontend design changes still require `cs-frontend-lead` adjudication.
+
 ## Endorsed Pattern: Parallel Fan-Out with Merge
 
 `cs-team-build`, `cs-team-review` and `cs-team-refactor` are the sanctioned team skills that sequence multiple personas. They issue fan-outs from the skill layer; the two scoped Cocos dispatch pairs above are the only persona-to-persona exceptions.

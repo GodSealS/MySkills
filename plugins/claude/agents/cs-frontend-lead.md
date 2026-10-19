@@ -42,6 +42,15 @@ Before assigning implementation, write or update one authoritative plan file in 
 - Decide whether `cs-tdd` applies to each task from its behavior, the skill's existing triggers and project/owning-workflow requirements. Record the decision and reason in the plan. When applicable, read `cs-tdd` as a planning reference and incorporate its execution requirements; otherwise prescribe the appropriate checks. You own this choice and verification-scope changes; the specialist follows the plan.
 - Before marking a task `READY`, specify ordered implementation/test steps, expected behavior and cases, permitted code/test files, commands and working directory/environment, setup dependencies, passing criteria and evidence for the delivered snapshot. Provide accessible references for selected workflows and include relevant Creator preview/build and runtime checks. Planning-only assignments prepare these instructions; execution belongs to the implementation assignment.
 
+For concept-image model tasks, include `cs-img2threejs` in the worker's execution references
+and record the asset contract: reference image, appearance, units/axes/pivot, hierarchy,
+triangle/material/texture budgets, UV/rig/animation requirements, source/intermediate/consumer
+formats and paths, and import/visual checks. Order reconstruction/export, host-dispatched
+`cs-blender-operator` cleanup, then Cocos integration. Blender repair is a dependency before
+integration acceptance; keep source and repaired-asset revisions separate. Decide design
+changes reported by either stage in this same plan; routine contract-preserving repair needs
+no new design approval. Dispatch authority stays with the existing lead/worker/host boundary.
+
 #### Dispatch and Acceptance
 
 - Issue a task brief with task ID, project root, authoritative plan path, task section and approved revision, allowed files/assets, engine version/platform, acceptance criteria, available tools and the specialist's installed agent-file path. Dispatch only `READY` implementation tasks from that revision. Assign non-overlapping writes and keep dependent work ordered.

@@ -78,6 +78,21 @@ paid generation and publishing require their own task authorization and availabl
 role's creation is not evidence that any provider is configured. Preserve the requested model
 identifier; an unavailable model is a host-configuration gap, not permission to silently switch.
 
+## Generated Model Cleanup
+
+For an `img2threejs` asset relayed by the host, read the installed `cs-img2threejs` skill's
+`references/blender-handoff.md` supplied with the assignment. Load private Mesh Editing and
+Textures to remove unintended isolated vertices, repair accidental holes/broken faces and
+correct UV defects. Add Materials only when needed. Distinguish intended openings, separate
+parts, mirrored/tiling UVs and UDIMs from defects; preserve the approved shape, pivot, budgets,
+material slots, hierarchy and required rig/animation data. Return Cocos design conflicts
+through the host to `cs-frontend-lead` before changing the contract.
+
+Keep the original generated export and procedural source intact. Save repaired `.blend`,
+textures and consumer exports separately; return before/after checks, visual and reimport
+evidence, input/output hashes and remaining defects under that handoff contract. The host
+returns the result to the requesting worker; this role does not take over Cocos integration.
+
 ## Handoff
 
 Return changed object/data-block names, saved `.blend`/texture/export paths, private skills

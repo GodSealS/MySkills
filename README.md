@@ -259,11 +259,41 @@ Validate packaging without touching a live Blender scene with
 `python scripts/test-blender-agent.py --builder powershell` on Windows or
 `python3 scripts/test-blender-agent.py --builder sh` on POSIX.
 
+### Concept image to Cocos asset
+
+`cs-img2threejs` migrates the local img2threejs reconstruction toolkit (Apache-2.0).
+Call it directly with a concept image, or let `cs-cocos-specialist` use it for an
+asset task in the frontend lead's approved plan. It builds a procedural Three.js
+model, exports a real asset, and hands it through the host to `cs-blender-operator`
+for isolated-vertex removal, broken-surface repair and UV correction. The repaired
+asset returns to the Cocos worker for import and the lead's planned checks.
+
+CodeBuddy uses `.codebuddy/skills/cs-img2threejs`; Codex uses
+`.agents/skills/cs-img2threejs` with generated UI metadata; Gemini uses
+`.gemini/skills/cs-img2threejs` and its `/cs-img2threejs` command. The standard builder
+also produces neutral and Claude adapters. The original `img2threejs` name remains
+a discovery trigger. Runtime scripts and references ship with the skill; there is
+no dependency on `E:\Work\SLG\img2threejs` after installation.
+
+Python 3.10+ is required for the core tools; a project Three.js preview/export setup
+and Blender tools are needed for the full asset flow. Optional upstream plugins,
+neural models and the showcase are not bundled. The skill documents GLB export
+explicitly rather than assuming the base toolkit has a GLB target provider.
+Surface routes are fixed in the asset contract. The projection helper emits a JSON
+descriptor; actual texture baking requires the project runtime and saved-image checks.
+Project exports and provider exports have explicit checklist/evidence procedures.
+See `PROVENANCE.json` for the upstream revision, unchanged resource hashes and
+separately recorded documentation adaptations.
+Run `python scripts/test-img2threejs.py --builder powershell` or
+`python3 scripts/test-img2threejs.py --builder sh` for isolated packaging, installation
+and Forge CLI checks, including descriptor-only output and terminal state closure.
+These checks do not claim browser reconstruction, texture baking or Blender repair.
+
 ### Public skills
 
 Define: cs-interview-me, cs-idea-refine, cs-grill-me, cs-spec-driven
 Plan: cs-planning
-Build: cs-incremental, cs-minimal, cs-tdd, cs-context-eng, cs-source-driven, cs-doubt-driven, cs-frontend-ui, cs-api-design
+Build: cs-incremental, cs-minimal, cs-tdd, cs-context-eng, cs-source-driven, cs-doubt-driven, cs-frontend-ui, cs-api-design, cs-img2threejs
 Verify: cs-browser-test, cs-debugging
 Review: cs-code-review, cs-simplify, cs-security, cs-perf-opt
 Manual only: cs-team-build (explicit skill or `/cs-team-coding`), cs-team-review (explicit skill or `/cs-team-review`), cs-team-refactor (explicit skill or `/cs-team-refactor`; evidence-based diagnosis and staged refactor/performance plan)

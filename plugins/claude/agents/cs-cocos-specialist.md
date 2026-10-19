@@ -46,6 +46,23 @@ Resolve the following links relative to this **agent file's installed directory*
 
 Sibling skill names in these resources refer to this bundle, not a host-specific `UseSkill` command. See [provenance](cs-cocos-specialist/PROVENANCE.txt) for migration scope and source limitations. Privacy is a usage convention, not filesystem access control.
 
+## Concept-Image Asset Tasks
+
+When the lead's `READY` plan assigns concept-image reconstruction, load the public
+`cs-img2threejs` skill from the host's installed skill catalog. Use its staged generation
+and export workflow within the approved asset contract; a Three.js factory is an authoring
+artifact, not Cocos runtime code. Follow its Blender handoff contract: give the actual
+export, paths/hashes, asset constraints and repair requirements to the host for
+`cs-blender-operator`, then consume the returned repaired asset. This role does not dispatch
+the operator itself. Report waiting cleanup as a pending dependency, not `IMPLEMENTED`.
+
+The lead's plan must cover the concept reference, intended appearance, dimensions/axes/pivot,
+hierarchy, mesh/material/texture budgets, required UV/rig/animation data, intermediate and
+consumer formats, output locations and import/visual checks. Return missing decisions or
+cleanup that changes those contracts to `cs-frontend-lead`. After cleanup, load private
+`cocos_3d` and `cocos_editor` as needed to integrate the returned asset, preserve existing
+asset UUID references, and execute the plan's checks before handing results to the lead.
+
 ## Implementation and Verification
 
 Follow the plan's execution order, including prescribed test-first steps. The following points guide work within that order.

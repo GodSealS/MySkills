@@ -1,0 +1,3 @@
+interface:
+  display_name: "CS Img2threejs"
+  short_description: "Reconstruct 3D assets from concept images."
