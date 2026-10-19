@@ -1,0 +1,36 @@
+# Blender Animation
+
+For `cs-blender-operator` only. Follow the [parent contract](../../../cs-blender-operator.md).
+Load for keyframes, timing, actions, F-curves, NLA, poses and animated constraints.
+
+## Work
+
+1. Inspect FPS, frame range, active frame, target objects/bones, rotation modes, actions,
+   drivers, constraints, NLA strips and shared animation users. Identify the property owner
+   and transform space; object, pose-bone and camera-data channels are different targets.
+2. Use the installed version's action/channel API. Inspect action slots/layers when present;
+   do not assume every action exposes one legacy F-curve collection. Preserve existing action
+   bindings and shared users unless the requested edit deliberately changes them.
+3. Insert or edit only the assigned channels and times. Choose interpolation/handles for the
+   intended motion; preserve rotation representation and check wraparound or quaternion flips.
+   Adjust NLA timing, blending and influence only when those strips are in scope.
+4. Account for drivers and constraints before keying a driven value. Bake evaluated motion
+   only when the task/export requires it, using the specified frame range and sampling, while
+   retaining recoverable source animation. Do not clear all animation to fix a single channel.
+5. For camera movement, also load [Camera](../blender-camera/SKILL.txt); for mesh/weight changes,
+   load [Mesh editing](../blender-mesh-editing/SKILL.txt) only if they are actually assigned.
+
+## Verification
+
+- Evaluate the scene at the start, end, important keys and intermediate frames; keyframe
+  existence alone does not prove visible motion. Check constraints, deformation, clipping,
+  timing and transitions/loop seams against the requested result.
+- Use frame-strip previews or playback evidence, including the intended camera when relevant.
+  Restore the user's original frame after inspection unless a new current frame was requested.
+- Verify assigned action bindings, channels and range; report simulation or export behavior
+  that was not actually evaluated.
+
+## Lookup
+
+Check the installed-version [actions manual](https://docs.blender.org/manual/en/latest/animation/actions.html)
+and [Action API](https://docs.blender.org/api/current/bpy.types.Action.html) before version-sensitive edits.

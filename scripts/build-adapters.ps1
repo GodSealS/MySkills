@@ -187,6 +187,8 @@ function Get-PlatformModel([string]$sourceModel, [string]$platform) {
 function Set-AgentPlatformModel([string]$path, [string]$platform) {
     $content = Get-Content -Raw -Path $path
     $agentName = if ($content -match '(?m)^name:\s*(.+?)\s*$') { $matches[1].Trim() } else { throw "Agent name missing: $path" }
+    # This role pins a provider model, not one of the legacy per-platform tiers.
+    if ($agentName -eq 'cs-blender-operator') { return }
     $proAgents = @('cs-architect', 'cs-backend-lead', 'cs-frontend-lead', 'cs-code-reviewer', 'cs-security-auditor', 'cs-review-advisor', 'cs-network-programmer')
     $flashAgents = @('cs-test-engineer', 'cs-web-perf-auditor', 'cs-knowledge-base-admin', 'cs-cocos-specialist')
     if ($proAgents -contains $agentName) {

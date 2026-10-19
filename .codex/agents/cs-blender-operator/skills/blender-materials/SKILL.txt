@@ -1,0 +1,37 @@
+# Blender Materials
+
+For `cs-blender-operator` only. Follow the [parent contract](../../../cs-blender-operator.md).
+Load for shader creation, material parameter changes, assignment and replacement.
+
+## Work
+
+1. Inspect target objects, material slots, object/data linking, polygon material indices,
+   shared material/node-group users, current render engine and existing output connections.
+   Determine whether replacement covers the whole object, selected faces or all users.
+2. For a local change to a shared material, copy the affected data-block and reassign only
+   the intended slots. A copied material may still share nested node groups and images;
+   isolate those only if their contents must change locally. For a deliberate global change,
+   preserve the requested sharing.
+3. Find shader nodes by node type rather than localized names. Inspect the installed node
+   inputs before assigning values; configure shader inputs and output connections for rendered
+   appearance. Viewport display color alone does not establish a rendered material.
+4. Build or modify the required surface graph and preserve unrelated nodes. Replace materials
+   through the intended slots/face assignments; do not globally remap or delete the old
+   material merely to change one object. Keep face assignments valid when slot counts change.
+5. Load the private [Textures](../blender-textures/SKILL.txt) workflow only when creating,
+   editing, baking or relinking image maps is part of the task. Preserve existing maps for a
+   parameter-only edit. Check engine-specific transparency, displacement and output support.
+
+## Verification
+
+- Inspect affected slots, polygon indices, graph connections and shader parameter values.
+- View the result in material/rendered shading or a preview render appropriate to the target
+  engine. Account for lighting and color management before attributing a color mismatch to
+  the shader; do not alter the entire scene's lighting to hide a material defect.
+- Check both intended targets and any shared users that must stay unchanged.
+
+## Lookup
+
+Consult the installed-version [material assignment manual](https://docs.blender.org/manual/en/latest/render/materials/assignment.html)
+and [shader node reference](https://docs.blender.org/manual/en/latest/render/shader_nodes/index.html)
+when assignment or node behavior is uncertain.

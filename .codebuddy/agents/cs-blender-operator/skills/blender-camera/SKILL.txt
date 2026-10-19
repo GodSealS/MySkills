@@ -1,0 +1,34 @@
+# Blender Camera
+
+For `cs-blender-operator` only. Follow the [parent contract](../../../cs-blender-operator.md).
+Load for camera creation/placement, composition, lens/projection and depth of field.
+
+## Work
+
+1. Identify the intended scene/camera, active scene camera, camera data users, parent/constraints,
+   frame, output aspect ratio and target bounds. Distinguish moving the viewport for inspection
+   from changing a render camera. Isolate shared camera data for a local lens edit when needed.
+2. Position and aim the camera using the target's world-space bounds and actual transforms.
+   Blender cameras look along local -Z with local Y up; account for parents and constraints
+   when converting the desired world orientation to the stored transform.
+3. Select the requested projection and framing. Perspective framing depends on focal length,
+   sensor fit and aspect ratio; orthographic framing uses orthographic scale. Adjust near/far
+   clipping, lens shift and focus deliberately, and keep resolution changes within scope.
+4. Assign the active scene camera when the requested result must affect rendering. A moved
+   camera that is not active may leave the final image unchanged. Configure focus target or
+   distance and aperture only if depth of field is requested or part of the accepted look.
+5. Load [Animation](../blender-animation/SKILL.txt) for camera or lens animation. For a static
+   composition, preserve existing keyframes/constraints and report conflicts before replacing them.
+
+## Verification
+
+- Inspect through the intended camera at the final aspect ratio, checking framing, clipping,
+  horizon/orientation and subject visibility. A free-viewport screenshot is insufficient.
+- Check the actual scene camera and its world transform, projection/lens and focus values.
+- For animated shots, sample intermediate frames as well as endpoints for collisions,
+  unwanted occlusion and focus drift. Restore temporary preview settings after inspection.
+
+## Lookup
+
+Use the installed-version [camera manual](https://docs.blender.org/manual/en/latest/render/cameras.html)
+and [Camera API](https://docs.blender.org/api/current/bpy.types.Camera.html).

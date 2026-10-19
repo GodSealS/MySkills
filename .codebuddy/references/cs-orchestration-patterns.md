@@ -45,11 +45,14 @@ Personas split into two families:
   - `cs-cocos-specialist` — execution-only Cocos worker directed by `cs-frontend-lead`; private subsystem skills, no design decision authority
   - `cs-backend-lead` — backend domain owner (via `cs-api-design`, `cs-tdd`, backend security/performance work, and `cs-incremental`)
   - `cs-network-programmer` — execution-only Cocos game server worker directed by `cs-backend-lead`; no design decision authority
+  - `cs-blender-operator` — host-dispatched Blender asset operator; five private skills for mesh, materials, textures, animation and camera work; no persona delegation
 - **Review-side auditors** (triggered by Review/Ship skills):
   - `cs-code-reviewer`, `cs-review-advisor`, `cs-security-auditor`, `cs-test-engineer`, `cs-web-perf-auditor`
 
 Regular owners and auditors are invoked **by skills**. The Cocos client/server workers are
 assigned by their respective leads under the dispatch contracts above.
+The host assigns Blender asset work directly to `cs-blender-operator`; this adds no new
+persona-to-persona dispatch exception and does not activate a team workflow.
 
 ## Endorsed Pattern: Parallel Fan-Out with Merge
 

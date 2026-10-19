@@ -1,0 +1,38 @@
+# Blender Mesh Editing
+
+For `cs-blender-operator` only. Follow the [parent contract](../../../cs-blender-operator.md).
+Load for asset construction or vertex, edge, face, topology and mesh-modifier work.
+
+## Work
+
+1. Inspect the target mesh, dimensions, object/world transforms, mode, modifiers, shared users,
+   shape keys, UV layers and vertex groups. Choose object-level transforms for placement changes;
+   edit mesh coordinates only when the geometry itself must change.
+2. Construct new geometry in a task-owned object/collection using primitives, curves, direct
+   mesh data or procedural modifiers as appropriate. Maintain the requested units, pivot and
+   naming. Resolve local versus world coordinates explicitly when placing or moving vertices.
+3. Use the appropriate mesh access path: an owned BMesh in Object Mode must be written back
+   and freed; an Edit Mode BMesh comes from the live edit mesh and is updated through the edit
+   mesh API, not freed as a private copy. Check version-specific signatures before use.
+   Reacquire element references after topology changes; indices are not persistent identities.
+4. Preserve UVs, material face assignments, weights and shape-key relationships when relevant.
+   Topology changes on a keyed or rigged asset can invalidate those relationships: establish the
+   intended transfer/rebuild before editing. Inspect evaluated modifier results for measurements;
+   modify source data deliberately and release temporary evaluated meshes.
+5. Keep modifiers editable unless applying them is part of the task. Apply transforms, merge
+   vertices or recalculate normals only for the targeted geometry and requested result.
+
+## Verification
+
+- Check world dimensions, vertex/edge/face counts, normals, degeneracy and unintended loose or
+  duplicate geometry. Assess boundaries/non-manifold edges against asset intent; open surfaces
+  are valid when intended, and are not automatically repaired into closed solids.
+- Inspect silhouettes and relevant details from several angles, including the evaluated modifier
+  result. Confirm neighboring objects and shared mesh users retain their intended appearance.
+- For deforming assets, inspect a representative pose after topology/weight-affecting changes.
+
+## API Lookup
+
+Use the installed-version [BMesh API](https://docs.blender.org/api/current/bmesh.html) and
+[mesh access guidance](https://docs.blender.org/api/current/info_gotchas_meshes.html).
+These links are lookup entry points; choose documentation matching the connected Blender.

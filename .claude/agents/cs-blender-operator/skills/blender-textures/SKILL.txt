@@ -1,0 +1,39 @@
+# Blender Textures
+
+For `cs-blender-operator` only. Follow the [parent contract](../../../cs-blender-operator.md).
+Load for image-map creation/editing, UV work, painting, baking and texture dependency repair.
+
+## Work
+
+1. Establish the required maps, dimensions, texel density, channels, bit depth, UV set and
+   target convention. Inspect existing image users, UVs, file/packed/generated state and
+   any UDIM layout. Reuse suitable images; preserve other users when editing shared pixels.
+2. Choose the appropriate source: edit supplied pixels, create a procedural image/material,
+   paint with available tools, or bake scene/shader information. A procedural shader is not
+   an exported image; bake or write actual image data when a texture file is required.
+   Describe any external source-generation requirement honestly if no such tool is available.
+3. Prepare UVs for the intended mapping; inspect seams, distortion, texel density and padding.
+   Keep existing UV contracts for rigged/exported assets unless the assignment permits changes.
+   For baking, set the correct source/target objects, active destination image, bake type,
+   supported render engine and cage/ray settings; preserve unrelated scene state.
+4. Set color interpretation per map: color maps use the appropriate color space, while numeric
+   maps such as normals, roughness and masks use data interpretation. Query available color
+   spaces rather than assuming names across OCIO configurations. Check normal-map convention,
+   channel packing and alpha meaning against the consumer's contract.
+5. Load [Materials](../blender-materials/SKILL.txt) when shader wiring changes are needed.
+   Save edited/generated/baked images explicitly to the requested paths or pack them when the
+   delivery calls for a self-contained blend. Saving the blend alone is not proof that external
+   image edits were saved. Resolve relative paths against the actual blend location.
+
+## Verification
+
+- Inspect the image itself and its appearance on the asset: resolution, seams, padding,
+  orientation, normal response, alpha and missing/pink texture indicators.
+- Verify the delivered images and dependency paths in Blender's environment, including all
+  required UDIM tiles. Confirm saved pixels and shader sampling correspond to the intended map.
+- Report procedural-only output, unbaked maps or missing source images as delivery limitations.
+
+## Lookup
+
+Use the installed-version [image texture documentation](https://docs.blender.org/manual/en/latest/render/shader_nodes/textures/image.html)
+and [baking manual](https://docs.blender.org/manual/en/latest/render/cycles/baking.html).

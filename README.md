@@ -52,6 +52,7 @@ into **Codex**, **CodeBuddy**, **Claude Code**, and **Gemini CLI** from a single
     ├── build-adapters.sh    # macOS/Linux adapter builder
     ├── test-adapters.ps1     # isolated PowerShell adapter verification
     ├── test-adapters.sh      # isolated POSIX adapter verification
+    ├── test-blender-agent.py # isolated Blender bundle build/install checks
     ├── validate-sysdocs.py    # shared protocol validator for fixtures
     ├── install.sh            # macOS/Linux installer
     └── install.ps1          # copy a platform's files to a target location
@@ -236,6 +237,26 @@ in the plan. Workers follow that plan, including its prescribed tests, and retur
 or blockers to the lead. These responsibilities live in the Agent definitions; the public
 planning/TDD skills retain their general workflows. Design and verification-scope decisions
 remain with the lead.
+
+### Blender asset operator
+
+`cs-blender-operator` creates and modifies Blender assets under a user/host assignment.
+It loads only the needed private skills: mesh/vertex editing, materials (including
+replacement), textures/UVs/baking, animation, and cameras. The five `SKILL.txt` resources
+under `agents/cs-blender-operator/` install with the agent and are not public skills.
+The host supplies the installed agent-file path, asset task and original user request;
+existing lead/worker dispatch pairs remain unchanged.
+
+The model is `qwen-3.8-flash`. Adapters preserve this exact provider model identifier;
+the target host/provider must support it. This pack does not configure a model provider
+or silently substitute a different model. Live work uses the host's Blender MCP tools
+(status, scene inspection, Python execution and visual preview); creating/installing the
+agent does not itself connect to or modify a Blender scene. Outputs include saved asset
+paths and actual data/visual verification, with missing tools or unsaved work reported.
+
+Validate packaging without touching a live Blender scene with
+`python scripts/test-blender-agent.py --builder powershell` on Windows or
+`python3 scripts/test-blender-agent.py --builder sh` on POSIX.
 
 ### Public skills
 

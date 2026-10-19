@@ -187,7 +187,8 @@ build_agents() (
     target="$dst/$name"
     cp "$src" "$target"
     if [ "$platform" = claude ]; then strip_claude_agent_frontmatter "$target"; fi
-    if [ "$platform" != neutral ]; then
+    # Preserve the Blender role's explicit provider model on every platform.
+    if [ "$platform" != neutral ] && [ "$name" != cs-blender-operator.md ]; then
       case "$name" in
         cs-architect.md|cs-backend-lead.md|cs-frontend-lead.md|cs-code-reviewer.md|cs-security-auditor.md|cs-review-advisor.md|cs-network-programmer.md) tier=DeepSeek-V4-Pro ;;
         cs-test-engineer.md|cs-web-perf-auditor.md|cs-knowledge-base-admin.md|cs-cocos-specialist.md) tier=DeepSeek-V4-Flash ;;
