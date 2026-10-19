@@ -5,7 +5,7 @@
 .DESCRIPTION
   -Target codebuddy  -> install .codebuddy/ (skills/agents/commands/references/hooks + AGENTS.md/settings.json/CODEBUDDY.md)
   -Target gemini     -> install .gemini/ + GEMINI.md
-  -Target codex      -> install project adapters, or register skills under ~/.codex/skills
+  -Target codex      -> install project adapters, or register skills and agents under ~/.codex
   -Target claude     -> install .claude/ + Claude skills/agents + CLAUDE.md, or register them under ~/.claude
   -Target all        -> all of the above
 

@@ -13,7 +13,7 @@
     commands/           -> canonical slash commands (markdown)
     .gemini/            -> Gemini CLI adapter (skills + commands/*.toml + agents + GEMINI.md)
     .agents/            -> Codex skill adapter (.agents/skills/<name>/SKILL.md + agents/openai.yaml)
-    .codex/             -> Codex adapter (prompts/ + agents/)
+    .codex/             -> Codex adapter (prompts/ + agents/*.toml)
     .claude/            -> Claude Code adapter (skills/ + agents/ + commands/ + rules/)
     .claude-plugin/     -> Claude Code plugin manifest
     CLAUDE.md           -> Claude Code top-level project context (only if missing)
@@ -184,11 +184,9 @@ function Get-PlatformModel([string]$sourceModel, [string]$platform) {
     return $models[$sourceModel]
 }
 
-function Set-AgentPlatformModel([string]$path, [string]$platform) {
-    $content = Get-Content -Raw -Path $path
-    $agentName = if ($content -match '(?m)^name:\s*(.+?)\s*$') { $matches[1].Trim() } else { throw "Agent name missing: $path" }
+function Get-AgentPlatformModel([string]$agentName, [string]$platform, [string]$sourceModel) {
     # This role pins a provider model, not one of the legacy per-platform tiers.
-    if ($agentName -eq 'cs-blender-operator') { return }
+    if ($agentName -eq 'cs-blender-operator') { return $sourceModel }
     $proAgents = @('cs-architect', 'cs-backend-lead', 'cs-frontend-lead', 'cs-code-reviewer', 'cs-security-auditor', 'cs-review-advisor', 'cs-network-programmer')
     $flashAgents = @('cs-test-engineer', 'cs-web-perf-auditor', 'cs-knowledge-base-admin', 'cs-cocos-specialist')
     if ($proAgents -contains $agentName) {
@@ -198,7 +196,14 @@ function Set-AgentPlatformModel([string]$path, [string]$platform) {
     } else {
         throw "Unsupported agent persona: $agentName"
     }
-    $targetModel = Get-PlatformModel $tier $platform
+    return Get-PlatformModel $tier $platform
+}
+
+function Set-AgentPlatformModel([string]$path, [string]$platform) {
+    $content = Get-Content -Raw -Path $path
+    $agentName = if ($content -match '(?m)^name:\s*(.+?)\s*$') { $matches[1].Trim() } else { throw "Agent name missing: $path" }
+    $sourceModel = if ($content -match '(?m)^model:\s*(.+?)\s*$') { $matches[1].Trim() } else { throw "Agent model missing: $path" }
+    $targetModel = Get-AgentPlatformModel $agentName $platform $sourceModel
     $content = $content -replace '(?m)^model:\s*.+?\s*$', "model: $targetModel"
     Write-TextFile $path $content
 }
@@ -208,6 +213,52 @@ function Copy-AgentPlatform([string]$source, [string]$destination, [string]$plat
     if ($platform -eq 'claude') { $content = Neutralize-AgentFrontmatter $content }
     Write-TextFile $destination $content
     Set-AgentPlatformModel $destination $platform
+}
+
+function ConvertFrom-AgentFrontmatterScalar([string]$value, [string]$agentPath, [string]$key) {
+    $value = $value.Trim()
+    if ($value.StartsWith('"')) {
+        try { return ConvertFrom-Json -InputObject $value -ErrorAction Stop }
+        catch { throw "Invalid quoted '$key' in agent frontmatter: $agentPath" }
+    }
+    if ($value.StartsWith("'")) {
+        if (-not $value.EndsWith("'")) { throw "Unterminated '$key' in agent frontmatter: $agentPath" }
+        return $value.Substring(1, $value.Length - 2).Replace("''", "'")
+    }
+    return $value
+}
+
+function Get-AgentFrontmatterValue([string]$frontmatter, [string]$key, [string]$agentPath) {
+    $pattern = '(?m)^' + [regex]::Escape($key) + ':\s*(.*?)\s*$'
+    $match = [regex]::Match($frontmatter, $pattern)
+    if (-not $match.Success) { throw "Agent '$key' missing from frontmatter: $agentPath" }
+    return ConvertFrom-AgentFrontmatterScalar $match.Groups[1].Value $agentPath $key
+}
+
+function ConvertTo-TomlString([string]$value) {
+    # JSON string literals use the same escapes needed by TOML basic strings.
+    return ConvertTo-Json -InputObject $value -Compress
+}
+
+function Write-CodexAgentToml([string]$source, [string]$destination) {
+    $content = Get-Content -Raw -Path $source
+    $frontmatterMatch = [regex]::Match($content, '(?s)^---\r?\n(.*?)\r?\n---\r?\n')
+    if (-not $frontmatterMatch.Success) { throw "Agent frontmatter missing: $source" }
+
+    $frontmatter = $frontmatterMatch.Groups[1].Value
+    $name = Get-AgentFrontmatterValue $frontmatter 'name' $source
+    $description = Get-AgentFrontmatterValue $frontmatter 'description' $source
+    $sourceModel = Get-AgentFrontmatterValue $frontmatter 'model' $source
+    $model = Get-AgentPlatformModel $name 'codex' $sourceModel
+    $developerInstructions = $content.Substring($frontmatterMatch.Length)
+
+    $toml = @(
+        "name = $(ConvertTo-TomlString $name)"
+        "description = $(ConvertTo-TomlString $description)"
+        "model = $(ConvertTo-TomlString $model)"
+        "developer_instructions = $(ConvertTo-TomlString $developerInstructions)"
+    ) -join "`n"
+    Write-TextFile $destination ($toml + "`n")
 }
 
 # ---------------------------------------------------------------------------
@@ -341,7 +392,7 @@ foreach ($rf in (Get-ChildItem -Path $SrcRefs -File)) {
 Write-Host "References: $((Get-ChildItem -Path $SrcRefs -File).Count) -> references/ .gemini/references/ .agents/references/ .claude/references/"
 
 # ---------------------------------------------------------------------------
-# 3. Agents  ->  agents/  +  .gemini/agents/  +  .codex/agents/  +  .claude/agents/
+# 3. Agents  ->  agents/*.md  +  .gemini/agents/*.md  +  .codex/agents/*.toml  +  .claude/agents/*.md
 # ---------------------------------------------------------------------------
 $dstAgentsCanon = Join-Path $Repo 'agents'
 $dstAgentsGem   = Join-Path $Repo '.gemini\agents'
@@ -353,13 +404,18 @@ foreach ($d in @($dstAgentsCanon, $dstAgentsGem, $dstAgentsCodex, $dstAgentsClau
 foreach ($ag in (Get-ChildItem -Path $SrcAgents -File -Filter '*.md')) {
     Copy-Item -Path $ag.FullName -Destination (Join-Path $dstAgentsCanon $ag.Name) -Force
     Copy-AgentPlatform $ag.FullName (Join-Path $dstAgentsGem $ag.Name) 'gemini'
-    Copy-AgentPlatform $ag.FullName (Join-Path $dstAgentsCodex $ag.Name) 'codex'
+    $codexAgent = Join-Path $dstAgentsCodex ($ag.BaseName + '.toml')
+    Write-CodexAgentToml $ag.FullName $codexAgent
+    $obsoleteCodexMarkdown = Join-Path $dstAgentsCodex $ag.Name
+    if (Test-Path -LiteralPath $obsoleteCodexMarkdown -PathType Leaf) {
+        Remove-Item -LiteralPath $obsoleteCodexMarkdown -Force
+    }
     Copy-AgentPlatform $ag.FullName (Join-Path $dstAgentsClaude $ag.Name) 'claude'
 }
 foreach ($d in @($dstAgentsCanon, $dstAgentsGem, $dstAgentsCodex, $dstAgentsClaude)) {
     Sync-AgentResources $SrcAgents $d
 }
-Write-Host "Agents: $((Get-ChildItem -Path $SrcAgents -File).Count) -> agents/ .gemini/agents/ .codex/agents/ .claude/agents/"
+Write-Host "Agents: $((Get-ChildItem -Path $SrcAgents -File).Count) -> agents/ .gemini/agents/*.md .codex/agents/*.toml .claude/agents/*.md"
 
 # ---------------------------------------------------------------------------
 # 4. Commands

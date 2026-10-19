@@ -40,7 +40,7 @@ into **Codex**, **CodeBuddy**, **Claude Code**, and **Gemini CLI** from a single
 ├── .gemini/           # Gemini CLI adapter (skills + commands/*.toml + agents + references)
 ├── .agents/           # Codex skill adapter (auto-discovered)
 │   └── skills/  references/
-├── .codex/            # Codex adapter (prompts/*.md + agents/)
+├── .codex/            # Codex adapter (prompts/*.md + agents/*.toml)
 ├── .claude/           # Claude Code adapter (skills + agents + slash commands + rules)
 │   ├── skills/ agents/ commands/ rules/ references/
 ├── .claude-plugin/    # Claude Code plugin + marketplace manifests (load via /plugin)
@@ -84,7 +84,8 @@ gemini skills install ./skills
 ### Codex
 Project-level — keep `.agents/`, `.codex/`, and `AGENTS.md` in your project root (Codex
 auto-discovers `.agents/skills` and `AGENTS.md`). For a global install, skills are registered in
-`~/.codex/skills`; existing files not owned by this pack are preserved:
+`~/.codex/skills` and custom agents in `~/.codex/agents/*.toml`; existing files not owned by
+this pack are preserved:
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install.ps1 -Target codex -UserHome
 ```

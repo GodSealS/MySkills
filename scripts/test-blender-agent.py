@@ -9,11 +9,13 @@ Examples:
 
 import argparse
 import hashlib
+import json
 import re
 import shutil
 import subprocess
 import tempfile
 from pathlib import Path
+import tomllib
 
 
 ROLE = "cs-blender-operator"
@@ -33,26 +35,45 @@ def read(path):
 
 
 def check_bundle(agent_root, source_root):
-    agent = agent_root / f"{ROLE}.md"
+    source_raw = read(source_root / f"{ROLE}.md")
+    source_header = FRONT.match(source_raw)
+    require(source_header is not None, f"Missing source frontmatter: {source_root / (ROLE + '.md')}")
+    codex = agent_root.parent.name == ".codex"
+    agent = agent_root / (f"{ROLE}.toml" if codex else f"{ROLE}.md")
     raw = read(agent)
-    header = FRONT.match(raw)
-    require(header is not None, f"Missing frontmatter: {agent}")
-    source_raw = read(source_root / agent.name)
-    for field in ("name", "description"):
-        pattern = rf"^{field}:\s*(.+)$"
-        require(re.search(pattern, header.group(), re.M).group(1)
-                == re.search(pattern, FRONT.match(source_raw).group(), re.M).group(1),
-                f"Agent metadata changed: {agent}: {field}")
-    require(re.search(r"^model:\s*qwen-3\.8-flash\s*$", header.group(), re.M),
-            f"Explicit model was replaced: {agent}")
-    tools = re.search(r"^tools:\s*(.+)$", header.group(), re.M).group(1).split(",")
-    tools = {tool.strip() for tool in tools}
-    require(not any(tool == "Task" or tool.startswith("Agent") for tool in tools),
-            f"Operator gained delegation tools: {agent}")
-    for name in ("get_addon_status", "get_scene_info", "execute_blender_code", "look"):
-        require(f"mcp__blender__{name}" in tools, f"Missing Blender operation: {name}")
-    require(FRONT.sub("", raw).strip() == FRONT.sub("", source_raw).strip(),
-            f"Agent body differs from source: {agent}")
+    if codex:
+        config = tomllib.loads(raw)
+        for field in ("name", "description"):
+            source_value = re.search(rf"^{field}:\s*(.+)$", source_header.group(), re.M).group(1).strip()
+            if source_value.startswith('"'):
+                source_value = json.loads(source_value)
+            require(config[field] == source_value, f"Agent metadata changed: {agent}: {field}")
+        require(config["model"] == "qwen-3.8-flash", f"Explicit model was replaced: {agent}")
+        instructions = config["developer_instructions"]
+        require("does not delegate to other personas" in instructions,
+                f"Operator gained delegation instructions: {agent}")
+        require(instructions.strip() == FRONT.sub("", source_raw).strip(),
+                f"Agent body differs from source: {agent}")
+        agent_text = instructions
+    else:
+        header = FRONT.match(raw)
+        require(header is not None, f"Missing frontmatter: {agent}")
+        for field in ("name", "description"):
+            pattern = rf"^{field}:\s*(.+)$"
+            require(re.search(pattern, header.group(), re.M).group(1)
+                    == re.search(pattern, source_header.group(), re.M).group(1),
+                    f"Agent metadata changed: {agent}: {field}")
+        require(re.search(r"^model:\s*qwen-3\.8-flash\s*$", header.group(), re.M),
+                f"Explicit model was replaced: {agent}")
+        tools = re.search(r"^tools:\s*(.+)$", header.group(), re.M).group(1).split(",")
+        tools = {tool.strip() for tool in tools}
+        require(not any(tool == "Task" or tool.startswith("Agent") for tool in tools),
+                f"Operator gained delegation tools: {agent}")
+        for name in ("get_addon_status", "get_scene_info", "execute_blender_code", "look"):
+            require(f"mcp__blender__{name}" in tools, f"Missing Blender operation: {agent}: {name}")
+        require(FRONT.sub("", raw).strip() == FRONT.sub("", source_raw).strip(),
+                f"Agent body differs from source: {agent}")
+        agent_text = raw
     bundle = agent_root / ROLE
     require({p.parent.name for p in bundle.rglob("SKILL.txt")} == SKILLS,
             f"Missing or extra private skill: {bundle}")
@@ -66,8 +87,12 @@ def check_bundle(agent_root, source_root):
                 f"Private resource changed during packaging: {relative}")
         require(manifest.get(relative.as_posix()) == hashlib.sha256(src.read_bytes()).hexdigest(),
                 f"Private resource ownership missing: {relative}")
-    for doc in [agent] + [bundle / p.relative_to(source_root / ROLE) for p in source_files]:
-        for link in re.findall(r"\[[^\]]+\]\(([^)]+)\)", read(doc)):
+    documents = [(agent, agent_text)] + [
+        (bundle / p.relative_to(source_root / ROLE), read(bundle / p.relative_to(source_root / ROLE)))
+        for p in source_files
+    ]
+    for doc, content in documents:
+        for link in re.findall(r"\[[^\]]+\]\(([^)]+)\)", content):
             if re.match(r"^[a-z]+://|^#", link):
                 continue
             require((doc.parent / link.split("#")[0]).resolve().is_file(),

@@ -26,7 +26,9 @@ function Sync-AgentResources([string]$Source, [string]$Destination) {
     }
     $current = @{}
     foreach ($bundle in (Get-ChildItem -LiteralPath $Source -Directory)) {
-        if (-not (Test-Path -LiteralPath (Join-Path $Source ($bundle.Name + '.md')))) { continue }
+        $markdownAgent = Test-Path -LiteralPath (Join-Path $Source ($bundle.Name + '.md'))
+        $tomlAgent = Test-Path -LiteralPath (Join-Path $Source ($bundle.Name + '.toml'))
+        if (-not ($markdownAgent -or $tomlAgent)) { continue }
         foreach ($file in (Get-ChildItem -LiteralPath $bundle.FullName -Recurse -File)) {
             $key = ($bundle.Name + '/' + $file.FullName.Substring($bundle.FullName.Length).TrimStart('\', '/')).Replace('\', '/')
             $current[$key] = $file.FullName

@@ -41,7 +41,7 @@ sync_agent_resources() (
   }
   for resource_bundle in "$resource_source"/*; do
     [ -d "$resource_bundle" ] || continue
-    [ -f "$resource_bundle.md" ] || continue
+    [ -f "$resource_bundle.md" ] || [ -f "$resource_bundle.toml" ] || continue
     find "$resource_bundle" -type f -print | while IFS= read -r resource_file; do
       resource_key=${resource_file#"$resource_source"/}
       resource_path_safe "$resource_key" || { printf 'Unsafe resource path: %s\n' "$resource_key" >&2; exit 1; }
@@ -72,7 +72,7 @@ sync_agent_resources() (
       resource_path_safe "$resource_key" || { printf 'Unsafe resource manifest path: %s\n' "$resource_key" >&2; exit 1; }
       # A removed/renamed bundle is no longer paired with a source persona.
       resource_name=${resource_key%%/*}
-      if [ ! -f "$resource_source/$resource_key" ] || [ ! -f "$resource_source/$resource_name.md" ]; then
+      if [ ! -f "$resource_source/$resource_key" ] || { [ ! -f "$resource_source/$resource_name.md" ] && [ ! -f "$resource_source/$resource_name.toml" ]; }; then
         resource_target="$resource_destination/$resource_key"
         if [ -f "$resource_target" ] && [ "$(resource_sha256 "$resource_target")" = "$resource_hash" ]; then
           rm -f "$resource_target"

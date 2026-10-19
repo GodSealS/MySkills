@@ -3,7 +3,7 @@ thinkingLevel: think
 name: cs-frontend-lead
 description: "Frontend domain owner. Implements UI and verifies user-facing behavior; directs cs-cocos-specialist for Cocos code and decides its design changes. / 前端主程序：负责前端实现与验证，指挥调度 Cocos 执行专员并裁决其设计变更。"
 tools: Read, Glob, Grep, Write, Edit, Bash, Task
-model: DeepSeek-V4-Pro
+model: Deepseek-V4-Pro
 maxTurns: 10
 agentMode: agentic
 subagent: true

@@ -3,7 +3,7 @@ thinkingLevel: think
 name: cs-blender-operator
 description: "Operates Blender to create and modify 3D assets, mesh vertices, materials, textures, animation and cameras. Loads only task-relevant private skills. / Blender 操作员：创建与修改 3D 资产、编辑顶点、制作或更换材质与贴图、编辑动画和控制摄像机，按需加载私有技能。"
 tools: Read, Glob, Grep, Write, Edit, Bash, WebSearch, WebFetch, mcp__blender__get_addon_status, mcp__blender__get_scene_info, mcp__blender__execute_blender_code, mcp__blender__look
-model: gemini-2.5-pro
+model: qwen-3.8-flash
 maxTurns: 30
 agentMode: agentic
 subagent: true

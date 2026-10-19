@@ -66,6 +66,39 @@ replace_model() {
   mv "$tmp" "$file"
 }
 
+toml_quote_scalar() {
+  escaped=$(printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g')
+  printf '"%s"' "$escaped"
+}
+
+toml_quote_file() {
+  awk '
+    BEGIN { printf "\"" }
+    {
+      sub(/\r$/, "", $0)
+      for (i = 1; i <= length($0); i++) {
+        c = substr($0, i, 1)
+        if (c == "\\") printf "%c%c", 92, 92
+        else if (c == "\"") printf "%c%c", 92, 34
+        else if (c == "\t") printf "%c%c", 92, 116
+        else if (c == "\b") printf "%c%c", 92, 98
+        else if (c == "\f") printf "%c%c", 92, 102
+        else printf "%s", c
+      }
+      printf "%c%c", 92, 110
+    }
+    END { printf "\"" }
+  ' "$1"
+}
+
+extract_agent_body() {
+  awk '
+    NR == 1 && /^---[[:space:]]*$/ { in_frontmatter = 1; next }
+    in_frontmatter && /^---[[:space:]]*$/ { in_frontmatter = 0; in_body = 1; next }
+    in_body { print }
+  ' "$1" > "$2"
+}
+
 strip_skill_frontmatter() {
   file=$1
   tmp="$file.tmp.$$"
@@ -184,6 +217,34 @@ build_agents() (
   for src in "$SRC_AGENTS"/*.md; do
     [ -f "$src" ] || continue
     name=$(basename "$src")
+    if [ "$platform" = codex ]; then
+      stem=${name%.md}
+      agent_name=$(frontmatter_value name "$src")
+      description=$(frontmatter_value description "$src")
+      model=$(frontmatter_value model "$src")
+      if [ "$agent_name" != cs-blender-operator ]; then
+        case "$name" in
+          cs-architect.md|cs-backend-lead.md|cs-frontend-lead.md|cs-code-reviewer.md|cs-security-auditor.md|cs-review-advisor.md|cs-network-programmer.md) tier=DeepSeek-V4-Pro ;;
+          cs-test-engineer.md|cs-web-perf-auditor.md|cs-knowledge-base-admin.md|cs-cocos-specialist.md) tier=DeepSeek-V4-Flash ;;
+          *) die "unsupported persona $name" ;;
+        esac
+        model=$(platform_model codex "$tier")
+      fi
+      body_tmp="$dst/.$stem.body.$$"
+      toml_tmp="$dst/.$stem.toml.tmp.$$"
+      extract_agent_body "$src" "$body_tmp"
+      {
+        printf 'name = %s\n' "$(toml_quote_scalar "$agent_name")"
+        printf 'description = %s\n' "$(toml_quote_scalar "$description")"
+        printf 'model = %s\n' "$(toml_quote_scalar "$model")"
+        printf 'developer_instructions = '
+        toml_quote_file "$body_tmp"
+        printf '\n'
+      } > "$toml_tmp"
+      mv "$toml_tmp" "$dst/$stem.toml"
+      rm -f "$body_tmp" "$dst/$name"
+      continue
+    fi
     target="$dst/$name"
     cp "$src" "$target"
     if [ "$platform" = claude ]; then strip_claude_agent_frontmatter "$target"; fi
