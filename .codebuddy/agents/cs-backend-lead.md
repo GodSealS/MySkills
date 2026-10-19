@@ -3,7 +3,7 @@ thinkingLevel: think
 name: cs-backend-lead
 description: "Backend domain owner for APIs, data, security and performance. Directs cs-network-programmer for Cocos game server code and decides its design changes. / 后端主程序：负责接口、数据与服务端实现，向 Cocos 服务端执行专员派单并裁决其设计变更。"
 tools: Read, Glob, Grep, Write, Edit, Bash, Task
-model: DeepSeek-V4-Pro
+model: Deepseek-V4-Pro
 maxTurns: 10
 agentMode: agentic
 subagent: true

@@ -3,7 +3,7 @@ thinkingLevel: deep
 name: cs-network-programmer
 description: "Execution-only Cocos game server programmer directed by cs-backend-lead. Implements server networking, replication, sessions, matchmaking and validation against approved contracts; returns all proposed design changes to the backend lead. / Cocos 游戏服务端执行专员：由后端主程序派单，负责服务端代码实现与验证，设计变更由 cs-backend-lead 裁决。"
 tools: Read, Glob, Grep, Write, Edit, Bash, WebSearch, WebFetch
-model: DeepSeek-V4-Flash
+model: Deepseek-V4.1-Flash
 maxTurns: 20
 agentMode: agentic
 subagent: true

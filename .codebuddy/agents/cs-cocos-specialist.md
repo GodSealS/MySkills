@@ -3,7 +3,7 @@ thinkingLevel: deep
 name: cs-cocos-specialist
 description: "Cocos Creator implementation worker directed by cs-frontend-lead. Writes and verifies Cocos code against the lead's approved design; returns proposed design changes to the lead for a decision. / Cocos 执行专员：由前端主程序派单，只负责代码实现与验证，设计变更由 cs-frontend-lead 裁决。"
 tools: Read, Glob, Grep, Write, Edit, Bash, WebSearch, WebFetch
-model: DeepSeek-V4-Flash
+model: Deepseek-V4.1-Flash
 maxTurns: 20
 agentMode: agentic
 subagent: true
