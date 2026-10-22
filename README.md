@@ -170,10 +170,15 @@ are `cs-code-query` and `cs-docs-adrs`, within the assigned read/write scope.
 Existing completed review runs remain immutable. Resume older runs under their recorded
 role protocol, or preserve them and create a new run when that protocol is unavailable.
 
-### Cocos implementation worker
+### Frontend lead and implementation worker
 
 `cs-frontend-lead` directs `cs-cocos-specialist`: the lead assigns and orders tasks,
-decides design changes, accepts results and requests rework. The Cocos specialist only
+decides design changes, accepts results and requests rework. The lead never writes code,
+tests or delivery scripts and never creates/edits production assets, including during
+small fixes or rework. It may maintain assigned planning/review documents and run existing
+checks at the prescribed stage. The specialist handles frontend code, tests and repairs
+in the approved target stack, including non-Cocos UI/tooling; Cocos prerequisites apply
+only to engine tasks. The specialist only
 implements and verifies the approved design. It returns a design-change request before
 altering behavior, contracts, UI layout, scene/prefab structure or engine strategy.
 Decisions beyond frontend authority return through the host and the relevant owner;
@@ -206,10 +211,14 @@ the `Agent(type)` type allowlist only for a main-thread `--agent`; nested subage
 ignore the parenthesized type list. Workers omit `Agent` entirely. See the
 [Claude subagent tool rules](https://code.claude.com/docs/en/sub-agents#restrict-which-subagents-can-be-spawned).
 
-### Cocos server implementation worker
+### Backend lead and implementation worker
 
-`cs-backend-lead` assigns and orders Cocos game server tasks for `cs-network-programmer`,
-decides every proposed design change, accepts results and requests rework. The worker
+`cs-backend-lead` assigns and orders backend tasks, including Cocos game servers, for
+`cs-network-programmer`, decides every proposed design change, accepts results and requests
+rework. It never writes implementation/test code or delivery scripts and never creates/edits
+production assets. The programmer owns code, tests and repairs; the lead owns guidance and
+acceptance. A missing worker/tool is reported to the host rather than taken over by the lead.
+Each role retains its configured model without CLI or dispatch overrides. The worker
 only implements and verifies the accepted protocol/server design using the project's
 approved runtime and framework. Protocol, synchronization, matchmaking, session, security
 or dependency changes return to the backend lead before implementation; client changes
@@ -232,7 +241,7 @@ adapters give the backend lead `Agent(cs-network-programmer)`; the plugin uses
 relays the backend lead's brief and returns results for lead acceptance. Source provenance
 is recorded in the agent file. This migration does not run a Cocos server or deploy one.
 
-Each Cocos lead decides whether TDD applies using the task, existing skill triggers and
+Each lead decides whether TDD applies using the task, existing skill triggers and
 project/workflow requirements, then records the decision and executable verification steps
 in the plan. Workers follow that plan, including its prescribed tests, and return evidence
 or blockers to the lead. These responsibilities live in the Agent definitions; the public

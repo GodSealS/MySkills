@@ -19,7 +19,7 @@ Measure before optimizing. Performance work without measurement is guessing — 
 
 **When NOT to use:** Don't optimize before you have evidence of a problem.
 
-**Owner Routing:** Route measured browser, rendering, and Core Web Vitals work to `cs-frontend-lead`; route measured server, API, query, and caching work to `cs-backend-lead`. `cs-web-perf-auditor` supplies independent evidence and does not own the implementation.
+**Owner Routing:** Route measured browser, rendering, and Core Web Vitals work to `cs-frontend-lead`; route measured server, API, query, and caching work to `cs-backend-lead`. The leads diagnose, plan and check; code/test/repair steps go to `cs-cocos-specialist` / `cs-network-programmer` respectively, and asset production goes through the host to the appropriate operator. Leads do not implement optimizations themselves. `cs-web-perf-auditor` supplies independent evidence and does not own the implementation.
 
 ## Core Web Vitals Targets
 

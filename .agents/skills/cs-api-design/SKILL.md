@@ -9,7 +9,7 @@ description: "Guides stable API and interface design. Use when designing APIs, m
 
 Design stable, well-documented interfaces that are hard to misuse. Good interfaces make the right thing easy and the wrong thing hard. This applies to REST APIs, GraphQL schemas, module boundaries, component props, and any surface where one piece of code talks to another.
 
-**Domain Owner:** The host designs ordinary interfaces. Delegate to `cs-backend-lead` only for a concrete independent task or an explicit team workflow. Define public contracts explicitly before their consumers depend on them.
+**Domain Owner:** The host designs ordinary interfaces. `cs-backend-lead` designs contracts, plans, delegates and checks; it never implements code, tests or assets. Backend implementation/tests/repairs assigned to that lead go to `cs-network-programmer` in the actual target stack. Define public contracts explicitly before their consumers depend on them.
 
 **Cocos game server:** `cs-backend-lead` assigns implementation of the accepted server/protocol design to `cs-network-programmer`. The worker implements and verifies; protocol or other design changes return to the backend lead for a decision before implementation. If nested dispatch is unavailable, the host relays the lead's brief and returns results for acceptance. Client changes remain with the frontend owner under the same accepted protocol revision.
 
@@ -91,7 +91,7 @@ Validate at every trust boundary:
 
 ## Orchestration
 
-- **Backend slice design/implementation** → active owner; optional `cs-backend-lead` consultation
+- **Backend slice design** → contract owner; implementation/tests/repairs owned by `cs-backend-lead` are executed by `cs-network-programmer`
 - **Frontend consumer** → `cs-frontend-lead`; the contract must be explicit and versioned before frontend consumes it
 - **Architecture boundaries** → set by `cs-architect`; surface disagreements in the report, do not silently redesign
 - **Breaking changes** → route through `cs-deprecation`

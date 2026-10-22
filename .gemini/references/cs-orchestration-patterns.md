@@ -14,14 +14,21 @@ This project has three composable layers:
 
 The user (or AGENTS.md intent mapping) is the orchestrator. A persona may invoke skills.
 Persona dispatch is limited to two fixed pairs: `cs-frontend-lead` directs
-`cs-cocos-specialist` for Cocos client work, and `cs-backend-lead` directs
-`cs-network-programmer` for Cocos server work. Workers only execute approved work; each
+`cs-cocos-specialist` for frontend code/tests/repairs, and `cs-backend-lead` directs
+`cs-network-programmer` for backend code/tests/repairs. Workers only execute approved work; each
 assigning lead orders tasks, accepts results, requests rework and decides design changes. Use the installed
 agent tool where available, otherwise the host relays the lead's brief and returns the result
 to the assigning lead. Other persona orchestration stays with the host. Neither worker delegates.
 
-Each lead's Cocos dispatch contract defines required inputs and decision handoffs.
-For Cocos client/server implementation, the assigning lead first records the task breakdown and
+Both leads are non-implementing: they design, plan, delegate, guide and check results.
+They never write implementation/test code or delivery scripts, nor create/edit production
+assets, including during small fixes or rework. They may maintain assigned planning/review
+documents and run existing checks at the active workflow's prescribed stage. A missing
+worker/tool is a blocker for host resolution, not permission for the lead to take over.
+Each role keeps its configured model; CLI/dispatch model overrides are not a fallback.
+
+Each lead's dispatch contract defines required inputs and decision handoffs.
+For frontend/backend implementation, the assigning lead first records the task breakdown and
 externally exposed interface agreements in one authoritative plan file (normally
 `tasks/plan.md`). It dispatches only tasks marked `READY` at an identified plan revision;
 the worker reads that plan and returns missing or ambiguous contracts to its assigning lead.
@@ -34,6 +41,8 @@ The private Cocos engine bundle belongs only to `cs-cocos-specialist` and travel
 accepted protocol revision. Decisions beyond a lead's authority are resolved by the host with
 the relevant owner, then communicated to the worker through its assigning lead. A read-only assignment stays
 read-only, and this scoped dispatch does not activate a manual team workflow.
+Non-Cocos tasks use the approved project's actual stack; engine/editor prerequisites and
+the private Cocos skills apply only to work that uses Cocos.
 
 ## Agent Families
 
@@ -41,17 +50,18 @@ Personas split into two families:
 
 - **Build-side owners** (triggered by Define/Plan/Build skills):
   - `cs-architect` — architecture, module boundaries, ADRs (via `cs-spec-driven`, `cs-planning`)
-  - `cs-frontend-lead` — frontend domain owner (via `cs-frontend-ui`, `cs-browser-test`, `cs-tdd`, frontend security/performance work, and `cs-incremental`)
-  - `cs-cocos-specialist` — execution-only Cocos worker directed by `cs-frontend-lead`; private subsystem skills, no design decision authority
-  - `cs-backend-lead` — backend domain owner (via `cs-api-design`, `cs-tdd`, backend security/performance work, and `cs-incremental`)
-  - `cs-network-programmer` — execution-only Cocos game server worker directed by `cs-backend-lead`; no design decision authority
+  - `cs-frontend-lead` — frontend design/planning/delegation/acceptance owner; no code or asset production
+  - `cs-cocos-specialist` — execution-only frontend worker directed by `cs-frontend-lead`; private Cocos skills when applicable, no design decision authority
+  - `cs-backend-lead` — backend design/planning/delegation/acceptance owner; no code or asset production
+  - `cs-network-programmer` — execution-only backend worker directed by `cs-backend-lead`, including Cocos game servers; no design decision authority
   - `cs-blender-operator` — host-dispatched Blender asset operator; five private skills for mesh, materials, textures, animation and camera work; no persona delegation
 - **Review-side auditors** (triggered by Review/Ship skills):
   - `cs-code-reviewer`, `cs-review-advisor`, `cs-security-auditor`, `cs-test-engineer`, `cs-web-perf-auditor`
 
-Regular owners and auditors are invoked **by skills**. The Cocos client/server workers are
+Regular owners and auditors are invoked **by skills**. The frontend/backend workers are
 assigned by their respective leads under the dispatch contracts above.
-The host assigns Blender asset work directly to `cs-blender-operator`; this adds no new
+The leads provide asset contracts and inspect returned evidence. The host assigns Blender
+asset work directly to `cs-blender-operator`; this adds no new
 persona-to-persona dispatch exception and does not activate a team workflow.
 
 For concept-image assets, `cs-img2threejs` is public and may be invoked directly or loaded by
@@ -63,7 +73,7 @@ does not delegate, and frontend design changes still require `cs-frontend-lead` 
 
 ## Endorsed Pattern: Parallel Fan-Out with Merge
 
-`cs-team-build`, `cs-team-review` and `cs-team-refactor` are the sanctioned team skills that sequence multiple personas. They issue fan-outs from the skill layer; the two scoped Cocos dispatch pairs above are the only persona-to-persona exceptions.
+`cs-team-build`, `cs-team-review` and `cs-team-refactor` are the sanctioned team skills that sequence multiple personas. They issue fan-outs from the skill layer; the two fixed lead/worker pairs above are the only persona-to-persona exceptions. A skill's implementation or repair step belongs to the worker when a lead owns the task; it cannot override the lead's role boundary.
 
 All three team workflows remain manual-only. The host executes their protocol and is not bound to any persona. Team Refactor reads an existing project and writes only its `Idea/` proposal and `tasks/` evidence; it neither changes target code nor invokes Team Build/Review. `cs-architect` retains Team Build decomposition, structural implementation and architecture consultation; in Team Refactor it proposes architecture and migration tasks without writing accepted ADRs. `cs-code-reviewer` retains the independent five-axis code first pass. `cs-review-advisor` proposes classification/assignment, reviews plans/designs, and gives focused recommendations and synthesis; these proposals do not grant orchestration or adjudication authority. Its private resources belong only to that role and are not public skills or another persona's roster.
 
@@ -99,8 +109,8 @@ their own final-step contract.
 
 ## Anti-Patterns
 
-- **Router Persona:** General persona selection belongs to AGENTS.md intent mapping; the two leads' fixed Cocos workers are the scoped exceptions above.
-- **Chain of Personas:** Keep Cocos dispatch to each lead and its assigned execution-only worker; other multi-role sequencing belongs to the host/skills.
+- **Router Persona:** General persona selection belongs to AGENTS.md intent mapping; the two leads' fixed workers are the scoped exceptions above.
+- **Chain of Personas:** Keep implementation dispatch to each lead and its assigned execution-only worker; other multi-role sequencing belongs to the host/skills.
 - **Persona Override of User Intent:** A persona should never make orchestration decisions without user approval.
 
 ## Persona Resolution

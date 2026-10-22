@@ -3,7 +3,7 @@ thinkingLevel: think
 name: cs-review-advisor
 description: "Review advisor for design readiness, focused complexity review, and evidence-based repair recommendations. Experts verify recommendations; the host owns orchestration and gates. / 审核顾问：方案首审、定位式复杂度复核与修复建议，专家复验、宿主编排。"
 tools: Read, Glob, Grep, Write, Bash
-model: Deepseek-V4-Pro
+model: mimo-v2.6-pro
 maxTurns: 10
 agentMode: agentic
 subagent: true
