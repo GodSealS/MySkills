@@ -18,6 +18,7 @@ is unclear; load the chosen skill, not every related skill or reference.
 | Implement several verifiable outcomes | `cs-incremental` |
 | Choose the smallest implementation / simplify existing code | `cs-minimal` / `cs-simplify` |
 | UI / public interfaces / executable behavior tests | `cs-frontend-ui` / `cs-api-design` / `cs-tdd` |
+| UI screenshot plus function notes → DESIGN.md / DESIGN.md → screen | `cs-ui-spec-from-image` / `cs-ui-generator` |
 | Browser verification / failures | `cs-browser-test` / `cs-debugging` |
 | Code review / concrete security or performance concerns | `cs-code-review` / `cs-security` / `cs-perf-opt` |
 | High-risk, unproven assumptions / framework fact verification | `cs-doubt-driven` / `cs-source-driven` |

@@ -1,0 +1,3 @@
+interface:
+  display_name: "CS UI Spec From Image"
+  short_description: "Extract a reproduction-ready DESIGN."

@@ -298,11 +298,29 @@ Run `python scripts/test-img2threejs.py --builder powershell` or
 and Forge CLI checks, including descriptor-only output and terminal state closure.
 These checks do not claim browser reconstruction, texture baking or Blender repair.
 
+### Screenshot UI reproduction
+
+`cs-ui-spec-from-image` records screenshot geometry, exact copy, component
+bindings, assets/fonts and annotated interactions in `DESIGN.md`. Missing facts
+stay explicit; an explicitly static-only request does not need invented behavior.
+`cs-ui-generator` distinguishes reproducing those screens from designing a new
+screen in the same system, then runs the actual target and records comparison,
+interaction checks and remaining gaps in `UI-VERIFICATION.md`.
+
+Python + Pillow enable the bundled point/region color sampler and screenshot
+comparison helper (side-by-side, overlay, difference image and JSON pixel gate).
+Browser/engine tools provide actual runtime captures. Pixel screening and static
+validation alone do not establish reproduction fidelity; unavailable runtime or
+missing resources remain explicit `PARTIAL`/`BLOCKED` results. See the shared
+[`DESIGN.md` contract](.codebuddy/references/cs-design-md-contract.md).
+Run `python -B -m unittest discover -s tests -p test_ui_reproduction_tools.py` for
+the deterministic image-tool checks; these are not an end-to-end UI playtest.
+
 ### Public skills
 
-Define: cs-interview-me, cs-idea-refine, cs-grill-me, cs-spec-driven
+Define: cs-interview-me, cs-idea-refine, cs-grill-me, cs-spec-driven, cs-ui-spec-from-image
 Plan: cs-planning
-Build: cs-incremental, cs-minimal, cs-tdd, cs-context-eng, cs-source-driven, cs-doubt-driven, cs-frontend-ui, cs-api-design, cs-img2threejs
+Build: cs-incremental, cs-minimal, cs-tdd, cs-context-eng, cs-source-driven, cs-doubt-driven, cs-frontend-ui, cs-api-design, cs-img2threejs, cs-ui-generator
 Verify: cs-browser-test, cs-debugging
 Review: cs-code-review, cs-simplify, cs-security, cs-perf-opt
 Manual only: cs-team-build (explicit skill or `/cs-team-coding`), cs-team-review (explicit skill or `/cs-team-review`), cs-team-refactor (explicit skill or `/cs-team-refactor`; evidence-based diagnosis and staged refactor/performance plan)

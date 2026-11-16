@@ -1,0 +1,3 @@
+interface:
+  display_name: "CS UI Generator"
+  short_description: "Generate and verify UI from DESIGN."
