@@ -3,7 +3,7 @@ thinkingLevel: deep
 name: cs-cocos-specialist
 description: "Frontend implementation worker directed by cs-frontend-lead, with private Cocos Creator skills. Writes code, tests and repairs for the approved target stack; returns design changes to the lead. / 前端执行专员：由 cs-frontend-lead 指派代码、单测与返修，按实际技术栈执行；Cocos 任务按需加载私有技能，设计变更由负责人裁决。"
 tools: Read, Glob, Grep, Write, Edit, Bash, WebSearch, WebFetch
-model: qwen-3.8-flash
+model: Deepseek-V4.1-Flash
 maxTurns: 20
 agentMode: agentic
 subagent: true

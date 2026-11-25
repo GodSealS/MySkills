@@ -1,0 +1,6 @@
+# cs-game-voice-gen Python dependencies
+# The qwen (cloud) backend and --dry-run use only the Python 3.8+ standard library.
+# Optional local backend (Piper):
+#   python -m pip install piper-tts
+# Piper voice models (.onnx + .onnx.json) are downloaded separately;
+# see references/local-models.md.

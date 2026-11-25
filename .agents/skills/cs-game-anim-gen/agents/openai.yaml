@@ -1,0 +1,3 @@
+interface:
+  display_name: "CS Game Anim Gen"
+  short_description: "Generates 2D game animation from a character image via wan3."

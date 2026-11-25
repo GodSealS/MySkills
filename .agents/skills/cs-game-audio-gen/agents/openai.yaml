@@ -1,0 +1,3 @@
+interface:
+  display_name: "CS Game Audio Gen"
+  short_description: "Generates game music and sound effects locally via ACE-Step, with an optional reference-audio style guide."

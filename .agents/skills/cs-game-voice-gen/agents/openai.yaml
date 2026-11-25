@@ -1,0 +1,3 @@
+interface:
+  display_name: "CS Game Voice Gen"
+  short_description: "Generates game character voice lines via qwen-audio-3."

@@ -1,0 +1,8 @@
+# cs-game-audio-gen Python dependencies
+# gen_audio.py and --dry-run use only the Python 3.8+ standard library.
+# The generation backend is a local ACE-Step 1.5 REST API server that you
+# install and start separately (torch + CUDA live in its own environment):
+#   git clone https://github.com/ACE-Step/ACE-Step-1.5.git && cd ACE-Step-1.5 && uv sync
+#   .venv\Scripts\python.exe -m acestep.api_server --host 127.0.0.1 --port 8001
+# Model weights (acestep-v15-turbo + acestep-5Hz-lm-0.6B + vae) auto-download
+# on first run; see references/local-models.md for VRAM tiers and mirrors.

@@ -298,6 +298,27 @@ Run `python scripts/test-img2threejs.py --builder powershell` or
 and Forge CLI checks, including descriptor-only output and terminal state closure.
 These checks do not claim browser reconstruction, texture baking or Blender repair.
 
+### Character image to 2D animation
+
+`cs-game-anim-gen` turns a character image plus an animation context into 2D game
+animation through `wan3.0-video` on the Token Plan video endpoint: a locked-camera
+MP4, uniform-canvas RGBA frames, a packed sprite sheet, a looping GIF preview and
+`manifest.json` (fps, cell, grid, loop, metrics). Loop cycles close by sending the
+character as both first and last frame. Cutout is `rembg` (painted scenes), `matte`
+(a dependency-free border-connected color key) or `none`; `--scale`/`--colors`
+deliver pixel-art sheets on one shared palette. The paid video stage and the
+zero-cost post-processing stages are separate CLI stages, so sampling can be
+re-run without re-paying; `--submit-only`/`--task-id` make generation asynchronous
+and resumable, and `--edit-from`/`--extend-from` revise an existing clip through
+`reference_video` (URL-only, 24 h sidecar). Sprite fps is quantized to
+`source_fps / integer step` and the real rate is recorded in the manifest.
+Skeletal/Spine export is a recorded ROADMAP increment whose v2 entry is a 2D-vs-3D
+pose-track comparison report; this version does not touch engine project files.
+Run `python -B -m unittest discover -s tests -p "test_game_anim_gen*.py"` for the
+offline contract checks; they cover the async task protocol, submit/resume,
+edit/extend payloads, argument guards, sampling math, cutout and the frame/sheet
+round trip — not live generation.
+
 ### Screenshot UI reproduction
 
 `cs-ui-spec-from-image` records screenshot geometry, exact copy, component
@@ -320,7 +341,7 @@ the deterministic image-tool checks; these are not an end-to-end UI playtest.
 
 Define: cs-interview-me, cs-idea-refine, cs-grill-me, cs-spec-driven, cs-ui-spec-from-image
 Plan: cs-planning
-Build: cs-incremental, cs-minimal, cs-tdd, cs-context-eng, cs-source-driven, cs-doubt-driven, cs-frontend-ui, cs-api-design, cs-img2threejs, cs-ui-generator
+Build: cs-incremental, cs-minimal, cs-tdd, cs-context-eng, cs-source-driven, cs-doubt-driven, cs-frontend-ui, cs-api-design, cs-img2threejs, cs-ui-generator, cs-game-image-gen, cs-game-anim-gen, cs-game-voice-gen, cs-game-audio-gen
 Verify: cs-browser-test, cs-debugging
 Review: cs-code-review, cs-simplify, cs-security, cs-perf-opt
 Manual only: cs-team-build (explicit skill or `/cs-team-coding`), cs-team-review (explicit skill or `/cs-team-review`), cs-team-refactor (explicit skill or `/cs-team-refactor`; evidence-based diagnosis and staged refactor/performance plan)

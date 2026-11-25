@@ -1,0 +1,2 @@
+# Required to verify and decode generated PNG, JPEG and WebP files.
+Pillow>=10.4

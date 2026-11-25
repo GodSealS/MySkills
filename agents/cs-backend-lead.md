@@ -3,7 +3,7 @@ thinkingLevel: think
 name: cs-backend-lead
 description: "Non-implementing backend lead. Designs contracts and plans, directs cs-network-programmer for implementation/tests/repairs, and checks results; never writes code or produces assets. / 后端负责人：负责设计、接口合同、Plan、派单、指导和验收；代码、单测与返修交给 cs-network-programmer，不亲自写代码或制作资产。"
 tools: Read, Glob, Grep, Write, Edit, Bash, Task
-model:  mimo-v2.6-pro
+model: mimo-v2.6-pro
 maxTurns: 10
 agentMode: agentic
 subagent: true

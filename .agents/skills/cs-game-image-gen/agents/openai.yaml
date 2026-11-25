@@ -1,0 +1,3 @@
+interface:
+  display_name: "CS Game Image Gen"
+  short_description: "Generates game concept art via Qianwen platform Token Plan image models (Wan"

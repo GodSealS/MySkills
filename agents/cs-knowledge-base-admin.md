@@ -3,7 +3,7 @@ thinkingLevel: think
 name: cs-knowledge-base-admin
 description: "Low-cost knowledge-base administrator that refreshes only existing project knowledge bases without creating, installing, or repairing them. / 低成本知识库管理员：只更新项目中已存在的知识库，绝不创建、安装或修复知识库。"
 tools: Read, Glob, Grep, Write, Edit, Bash
-model: Deepseek-V4.1-Flash
+model: deepseek-v4.1-flash
 maxTurns: 6
 agentMode: agentic
 subagent: true
